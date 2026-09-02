@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BookMaker – Trainer</title>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
+<script>
+    // Simple check if markdown-it loaded
+    if (typeof window.markdownit === 'undefined') {
+        console.warn('markdown-it not loaded from CDN - please check your internet connection');
+    }
+</script>
+<style>
+:root {
+    --bubblefontcolor: #3a5568;
+    --bookfontcolor: #3a5568;
+}
+
+* {
+    font-size: 1.0rem;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: auto;
+}
+body {
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    color: #000000;
+    line-height: 1.2;
+    background: transparent !important;
+}
+.builder {
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.3rem;
+    margin: 0;
+    background: transparent !important;
+}
+
+/* ===== TABS ===== */
+.tab-container {
+    display: flex;
+    flex-wrap: wrap; 
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 0.5rem;
+    gap: 0.2rem;      /* ← ADD THIS (optional) */
+}
+.tab {
+    padding: 0.3rem 1rem;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--bubblefontcolor);
+    font-weight: bold;
+    transition: all 0.3s ease;
+    margin-right: 0.2rem;
+}
+.tab:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+.tab.active {
+    background: rgba(255, 255, 255, 0.3);
+    border-bottom: 3px solid #4fc3f7;
+}
+.tab-panel {
+    display: none;
+    padding: 0.3rem 0;
+}
+.tab-panel.active {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+    min-height: 100px;
+}
+.form-page {
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.2rem;
+    margin-bottom: 0.3rem;
+    background: rgba(225, 236, 225);
+}
+
+.glassbtn {
+    background: rgba(0, 0, 0, 0.15) !important;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    padding: 2px 8px;
+    margin: 2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--bubblefontcolor);
+    display: inline-block;
+    font-size: 1.0rem !important;
+}
+.glassbtn:hover {
+    background: rgba(0, 0, 0, 0.4) !important;
+}
+
+.builder label,
+.field-group label {
+    font-size: 1.0rem !important;
+    font-weight: normal !important;
+    display: block;
+    margin-bottom: 0.1rem;
+    color: var(--bubblefontcolor);
+}
+
+input, select, textarea {
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 0.15rem 0.3rem;
+    color: #000;
+    background: rgba(255,255,255,0.9);
+    font-size: 1.0rem !important;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+textarea {
+    resize: vertical;
+    overflow-y: auto;
+    min-height: 40px;
+}
+
+button {
+    background: #4fc3f7;
+    border: none;
+    border-radius: 12px;
+    padding: 0.15rem 0.6rem;
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--bubblefontcolor);
+    font-size: 1.0rem !important;
+}
+button:hover { background: #2fa0d0; }
+
+.field-group {
+    margin-bottom: 0.4rem;
+}
+
+.flex-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.flex-row > * {
+    flex: 1 1 200px;
+    min-width: 150px;
+}
+
+.error {
+    color: #e11d48;
+    font-size: 0.8rem;
+    margin-top: 0.1rem;
+}
+
+.color-control-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.1rem;
+}
+.color-control-row input[type="color"] {
+    width: 36px;
+    height: 30px;
+    padding: 0;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+}
+.color-control-row input[type="text"] {
+    width: 80px;
+    font-family: monospace;
+}
+.color-control-row label {
+    font-size: 0.85rem !important;
+    font-weight: normal !important;
+    margin: 0 !important;
+    display: inline !important;
+}
+.color-control-row div {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+/* ===== SECTION DIVIDER with border ===== */
+.section-divider {
+    font-weight: bold;
+    margin: 0.3rem 0 0.2rem 0;
+    color: var(--bubblefontcolor);
+    font-size: 0.95rem;
+    border-left: 2px solid #4fc3f7;
+    padding-left: 0.3rem;
+}
+
+/* ===== RAISED PANEL with white border ===== */
+.RaisedPnl {
+    background: rgba(225, 236, 225);
+    color: var(--bookfontcolor, #b0e0ff);
+    border-radius: 4px;
+    padding: 0.3rem;
+    margin-top: 0.3rem;
+    margin-bottom: 0.3rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ===== WHITE BORDERED SECTION ===== */
+.section-border {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    padding: 0.3rem;
+    margin-bottom: 0.3rem;
+    background: rgba(225, 236, 225);
+}
+
+/* ===== WHITE BORDERED CONTENT GROUP ===== */
+.content-group {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    padding: 0.3rem;
+    margin-top: 0.2rem;
+    margin-bottom: 0.2rem;
+    background: rgba(225, 236, 225);
+}
+
+#outputBubble {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    padding: 0.3rem;
+    border: 1px solid rgba(255,255,255,0.1);
+    display: none;
+    margin-top: 0.3rem;
+}
+#output {
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-family: monospace;
+    font-size: 0.85rem;
+}
+
+#previewContent {
+    background: rgba(0,0,0,0.1);
+    padding: 0.3rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    overflow: auto;
+    max-height: none;
+    font-family: monospace;
+    width: 100% !important;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+}
+
+#copyTagsFeedback, #convertStatus {
+    font-size: 0.85rem;
+    margin-top: 0.2rem;
+}
+
+/* ===== TEMPLATE DISPLAY ===== */
+#templateDisplay {
+    background: rgba(225, 236, 225);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    padding: 0.3rem;
+    margin-top: 0.3rem;
+    margin-bottom: 0.3rem;
+}
+#templateContent {
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-family: monospace;
+    font-size: 0.85rem;
+    background: rgba(255,255,255,0.3);
+    padding: 0.3rem;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.template-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 0.3rem;
+}
+
+/* ===== INSTRUCTION BUBBLE ===== */
+.instruction-bubble {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 0.5rem 0.8rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--bubblefontcolor);
+    line-height: 1.4;
+}
+.instruction-bubble .emoji {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+}
+.instruction-bubble .text {
+    flex: 1;
+}
+.instruction-bubble .text strong {
+    color: #4fc3f7;
+}
+
+/* ===== INFO CARD MODAL ===== */
+/* ===== INFO CARD MODAL ===== */
+#infoCardOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+/* When the overlay is shown, use flex to center the card */
+#infoCardOverlay.active {
+    display: flex !important;
+    overflow: hidden;
+}
+
+#infoCard {
+    margin: auto;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    color: #3a5568;
+    font-family: Arial, sans-serif;
+    background: rgb(204, 216, 204);
+    border: 2px solid #9aa1a0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    border-radius: 8px;
+    padding: 20px !important;
+    width: 60vw;
+    max-width: 70vw;
+    max-height: 70vh; 
+    overflow-y: auto;
+
+    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;  /* IE/Edge */
+}
+
+#infoCard::-webkit-scrollbar {
+    display: none;  /* Chrome/Safari/Opera */
+}
+
+/* ===== GLASS BUTTONS INSIDE THE MODAL ===== */
+#infoCard .glassbtn {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #044224 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset !important;
+    padding: 6px 16px !important;
+    font-size: 0.95rem !important;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#infoCard .glassbtn:hover {
+    background: rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6),
+                0 0 0 2px rgba(255, 255, 255, 0.2) inset !important;
+    transform: scale(1.02);
+}
+
+/* Button container inside the modal */
+#infoCard .modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ===== STEP 2: MARKDOWN CONTENT STYLES (one line each) ===== */
+/* ============================================================
+   GLOBAL TABLE & LIST STYLES - One line per item
+   ============================================================ */
+
+/* ===== BASE TABLE STYLES ===== */
+table { width: 100%; max-width: 100%; table-layout: fixed; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; border-collapse: collapse; margin: 0.8em 0; font-size: 0.9em; border: 1px solid #ddd; display: table; box-sizing: border-box; }
+th, td { border: 1px solid #ddd; padding: 0.4em 0.6em; text-align: left; max-width: 200px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; vertical-align: top; box-sizing: border-box; }
+th { background: #f7faf9; font-weight: 600; }
+
+/* ===== TABLE CONTAINER ===== */
+.table-container { width: 100%; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0.5em 0; box-sizing: border-box; }
+.table-container::-webkit-scrollbar { height: 6px; }
+.table-container::-webkit-scrollbar-thumb { border-radius: 4px; background: rgba(0,0,0,0.2); }
+.table-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }
+
+/* ===== BASE LIST STYLES ===== */
+ul, ol { margin: 0.6em 0 0.6em 1.8em; padding-left: 0.5em; }
+li { margin: 0.2em 0; line-height: 1.6; }
+ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
+
+/* ===== INTRO CONTENT OVERRIDES ===== */
+#introContent table { font-size: 0.9em; }
+#introContent th, #introContent td { max-width: 200px; }
+#introContent ul, #introContent ol { margin: 0.6em 0 0.6em 1.8em; }
+#introContent li { margin: 0.2em 0; line-height: 1.6; }
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 768px) { table { font-size: 0.75em; } th, td { padding: 0.3em 0.4em; max-width: 120px; word-break: break-all; } .table-container { overflow-x: auto; } }
+@media (max-width: 415px) { table { font-size: 0.65em; } th, td { padding: 0.2em 0.3em; max-width: 80px; word-break: break-all; } }
+
+/* ===== BOOK9 SPECIFIC ===== */
+.page table, .page .table-container table { width: 100%; max-width: 100%; table-layout: fixed; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; }
+.page th, .page td { max-width: 150px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; }
+.page ul, .page ol { margin: 0.6em 0 0.6em 1.8em; }
+.page li { margin: 0.2em 0; line-height: 1.6; }
+
+/* ===== DESIGNER SPECIFIC ===== */
+#previewContent table, #previewContent .table-container table { width: 100%; max-width: 100%; table-layout: fixed; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; }
+#previewContent th, #previewContent td { max-width: 150px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; }
+#previewContent ul, #previewContent ol { margin: 0.6em 0 0.6em 1.8em; }
+#previewContent li { margin: 0.2em 0; line-height: 1.6; }
+#previewContent th, #previewContent td { max-width: 150px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; }
+
+@media (max-width: 415px) {
+    .builder {
+        padding: 0.2rem;
+    }
+    .form-page {
+        padding: 0.2rem;
+    }
+    .RaisedPnl {
+        padding: 0.3rem !important;
+    }
+    .section-border {
+        padding: 0.2rem;
+    }
+    .content-group {
+        padding: 0.2rem;
+    }
+    .color-control-row input[type="color"] {
+        width: 30px !important;
+        height: 26px !important;
+    }
+    .color-control-row input[type="text"] {
+        width: 60px !important;
+    }
+    .flex-row {
+        gap: 0.3rem;
+    }
+    .flex-row > * {
+        flex: 1 1 100%;
+        min-width: 100%;
+    }
+    input, select, textarea {
+        font-size: 0.9rem !important;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="builder">
+    <h3>📘 BookMaker – Trainer</h3>
+
+    <!-- ===== MAIN FORM PAGE ===== -->
+    <div class="form-page">
+
+        <!-- ===== TABS ===== -->
+        <div class="tab-container">
+            <div class="tab active" data-tab="about">ℹ️ About</div>
+            <div class="tab" data-tab="intro">📖 Introduction</div>
+            <div class="tab" data-tab="config">⚙️ Config Registry</div>
+            <div class="tab" data-tab="custom">🏷️ Custom Tags</div>
+            <div class="tab" data-tab="tobj">🎨 TOBj</div>
+            <div class="tab" data-tab="markdown">📝 Markdown</div>
+        </div>
+
+        <!-- ===== TAB 0: ABOUT ===== -->
+        <div class="tab-panel active" id="panel-about">
+            <div class="section-border">
+                <div class="section-divider">📘 About BookMaker Trainer</div>
+                <div class="content-group">
+                    <p style="margin: 0.3rem 0; line-height: 1.6; color: var(--bubblefontcolor);">
+                        This training manual explains the core components of the BookMaker system. 
+                        Use this as a reference to understand how to configure, style, and structure your manuscript.
+                    </p>
+                    
+                    <div style="margin: 0.5rem 0; padding: 0.3rem 0.5rem; background: rgba(79,195,247,0.08); border-radius: 6px;">
+                        <div style="font-weight: bold; color: var(--bubblefontcolor); margin-bottom: 0.2rem;">⚙️ Config Registry</div>
+                        <p style="margin: 0.1rem 0; font-size: 0.9rem; color: #444; line-height: 1.5;">
+                            Lists all available <strong>configuration tags</strong> that control book metadata, colors, 
+                            pagination, and display options. Each tag is defined in the <strong>CONFIG_SCHEMA</strong> 
+                            and can be placed at the top of your .md file.
+                        </p>
+                    </div>
+
+                    <div style="margin: 0.5rem 0; padding: 0.3rem 0.5rem; background: rgba(79,195,247,0.08); border-radius: 6px;">
+                        <div style="font-weight: bold; color: var(--bubblefontcolor); margin-bottom: 0.2rem;">🎨 TOBj</div>
+                        <p style="margin: 0.1rem 0; font-size: 0.9rem; color: #444; line-height: 1.5;">
+                            <strong>TOBj (Text Object Builder)</strong> is a powerful styling syntax that allows you to apply 
+                            inline, block, and inline-block styles to any text or paragraph. The <strong>REG_ATTR</strong> 
+                            registry defines all available TOBj items, grouped by type (block, inlineblock, inline) 
+                            and category (alignment, background, spacing, typography, etc.).
+                        </p>
+                    </div>
+
+                    <div style="margin: 0.5rem 0; padding: 0.3rem 0.5rem; background: rgba(79,195,247,0.08); border-radius: 6px;">
+                        <div style="font-weight: bold; color: var(--bubblefontcolor); margin-bottom: 0.2rem;">📝 Markdown</div>
+                        <p style="margin: 0.1rem 0; font-size: 0.9rem; color: #444; line-height: 1.5;">
+                            BookMaker supports a <strong>superset of Markdown</strong>, including tables, lists, headings, 
+                            emphasis, and custom tags. Learn which HTML tags are supported, how to use 
+                            <strong>Chapter</strong> and <strong>Section</strong> markers, and how to structure your 
+                            manuscript for automatic pagination and TOC generation.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== INSTRUCTION BUBBLE ===== -->
+            <div class="instruction-bubble" style="margin-top: 0.5rem;">
+                <span class="emoji">🚀</span>
+                <div class="text">
+                    <strong>Start here:</strong> The <strong>Config Registry</strong> tab shows all available settings. 
+                    Use <strong>TOBj</strong> to style your text, and format your manuscript using <strong>Markdown</strong> 
+                    with custom tags. Each tab explains the syntax and shows examples.
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TAB 1: INTRODUCTION ===== -->
+        <!-- ===== TAB 1: INTRODUCTION ===== -->
+        <div class="tab-panel" id="panel-intro">
+            <div class="section-border">
+                <div class="section-divider">📖 Introduction to BookMaker</div>
+                <div class="content-group">
+                    <p style="font-size: 0.95rem; color: var(--bubblefontcolor, #3a5568); margin: 0 0 0.5rem 0;">
+                        Welcome to BookMaker! This guide covers everything you need to know to get started with styling, configuring, and structuring your manuscript.
+                    </p>
+                </div>
+            </div>
+
+            <!-- ===== INTRO CONTENT RENDERED FROM INTRO.MD ===== -->
+            <div class="section-border">
+                <div class="section-divider">📚 User Guide</div>
+                <div class="content-group">
+                    <div id="introContent" style="padding: 1rem; background: rgba(255,255,255,0.95); border-radius: 8px; min-height: 300px; max-height: 70vh; overflow-y: auto; color: #2d3748; line-height: 1.7;">
+                        <!-- Populated by JavaScript from INTRO.md -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TAB 1: CONFIG REGISTRY ===== -->
+        <div class="tab-panel" id="panel-config">
+            <div class="section-border">
+                <div class="section-divider">⚙️ CONFIG_SCHEMA – All Available Tags</div>
+                <div class="content-group">
+                    <p style="font-size: 0.9rem; color: var(--bubblefontcolor, #3a5568); margin: 0 0 0.5rem 0;">
+                        BookMaker supports configuration tags for book metadata, styling, and behavior.
+                        Click any tag below to view its full documentation.
+                    </p>
+                </div>
+            </div>
+
+            <!-- ===== REG_CONFIG REFERENCE (clickable labels) ===== -->
+            <div class="section-border">
+                <div class="section-divider">📋 Complete REG_CONFIG Reference</div>
+                <div class="content-group">
+                    <div id="regConfigContainer" style="padding: 0.5rem; background: rgba(255,255,255,0.2); border-radius: 8px; min-height: 50px;">
+                        <!-- Populated by JavaScript with clickable labels -->
+                    </div>
+                    <div id="regConfigStatus" style="font-size: 0.85rem; margin-top: 0.3rem; color: var(--bubblefontcolor);"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TAB: CUSTOM TAGS ===== -->
+        <div class="tab-panel" id="panel-custom">
+            <div class="section-border">
+                <div class="section-divider">🏷️ Custom Tags – Reference</div>
+                <div class="content-group">
+                    <p style="font-size: 0.9rem; color: var(--bubblefontcolor, #3a5568); margin: 0 0 0.5rem 0;">
+                        BookMaker supports custom tags for structure, styling, and interactivity. 
+                        Click any tag below to view its full documentation.
+                    </p>
+                </div>
+            </div>
+
+            <!-- ===== REG_TAG REFERENCE (clickable labels) ===== -->
+            <div class="section-border">
+                <div class="section-divider">📋 Complete REG_TAG Reference</div>
+                <div class="content-group">
+                    <div id="regTagContainer" style="padding: 0.5rem; background: rgba(255,255,255,0.2); border-radius: 8px; min-height: 50px;">
+                        <!-- Populated by JavaScript with clickable labels -->
+                    </div>
+                    <div id="regTagStatus" style="font-size: 0.85rem; margin-top: 0.3rem; color: var(--bubblefontcolor);"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ===== TAB 2: TOBj ===== -->
+        <div class="tab-panel" id="panel-tobj">
+            <div class="section-border">
+                <div class="section-divider">🎨 TOBj – Text Object Builder</div>
+                <div class="content-group">
+                    <p style="font-size: 0.9rem; color: var(--bubblefontcolor, #3a5568); margin: 0 0 0.5rem 0;">
+                        <strong>TOBj</strong> is a styling syntax that lets you apply CSS styles to text. 
+                        The format is: <br><code style="font-size: 1.3rem; color: darkGreen; padding-left: 4em;"> <strong>{[ item1; item2; ... ]} [[Your text]]</strong></code>
+                    </p>
+                    <p style="font-size: 0.9rem; color: var(--bubblefontcolor, #3a5568); margin: 0 0 0.5rem 0;">
+                        <strong>Items</strong> can be <strong>block</strong> (<code>__</code>), <strong>inline-block</strong> (<code>__i</code>), 
+                        or <strong>inline</strong> (<code>_</code>) styles. Some items accept parameters: 
+                        <code>_color(red)</code>, <code>_fontsize(1.5)</code>, <code>__bgcolor(#ffeeee)</code>.
+                    </p>
+                    <p style="font-size: 0.9rem; color: var(--bubblefontcolor, #3a5568); margin: 0 0 0.5rem 0;">
+                        <strong>Examples:</strong>
+                    </p>
+                    <ul style="font-size: 0.9rem; color: var(--bubblefontcolor, #3a5568); margin: 0.2rem 0 0.5rem 1.5rem; line-height: 1.6;">
+                        <li><code style="font-size: 0.8rem;" >{[_bold; _color(#e74c3c)]} [[Important text]]</code></li>
+                        <li><code style="font-size: 0.8rem;" >{[__bgcolor(#f0f0f0); __padding(1rem); _italic]} [[Highlighted paragraph]]</code></li>
+                        <li><code style="font-size: 0.8rem;" >{[_fontsize(1.8); _fontfamily(Georgia); __center]} [[Chapter Title]]</code></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ===== REG_ATTR REFERENCE ===== -->
+            <div class="section-border">
+                <div class="section-divider">📋 Complete REG_ATTR Reference</div>
+                <div class="content-group">
+                    <p style="font-size: 0.9rem; color: #444; margin: 0 0 0.5rem 0;">
+                        Click any item below to view its full documentation.
+                    </p>
+                    <div id="regAttrContainer" style="padding: 0.5rem; background: rgba(255,255,255,0.2); border-radius: 8px; min-height: 50px;">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                    <div id="regAttrStatus" style="font-size: 0.85rem; margin-top: 0.3rem; color: var(--bubblefontcolor);"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TAB 3: MARKDOWN ===== -->
+        <div class="tab-panel" id="panel-markdown">
+            <div class="section-border">
+                <div class="section-divider">📝 REG_MARKDOWN – Syntax Reference</div>
+                <div class="content-group">
+                    <p style="font-size: 0.9rem; color: var(--bubblefontcolor, #3a5568); margin: 0 0 0.5rem 0;">
+                        BookMaker supports standard Markdown syntax. Click any item below to view its full documentation.
+                    </p>
+                </div>
+            </div>
+
+            <!-- ===== REG_MARKDOWN REFERENCE (clickable labels) ===== -->
+            <div class="section-border">
+                <div class="section-divider">📋 Complete REG_MARKDOWN Reference</div>
+                <div class="content-group">
+                    <div id="regMarkdownContainer" style="padding: 0.5rem; background: rgba(255,255,255,0.2); border-radius: 8px; min-height: 50px;">
+                        <!-- Populated by JavaScript with clickable labels -->
+                    </div>
+                    <div id="regMarkdownStatus" style="font-size: 0.85rem; margin-top: 0.3rem; color: var(--bubblefontcolor);"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+    <!-- ===== INFO CARD MODAL ===== -->
+    <div id="infoCardOverlay">
+        <div id="infoCard">
+            <div id="infoCardContent">
+                <!-- Populated by JavaScript -->
+            </div>
+            <div class="modal-actions">
+                <button id="copyExampleBtn" class="glassbtn">📋 Copy Example</button>
+                <button id="closeInfoCardBtn" class="glassbtn">❌ Close</button>
+            </div>
+        </div>
+    </div>
+
+
+<script>
+
+//-->>
+// Set to null to auto-detect
+    // ->> API router
+    // Determine which API to use
+    // const BASE_URL = 'http://127.0.0.1:5000';
+
+    //AUtodetect
+    // Auto-detect for trainer
+    // const BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    //    ? 'http://127.0.0.1:5000'
+    //    : 'https://grantherwright.pythonanywhere.com';
+
+    //PythonANywhere - GrantherWright
+     const BASE_URL = 'https://grantherwright.pythonanywhere.com';
+     window.BASE_URL = BASE_URL;  // Make it global
+
+    console.log('🔴 BASE_URL:', BASE_URL);
+
+// ============================================================
+// REG_ATTR - Loaded from shared reg_attr_trainer.json
+// ============================================================
+let REG_ATTR = {};
+
+// Fallback in case the JSON file can't be loaded
+const FALLBACK_REG_ATTR = {
+    "__left": {"type":"block","css":"text-align: left","validate":"none","regex":null,"group":"alignment","control":"toggle","label":"Left","default":null,"category":"Alignment","syntax":"__left","purpose":"Align text to the left","arguments":"None","validation":"none","allowed_content":"Block-level elements","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[_bold; __left]} [[Left-aligned bold text]]","result":"Left-aligned bold text"},
+    "__center": {"type":"block","css":"text-align: center","validate":"none","regex":null,"group":"alignment","control":"toggle","label":"Center","default":null,"category":"Alignment","syntax":"__center","purpose":"Center-align text","arguments":"None","validation":"none","allowed_content":"Block-level elements","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[_italic; __center]} [[Centered italic text]]","result":"Centered italic text"},
+    "__right": {"type":"block","css":"text-align: right","validate":"none","regex":null,"group":"alignment","control":"toggle","label":"Right","default":null,"category":"Alignment","syntax":"__right","purpose":"Right-align text","arguments":"None","validation":"none","allowed_content":"Block-level elements","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[_bold; __right]} [[Right-aligned bold text]]","result":"Right-aligned bold text"},
+    "__center_block": {"type":"block","css":"display: block; margin-left: auto; margin-right: auto; width: fit-content;","validate":"none","regex":null,"group":"alignment","control":"toggle","label":"Center Block","default":null,"category":"Alignment","syntax":"__center_block","purpose":"Center a block element using auto margins","arguments":"None","validation":"none","allowed_content":"Block elements","restrictions":"Width must be fit-content or explicit","defaults":"None","rules":"None","errors":"None","example":"{[__center_block]} [[Centered block]]","result":"A centered block"},
+    "__float_left": {"type":"block","css":"float: left; margin-right: 1em;","validate":"none","regex":null,"group":"alignment","control":"toggle","label":"Float Left","default":null,"category":"Alignment","syntax":"__float_left","purpose":"Float element to the left with right margin","arguments":"None","validation":"none","allowed_content":"Block elements","restrictions":"May not work within certain containers","defaults":"None","rules":"None","errors":"None","example":"{[__float_left]} [[Float left text]]","result":"Text floated left"},
+    "__float_right": {"type":"block","css":"float: right; margin-left: 1em;","validate":"none","regex":null,"group":"alignment","control":"toggle","label":"Float Right","default":null,"category":"Alignment","syntax":"__float_right","purpose":"Float element to the right with left margin","arguments":"None","validation":"none","allowed_content":"Block elements","restrictions":"May not work within certain containers","defaults":"None","rules":"None","errors":"None","example":"{[__float_right]} [[Float right text]]","result":"Text floated right"},
+    "__bgcolor": {"type":"block","css":"background-color: {value}","validate":"color","regex":"RE_COLOR_PATTERN","group":"background","control":"color","label":"Bg Color:","default":"#eeeeee","category":"Background","syntax":"__bgcolor(value)","purpose":"Set background color for a block","arguments":"color","validation":"color","allowed_content":"Any block content","restrictions":"Must be a valid CSS color","defaults":"#eeeeee","rules":"None","errors":"Invalid color","example":"{[__bgcolor(#f0f0f0); __padding(1rem)]} [[Highlighted paragraph]]","result":"Paragraph with light gray background and padding"},
+    "__border": {"type":"block","css":"border: 1px solid currentColor; padding: 0.5em;","validate":"none","regex":null,"group":"background","control":"toggle","label":"Border","default":null,"category":"Background","syntax":"__border","purpose":"Add a border around a block","arguments":"None","validation":"none","allowed_content":"Any block content","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[__border; __rounded]} [[Bordered and rounded text]]","result":"Text with border and rounded corners"},
+    "__rounded": {"type":"block","css":"border-radius: 8px","validate":"none","regex":null,"group":"background","control":"toggle","label":"Rounded","default":null,"category":"Background","syntax":"__rounded","purpose":"Round corners of a block","arguments":"None","validation":"none","allowed_content":"Any block content","restrictions":"Works best with __border or __bgcolor","defaults":"None","rules":"None","errors":"None","example":"{[__bgcolor(#e8f4f8); __rounded; __padding(1rem)]} [[Rounded card]]","result":"Rounded card with background"},
+    "__shadow": {"type":"block","css":"box-shadow: 0 8px 25px rgba(0,0,0,0.4)","validate":"none","regex":null,"group":"background","control":"toggle","label":"Shadow","default":null,"category":"Background","syntax":"__shadow","purpose":"Add a shadow effect to a block","arguments":"None","validation":"none","allowed_content":"Any block content","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[__bgcolor(#ffffff); __shadow; __rounded]} [[Card with shadow]]","result":"Card with shadow and rounded corners"},
+    "__margin": {"type":"block","css":"margin: {value}","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Margin:","default":"1rem","placeholder":"margin","category":"Spacing","syntax":"__margin(value)","purpose":"Set margin on all sides","arguments":"size","validation":"css_size","allowed_content":"Any block content","restrictions":"Must be valid CSS size","defaults":"1rem","rules":"None","errors":"Invalid CSS size","example":"{[__margin(2rem); __bgcolor(#f9f9f9)]} [[Spaced paragraph]]","result":"Paragraph with 2rem margin and light background"},
+    "__margin_top": {"type":"block","css":"margin-top: {value}","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Margin Top:","default":"1rem","placeholder":"margin top","category":"Spacing","syntax":"__margin_top(value)","purpose":"Set top margin only","arguments":"size","validation":"css_size","allowed_content":"Any block content","restrictions":"Must be valid CSS size","defaults":"1rem","rules":"None","errors":"Invalid CSS size","example":"{[__margin_top(3rem)]} [[Paragraph with extra top space]]","result":"Paragraph with 3rem top margin"},
+    "__margin_bottom": {"type":"block","css":"margin-bottom: {value}","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Margin Bottom:","default":"1rem","placeholder":"margin bottom","category":"Spacing","syntax":"__margin_bottom(value)","purpose":"Set bottom margin only","arguments":"size","validation":"css_size","allowed_content":"Any block content","restrictions":"Must be valid CSS size","defaults":"1rem","rules":"None","errors":"Invalid CSS size","example":"{[__margin_bottom(2rem)]} [[Paragraph with extra bottom space]]","result":"Paragraph with 2rem bottom margin"},
+    "__margin_vertical": {"type":"block","css":"margin: {value} 0","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Margin Vertical:","default":"1rem","placeholder":"margin vertical","category":"Spacing","syntax":"__margin_vertical(value)","purpose":"Set top and bottom margin (horizontal margins 0)","arguments":"size","validation":"css_size","allowed_content":"Any block content","restrictions":"Must be valid CSS size","defaults":"1rem","rules":"None","errors":"Invalid CSS size","example":"{[__margin_vertical(1.5rem)]} [[Vertical space]]","result":"Paragraph with 1.5rem top and bottom margin"},
+    "__margin_horizontal": {"type":"block","css":"margin: 0 {value}","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Margin Horizontal:","default":"1rem","placeholder":"margin horizontal","category":"Spacing","syntax":"__margin_horizontal(value)","purpose":"Set left and right margin (vertical margins 0)","arguments":"size","validation":"css_size","allowed_content":"Any block content","restrictions":"Must be valid CSS size","defaults":"1rem","rules":"None","errors":"Invalid CSS size","example":"{[__margin_horizontal(10%)]} [[Horizontal space]]","result":"Paragraph with 10% left and right margin"},
+    "__padding": {"type":"block","css":"padding: {value}","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Padding:","default":"1rem","placeholder":"padding","category":"Spacing","syntax":"__padding(value)","purpose":"Set padding on all sides","arguments":"size","validation":"css_size","allowed_content":"Any block content","restrictions":"Must be valid CSS size","defaults":"1rem","rules":"None","errors":"Invalid CSS size","example":"{[__bgcolor(#e8f4f8); __padding(1.5rem)]} [[Padded box]]","result":"Box with 1.5rem padding and background"},
+    "__padding_vertical": {"type":"block","css":"padding: {value} 0","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Padding Vertical:","default":"1rem","placeholder":"padding vertical","category":"Spacing","syntax":"__padding_vertical(value)","purpose":"Set top and bottom padding (horizontal padding 0)","arguments":"size","validation":"css_size","allowed_content":"Any block content","restrictions":"Must be valid CSS size","defaults":"1rem","rules":"None","errors":"Invalid CSS size","example":"{[__bgcolor(#f0f0f0); __padding_vertical(1rem)]} [[Vertical padding]]","result":"Box with vertical padding only"},
+    "__padding_horizontal": {"type":"block","css":"padding: 0 {value}","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Padding Horizontal:","default":"1rem","placeholder":"padding horizontal","category":"Spacing","syntax":"__padding_horizontal(value)","purpose":"Set left and right padding (vertical padding 0)","arguments":"size","validation":"css_size","allowed_content":"Any block content","restrictions":"Must be valid CSS size","defaults":"1rem","rules":"None","errors":"Invalid CSS size","example":"{[__bgcolor(#f0f0f0); __padding_horizontal(2rem)]} [[Horizontal padding]]","result":"Box with horizontal padding only"},
+    "__width": {"type":"block","css":"width: {value}","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Width:","default":"100%","placeholder":"width","category":"Dimension","syntax":"__width(value)","purpose":"Set width of a block element","arguments":"size","validation":"css_size","allowed_content":"Any block content","restrictions":"Must be valid CSS size","defaults":"100%","rules":"None","errors":"Invalid CSS size","example":"{[__width(60%); __bgcolor(#f9f9f9)]} [[60% width box]]","result":"Box at 60% width with background"},
+    "__height": {"type":"block","css":"height: {value}","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Height:","default":"auto","placeholder":"height","category":"Dimension","syntax":"__height(value)","purpose":"Set height of a block element","arguments":"size","validation":"css_size","allowed_content":"Any block content","restrictions":"Must be valid CSS size","defaults":"auto","rules":"None","errors":"Invalid CSS size","example":"{[__height(200px); __bgcolor(#e8f4f8)]} [[200px height box]]","result":"Box with 200px height"},
+    "__min_width": {"type":"block","css":"min-width: {value}","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Min Width:","default":"auto","placeholder":"min width","category":"Dimension","syntax":"__min_width(value)","purpose":"Set minimum width","arguments":"size","validation":"css_size","allowed_content":"Any block content","restrictions":"Must be valid CSS size","defaults":"auto","rules":"None","errors":"Invalid CSS size","example":"{[__min_width(300px); __bgcolor(#f9f9f9)]} [[Min width box]]","result":"Box with minimum 300px width"},
+    "__max_width": {"type":"block","css":"max-width: {value}","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Max Width:","default":"auto","placeholder":"max width","category":"Dimension","syntax":"__max_width(value)","purpose":"Set maximum width","arguments":"size","validation":"css_size","allowed_content":"Any block content","restrictions":"Must be valid CSS size","defaults":"auto","rules":"None","errors":"Invalid CSS size","example":"{[__max_width(500px); __center]} [[Max width centered]]","result":"Centered box with max 500px width"},
+    "__min_height": {"type":"block","css":"min-height: {value}","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Min Height:","default":"auto","placeholder":"min height","category":"Dimension","syntax":"__min_height(value)","purpose":"Set minimum height","arguments":"size","validation":"css_size","allowed_content":"Any block content","restrictions":"Must be valid CSS size","defaults":"auto","rules":"None","errors":"Invalid CSS size","example":"{[__min_height(100px); __bgcolor(#f0f0f0)]} [[Min height box]]","result":"Box with minimum 100px height"},
+    "__max_height": {"type":"block","css":"max-height: {value}","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Max Height:","default":"auto","placeholder":"max height","category":"Dimension","syntax":"__max_height(value)","purpose":"Set maximum height","arguments":"size","validation":"css_size","allowed_content":"Any block content","restrictions":"Must be valid CSS size","defaults":"auto","rules":"None","errors":"Invalid CSS size","example":"{[__max_height(150px); __overflow(auto)]} [[Scrollable box]]","result":"Box with max height and scroll"},
+    "__text_align_justify": {"type":"block","css":"text-align: justify","validate":"none","regex":null,"group":"alignment","control":"toggle","label":"Justify","default":null,"category":"Alignment","syntax":"__text_align_justify","purpose":"Justify text alignment (even spacing between words)","arguments":"None","validation":"none","allowed_content":"Text content","restrictions":"Works best with longer text blocks","defaults":"None","rules":"None","errors":"None","example":"{[__text_align_justify]} [[Justified text that spans multiple lines...]]","result":"Text with justified alignment"},
+    "__columns": {"type":"block","css":"column-count: {value}; column-gap: 2rem;","validate":"integer","regex":"RE_INTEGER_PATTERN","group":"columns","control":"text","label":"Columns:","default":"2","placeholder":"columns","category":"Layout","syntax":"__columns(value)","purpose":"Split content into multiple columns","arguments":"number","validation":"integer","allowed_content":"Text content","restrictions":"Value must be an integer > 0","defaults":"2","rules":"None","errors":"Invalid integer","example":"{[__columns(3); __column_gap(1.5rem)]} [[Three column text...]]","result":"Text split into 3 columns"},
+    "__column_gap": {"type":"block","css":"column-gap: {value}","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"columns","control":"text","label":"Column Gap:","default":"2rem","placeholder":"column gap","category":"Layout","syntax":"__column_gap(value)","purpose":"Set gap between columns","arguments":"size","validation":"css_size","allowed_content":"Used with __columns","restrictions":"Must be valid CSS size","defaults":"2rem","rules":"None","errors":"Invalid CSS size","example":"{[__columns(2); __column_gap(3rem)]} [[Two columns with large gap]]","result":"Two columns with 3rem gap"},
+    "__column_rule": {"type":"block","css":"column-rule: {value}","validate":"text","regex":null,"group":"columns","control":"text","label":"Column Rule:","default":"1px solid #ccc","placeholder":"column rule","category":"Layout","syntax":"__column_rule(value)","purpose":"Add a line between columns","arguments":"value","validation":"text","allowed_content":"Used with __columns","restrictions":"Must be valid CSS column-rule value","defaults":"1px solid #ccc","rules":"None","errors":"Invalid column-rule","example":"{[__columns(2); __column_rule(2px dashed #999)]} [[Two columns with dashed rule]]","result":"Two columns with dashed separator line"},
+    "__flex": {"type":"block","css":"display: flex","validate":"none","regex":null,"group":"flex","control":"toggle","label":"Flex","default":null,"category":"Layout","syntax":"__flex","purpose":"Enable flexbox layout","arguments":"None","validation":"none","allowed_content":"Child elements","restrictions":"Children become flex items","defaults":"None","rules":"None","errors":"None","example":"{[__flex; __gap(1rem)]} [[Item 1]] [[Item 2]]","result":"Items displayed in flex row"},
+    "__flex_center": {"type":"block","css":"display: flex; align-items: center; justify-content: center;","validate":"none","regex":null,"group":"flex","control":"toggle","label":"Flex Center","default":null,"category":"Layout","syntax":"__flex_center","purpose":"Center items both horizontally and vertically using flexbox","arguments":"None","validation":"none","allowed_content":"Child elements","restrictions":"Children become flex items","defaults":"None","rules":"None","errors":"None","example":"{[__flex_center; __height(200px)]} [[Centered text]]","result":"Text centered both ways in 200px container"},
+    "__flex_column": {"type":"block","css":"display: flex; flex-direction: column;","validate":"none","regex":null,"group":"flex","control":"toggle","label":"Flex Column","default":null,"category":"Layout","syntax":"__flex_column","purpose":"Arrange flex items in a column (vertical)","arguments":"None","validation":"none","allowed_content":"Child elements","restrictions":"Children become flex items","defaults":"None","rules":"None","errors":"None","example":"{[__flex_column; __gap(0.5rem)]} [[Item 1]] [[Item 2]]","result":"Items stacked vertically"},
+    "__absolute": {"type":"block","css":"position: absolute","validate":"none","regex":null,"group":"flex","control":"toggle","label":"Absolute","default":null,"category":"Layout","syntax":"__absolute","purpose":"Position element absolutely (requires parent with relative)","arguments":"None","validation":"none","allowed_content":"Any content","restrictions":"Parent needs position: relative","defaults":"None","rules":"None","errors":"None","example":"{[__relative]} [[{[__absolute; __top(10px); __right(10px)]} [[Corner]]]]","result":"Element positioned in corner"},
+    "__relative": {"type":"block","css":"position: relative","validate":"none","regex":null,"group":"flex","control":"toggle","label":"Relative","default":null,"category":"Layout","syntax":"__relative","purpose":"Set position: relative (anchor for absolute children)","arguments":"None","validation":"none","allowed_content":"Any content","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[__relative]} [[Container for absolute elements]]","result":"Container with relative positioning"},
+    "__sticky": {"type":"block","css":"position: sticky; top: 0;","validate":"none","regex":null,"group":"flex","control":"toggle","label":"Sticky","default":null,"category":"Layout","syntax":"__sticky","purpose":"Make element stick to top when scrolling","arguments":"None","validation":"none","allowed_content":"Any content","restrictions":"Works within a scrollable container","defaults":"None","rules":"None","errors":"None","example":"{[__sticky; __bgcolor(#f0f0f0)]} [[Sticky header]]","result":"Element sticks to top when scrolling"},
+    "__z_index": {"type":"block","css":"z-index: {value}","validate":"integer","regex":"RE_INTEGER_PATTERN","group":"flex","control":"text","label":"Z-Index:","default":"1","placeholder":"z-index","category":"Layout","syntax":"__z_index(value)","purpose":"Control stacking order of positioned elements","arguments":"number","validation":"integer","allowed_content":"Positioned elements","restrictions":"Value must be an integer","defaults":"1","rules":"None","errors":"Invalid integer","example":"{[__z_index(10); __relative]} [[Element on top]]","result":"Element appears above others"},
+    "__opacity": {"type":"block","css":"opacity: {value}","validate":"number","regex":"RE_NUMBER_PATTERN","group":"flex","control":"text","label":"Opacity:","default":"1","placeholder":"opacity","category":"Effects","syntax":"__opacity(value)","purpose":"Set transparency (0 = fully transparent, 1 = fully opaque)","arguments":"number","validation":"number","allowed_content":"Any content","restrictions":"Value must be between 0 and 1","defaults":"1","rules":"None","errors":"Invalid number","example":"{[__opacity(0.5)]} [[Semi-transparent text]]","result":"Text with 50% opacity"},
+    "__blockindent": {"type":"block","css":"margin-left: 2em","validate":"none","regex":null,"group":"indentation","control":"toggle","label":"Block Indent","default":null,"category":"Indentation","syntax":"__blockindent","purpose":"Indent the entire block by 2em","arguments":"None","validation":"none","allowed_content":"Any block content","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[__blockindent]} [[Indented paragraph]]","result":"Paragraph indented 2em from left"},
+    "__hanging_indent": {"type":"block","css":"padding-left: 2em; text-indent: -2em;","validate":"none","regex":null,"group":"indentation","control":"toggle","label":"Hanging Indent","default":null,"category":"Indentation","syntax":"__hanging_indent","purpose":"Create a hanging indent (first line pulled left)","arguments":"None","validation":"none","allowed_content":"Text content","restrictions":"Works best with multi-line text","defaults":"None","rules":"None","errors":"None","example":"{[__hanging_indent]} [[First line starts left, subsequent lines are indented]]","result":"Hanging indent format"},
+    "__first_line_indent": {"type":"block","css":"text-indent: 2em","validate":"none","regex":null,"group":"indentation","control":"toggle","label":"First Line Indent","default":null,"category":"Indentation","syntax":"__first_line_indent","purpose":"Indent only the first line of text by 2em","arguments":"None","validation":"none","allowed_content":"Text content","restrictions":"Works with multi-line text","defaults":"None","rules":"None","errors":"None","example":"{[__first_line_indent]} [[Paragraph with first line indented...]]","result":"First line indented 2em"},
+    "__negative_indent": {"type":"block","css":"margin-left: -2em","validate":"none","regex":null,"group":"indentation","control":"toggle","label":"Negative Indent","default":null,"category":"Indentation","syntax":"__negative_indent","purpose":"Pull element left by 2em (negative margin)","arguments":"None","validation":"none","allowed_content":"Any content","restrictions":"May cause overflow","defaults":"None","rules":"None","errors":"None","example":"{[__negative_indent]} [[Element pulled left]]","result":"Element shifted left 2em"},
+    "__outdent": {"type":"block","css":"margin-left: -2em; padding-right: 2em;","validate":"none","regex":null,"group":"indentation","control":"toggle","label":"Outdent","default":null,"category":"Indentation","syntax":"__outdent","purpose":"Outdent content (pull left with compensation on right)","arguments":"None","validation":"none","allowed_content":"Any content","restrictions":"May cause overflow","defaults":"None","rules":"None","errors":"None","example":"{[__outdent]} [[Outdented content]]","result":"Content shifted left 2em with 2em right padding"},
+    "__safe": {"type":"block","css":"margin-left: var(--Lsafe-margin) !important; margin-right: var(--Rsafe-margin) !important;","validate":"none","regex":null,"group":"indentation","control":"toggle","label":"Safe Margins","default":null,"category":"Layout","syntax":"__safe","purpose":"Apply safe margins that avoid arrows and navigation elements","arguments":"None","validation":"none","allowed_content":"Any content","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[__safe]} [[Content with safe margins]]","result":"Content positioned within safe area"},
+    "__ibgcolor": {"type":"inlineblock","css":"background-color: {value}","validate":"color","regex":"RE_COLOR_PATTERN","group":"background","control":"color","label":"Bg Color:","default":"#eeeeee","category":"Background","syntax":"__ibgcolor(value)","purpose":"Set background color for inline-block element","arguments":"color","validation":"color","allowed_content":"Inline-block content","restrictions":"Must be valid CSS color","defaults":"#eeeeee","rules":"None","errors":"Invalid color","example":"{[__ibgcolor(#fff3cd); __ipadding(0.3rem 0.6rem)]} [[Highlighted]]","result":"Inline-block with highlight background"},
+    "__iborder": {"type":"inlineblock","css":"border: 1px solid currentColor; padding: 0.5em; box-sizing: border-box;","validate":"none","regex":null,"group":"background","control":"toggle","label":"Border","default":null,"category":"Background","syntax":"__iborder","purpose":"Add border to inline-block element","arguments":"None","validation":"none","allowed_content":"Inline-block content","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[__iborder; __irounded]} [[Bordered inline text]]","result":"Inline text with border"},
+    "__irounded": {"type":"inlineblock","css":"border-radius: 8px; background-color: rgba(255,255,255,0.5); backdrop-filter: blur(4px); padding: 0.5rem 1rem;","validate":"none","regex":null,"group":"background","control":"toggle","label":"Rounded","default":null,"category":"Background","syntax":"__irounded","purpose":"Add rounded corners with semi-transparent background and blur to inline-block","arguments":"None","validation":"none","allowed_content":"Inline-block content","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[__irounded]} [[Rounded pill text]]","result":"Rounded pill with glass effect"},
+    "__ishadow": {"type":"inlineblock","css":"box-shadow: 4px 4px 15px rgba(0,0,0,0.4)","validate":"none","regex":null,"group":"background","control":"toggle","label":"Shadow","default":null,"category":"Background","syntax":"__ishadow","purpose":"Add shadow to inline-block element","arguments":"None","validation":"none","allowed_content":"Inline-block content","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[__ibgcolor(#ffffff); __ishadow; __irounded]} [[Shadow card]]","result":"Inline-block with shadow"},
+    "__imargin": {"type":"inlineblock","css":"margin: {value}","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Margin:","default":"1rem","placeholder":"margin","category":"Spacing","syntax":"__imargin(value)","purpose":"Set margin on inline-block element","arguments":"size","validation":"css_size","allowed_content":"Inline-block content","restrictions":"Must be valid CSS size","defaults":"1rem","rules":"None","errors":"Invalid CSS size","example":"{[__imargin(0.5rem)]} [[Spaced inline element]]","result":"Inline-block with margin"},
+    "__imargin_vertical": {"type":"inlineblock","css":"margin: {value} 0","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Margin Vertical:","default":"1rem","placeholder":"margin vertical","category":"Spacing","syntax":"__imargin_vertical(value)","purpose":"Set vertical margin on inline-block","arguments":"size","validation":"css_size","allowed_content":"Inline-block content","restrictions":"Must be valid CSS size","defaults":"1rem","rules":"None","errors":"Invalid CSS size","example":"{[__imargin_vertical(0.5rem)]} [[Vertical space]]","result":"Inline-block with vertical margin"},
+    "__imargin_horizontal": {"type":"inlineblock","css":"margin: 0 {value}","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Margin Horizontal:","default":"1rem","placeholder":"margin horizontal","category":"Spacing","syntax":"__imargin_horizontal(value)","purpose":"Set horizontal margin on inline-block","arguments":"size","validation":"css_size","allowed_content":"Inline-block content","restrictions":"Must be valid CSS size","defaults":"1rem","rules":"None","errors":"Invalid CSS size","example":"{[__imargin_horizontal(0.5rem)]} [[Horizontal space]]","result":"Inline-block with horizontal margin"},
+    "__ipadding": {"type":"inlineblock","css":"padding: {value}; box-sizing: border-box;","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Padding:","default":"1rem","placeholder":"padding","category":"Spacing","syntax":"__ipadding(value)","purpose":"Set padding on inline-block element","arguments":"size","validation":"css_size","allowed_content":"Inline-block content","restrictions":"Must be valid CSS size","defaults":"1rem","rules":"None","errors":"Invalid CSS size","example":"{[__ibgcolor(#f0f0f0); __ipadding(0.5rem)]} [[Padded inline]]","result":"Inline-block with padding"},
+    "__ipadding_vertical": {"type":"inlineblock","css":"padding: {value} 0; box-sizing: border-box;","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Padding Vertical:","default":"1rem","placeholder":"padding vertical","category":"Spacing","syntax":"__ipadding_vertical(value)","purpose":"Set vertical padding on inline-block","arguments":"size","validation":"css_size","allowed_content":"Inline-block content","restrictions":"Must be valid CSS size","defaults":"1rem","rules":"None","errors":"Invalid CSS size","example":"{[__ibgcolor(#f0f0f0); __ipadding_vertical(0.5rem)]} [[Vertical padding]]","result":"Inline-block with vertical padding"},
+    "__ipadding_horizontal": {"type":"inlineblock","css":"padding: 0 {value}; box-sizing: border-box;","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Padding Horizontal:","default":"1rem","placeholder":"padding horizontal","category":"Spacing","syntax":"__ipadding_horizontal(value)","purpose":"Set horizontal padding on inline-block","arguments":"size","validation":"css_size","allowed_content":"Inline-block content","restrictions":"Must be valid CSS size","defaults":"1rem","rules":"None","errors":"Invalid CSS size","example":"{[__ibgcolor(#f0f0f0); __ipadding_horizontal(1rem)]} [[Horizontal padding]]","result":"Inline-block with horizontal padding"},
+    "__iwidth": {"type":"inlineblock","css":"width: {value}; min-width: {value}; max-width: {value}; overflow: hidden; box-sizing: border-box;","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Width:","default":"100%","placeholder":"width","category":"Dimension","syntax":"__iwidth(value)","purpose":"Set width with overflow hidden on inline-block","arguments":"size","validation":"css_size","allowed_content":"Inline-block content","restrictions":"Must be valid CSS size","defaults":"100%","rules":"None","errors":"Invalid CSS size","example":"{[__iwidth(200px); __ibgcolor(#f0f0f0)]} [[Fixed width inline]]","result":"Inline-block with fixed width and hidden overflow"},
+    "__iheight": {"type":"inlineblock","css":"height: {value}; box-sizing: border-box; display: inline-block;","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Height:","default":"auto","placeholder":"height","category":"Dimension","syntax":"__iheight(value)","purpose":"Set height on inline-block element","arguments":"size","validation":"css_size","allowed_content":"Inline-block content","restrictions":"Must be valid CSS size","defaults":"auto","rules":"None","errors":"Invalid CSS size","example":"{[__iheight(50px); __ibgcolor(#f0f0f0)]} [[Fixed height inline]]","result":"Inline-block with fixed height"},
+    "__imin_width": {"type":"inlineblock","css":"min-width: {value}; box-sizing: border-box;","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Min Width:","default":"auto","placeholder":"min width","category":"Dimension","syntax":"__imin_width(value)","purpose":"Set minimum width on inline-block","arguments":"size","validation":"css_size","allowed_content":"Inline-block content","restrictions":"Must be valid CSS size","defaults":"auto","rules":"None","errors":"Invalid CSS size","example":"{[__imin_width(100px); __ibgcolor(#f0f0f0)]} [[Min width inline]]","result":"Inline-block with minimum width"},
+    "__imax_width": {"type":"inlineblock","css":"max-width: {value}; box-sizing: border-box;","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Max Width:","default":"auto","placeholder":"max width","category":"Dimension","syntax":"__imax_width(value)","purpose":"Set maximum width on inline-block","arguments":"size","validation":"css_size","allowed_content":"Inline-block content","restrictions":"Must be valid CSS size","defaults":"auto","rules":"None","errors":"Invalid CSS size","example":"{[__imax_width(300px); __ibgcolor(#f0f0f0)]} [[Max width inline]]","result":"Inline-block with maximum width"},
+    "__imin_height": {"type":"inlineblock","css":"min-height: {value}; box-sizing: border-box;","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Min Height:","default":"auto","placeholder":"min height","category":"Dimension","syntax":"__imin_height(value)","purpose":"Set minimum height on inline-block","arguments":"size","validation":"css_size","allowed_content":"Inline-block content","restrictions":"Must be valid CSS size","defaults":"auto","rules":"None","errors":"Invalid CSS size","example":"{[__imin_height(50px); __ibgcolor(#f0f0f0)]} [[Min height inline]]","result":"Inline-block with minimum height"},
+    "__imax_height": {"type":"inlineblock","css":"max-height: {value}; box-sizing: border-box;","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Max Height:","default":"auto","placeholder":"max height","category":"Dimension","syntax":"__imax_height(value)","purpose":"Set maximum height on inline-block","arguments":"size","validation":"css_size","allowed_content":"Inline-block content","restrictions":"Must be valid CSS size","defaults":"auto","rules":"None","errors":"Invalid CSS size","example":"{[__imax_height(100px); __overflow(auto)]} [[Scrollable inline]]","result":"Inline-block with max height and scroll"},
+    "__iletter_spacing": {"type":"inlineblock","css":"letter-spacing: {value}","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"typography","control":"text","label":"Letter Spacing:","default":"0.1em","placeholder":"letter spacing","category":"Typography","syntax":"__iletter_spacing(value)","purpose":"Adjust spacing between letters","arguments":"size","validation":"css_size","allowed_content":"Text","restrictions":"Must be valid CSS size","defaults":"0.1em","rules":"None","errors":"Invalid CSS size","example":"{[__iletter_spacing(0.2em)]} [[Expanded text]]","result":"Text with expanded letter spacing"},
+    "__itext_transform": {"type":"inlineblock","css":"text-transform: {value}","validate":"text","regex":null,"group":"typography","control":"text","label":"Text Transform:","default":"none","placeholder":"text transform","category":"Typography","syntax":"__itext_transform(value)","purpose":"Transform text case (uppercase, lowercase, capitalize)","arguments":"value","validation":"text","allowed_content":"Text","restrictions":"Value must be valid text-transform","defaults":"none","rules":"None","errors":"Invalid text-transform","example":"{[__itext_transform(uppercase)]} [[uppercase]]","result":"UPPERCASE"},
+    "__ifont_weight": {"type":"inlineblock","css":"font-weight: {value}","validate":"text","regex":null,"group":"typography","control":"text","label":"Font Weight:","default":"normal","placeholder":"font weight","category":"Typography","syntax":"__ifont_weight(value)","purpose":"Set font weight (boldness)","arguments":"value","validation":"text","allowed_content":"Text","restrictions":"Value must be valid font-weight","defaults":"normal","rules":"None","errors":"Invalid font-weight","example":"{[__ifont_weight(700)]} [[Bold text]]","result":"Bold text"},
+    "__itext_shadow": {"type":"inlineblock","css":"text-shadow: {value}","validate":"text","regex":null,"group":"typography","control":"text","label":"Text Shadow:","default":"none","placeholder":"text shadow","category":"Typography","syntax":"__itext_shadow(value)","purpose":"Add shadow to text","arguments":"value","validation":"text","allowed_content":"Text","restrictions":"Must be valid text-shadow value","defaults":"none","rules":"None","errors":"Invalid text-shadow","example":"{[__itext_shadow(2px 2px 4px rgba(0,0,0,0.3))]} [[Shadow text]]","result":"Text with shadow"},
+    "__icolumns": {"type":"inlineblock","css":"column-count: {value}; column-gap: 2rem;","validate":"integer","regex":"RE_INTEGER_PATTERN","group":"columns","control":"text","label":"Columns:","default":"2","placeholder":"columns","category":"Layout","syntax":"__icolumns(value)","purpose":"Split inline-block content into columns","arguments":"number","validation":"integer","allowed_content":"Text","restrictions":"Value must be integer > 0","defaults":"2","rules":"None","errors":"Invalid integer","example":"{[__icolumns(2)]} [[Two column text...]]","result":"Inline-block text split into 2 columns"},
+    "__iindent": {"type":"inlineblock","css":"margin-left: 2em","validate":"none","regex":null,"group":"indentation","control":"toggle","label":"Indent","default":null,"category":"Indentation","syntax":"__iindent","purpose":"Indent inline-block content by 2em","arguments":"None","validation":"none","allowed_content":"Inline-block content","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[__iindent]} [[Indented inline text]]","result":"Inline-block indented 2em"},
+    "__ihanging_indent": {"type":"inlineblock","css":"padding-left: 2em; text-indent: -2em;","validate":"none","regex":null,"group":"indentation","control":"toggle","label":"Hanging Indent","default":null,"category":"Indentation","syntax":"__ihanging_indent","purpose":"Create hanging indent in inline-block text","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"Works with multi-line text","defaults":"None","rules":"None","errors":"None","example":"{[__ihanging_indent]} [[Hanging indent text...]]","result":"Inline-block with hanging indent"},
+    "__ifirst_line_indent": {"type":"inlineblock","css":"text-indent: 2em","validate":"none","regex":null,"group":"indentation","control":"toggle","label":"First Line Indent","default":null,"category":"Indentation","syntax":"__ifirst_line_indent","purpose":"Indent only first line of inline-block text by 2em","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"Works with multi-line text","defaults":"None","rules":"None","errors":"None","example":"{[__ifirst_line_indent]} [[First line indented...]]","result":"Inline-block with first line indent"},
+    "__ioutdent": {"type":"inlineblock","css":"margin-left: -2em","validate":"none","regex":null,"group":"indentation","control":"toggle","label":"Outdent","default":null,"category":"Indentation","syntax":"__ioutdent","purpose":"Pull inline-block left by 2em","arguments":"None","validation":"none","allowed_content":"Inline-block content","restrictions":"May cause overflow","defaults":"None","rules":"None","errors":"None","example":"{[__ioutdent]} [[Outdented inline text]]","result":"Inline-block shifted left 2em"},
+    "__iopacity": {"type":"inlineblock","css":"opacity: {value}","validate":"number","regex":"RE_NUMBER_PATTERN","group":"effects","control":"text","label":"Opacity:","default":"1","placeholder":"opacity","category":"Effects","syntax":"__iopacity(value)","purpose":"Set transparency of inline-block element","arguments":"number","validation":"number","allowed_content":"Inline-block content","restrictions":"Value must be between 0 and 1","defaults":"1","rules":"None","errors":"Invalid number","example":"{[__iopacity(0.6)]} [[Semi-transparent inline]]","result":"Inline-block with 60% opacity"},
+    "__itransform": {"type":"inlineblock","css":"transform: {value}","validate":"text","regex":null,"group":"effects","control":"text","label":"Transform:","default":"none","placeholder":"transform","category":"Effects","syntax":"__itransform(value)","purpose":"Apply CSS transform (rotate, scale, etc.)","arguments":"value","validation":"text","allowed_content":"Inline-block content","restrictions":"Must be valid transform value","defaults":"none","rules":"None","errors":"Invalid transform","example":"{[__itransform(rotate(15deg))]} [[Rotated text]]","result":"Inline-block rotated 15 degrees"},
+    "__icenter": {"type":"inlineblock","css":"text-align: center","validate":"none","regex":null,"group":"alignment","control":"toggle","label":"Center","default":null,"category":"Alignment","syntax":"__icenter","purpose":"Center text inside inline-block","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[__icenter]} [[Centered text]]","result":"Inline-block with centered text"},
+    "__itext_align_justify": {"type":"inlineblock","css":"text-align: justify","validate":"none","regex":null,"group":"alignment","control":"toggle","label":"Justify","default":null,"category":"Alignment","syntax":"__itext_align_justify","purpose":"Justify text inside inline-block","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"Works with multi-line text","defaults":"None","rules":"None","errors":"None","example":"{[__itext_align_justify]} [[Justified text...]]","result":"Inline-block with justified text"},
+    "_bold": {"type":"inline","css":"font-weight: bold","validate":"none","regex":null,"group":"styling","control":"toggle","label":"Bold","default":null,"category":"Text Styling","syntax":"_bold","purpose":"Make text bold","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[_bold]} [[Bold text]]","result":"**Bold text**"},
+    "_italic": {"type":"inline","css":"font-style: italic","validate":"none","regex":null,"group":"styling","control":"toggle","label":"Italic","default":null,"category":"Text Styling","syntax":"_italic","purpose":"Make text italic","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[_italic]} [[Italic text]]","result":"*Italic text*"},
+    "_underline": {"type":"inline","css":"text-decoration: underline","validate":"none","regex":null,"group":"styling","control":"toggle","label":"Underline","default":null,"category":"Text Styling","syntax":"_underline","purpose":"Underline text","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[_underline]} [[Underlined text]]","result":"Underlined text"},
+    "_box": {"type":"inline","css":"border: 1px solid currentColor; padding: 0 0.4em;","validate":"none","regex":null,"group":"styling","control":"toggle","label":"Box","default":null,"category":"Text Styling","syntax":"_box","purpose":"Wrap text in a box (border + padding)","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[_box]} [[Boxed text]]","result":"[Boxed text]"},
+    "_fontup": {"type":"inline","css":"font-size: 1.2rem !important","validate":"none","regex":null,"group":"styling","control":"toggle","label":"Font Up","default":null,"category":"Text Styling","syntax":"_fontup","purpose":"Increase font size by 20% (1.2rem)","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[_fontup]} [[Larger text]]","result":"Larger text (1.2rem)"},
+    "_fontdn": {"type":"inline","css":"font-size: 0.8rem !important","validate":"none","regex":null,"group":"styling","control":"toggle","label":"Font Down","default":null,"category":"Text Styling","syntax":"_fontdn","purpose":"Decrease font size by 20% (0.8rem)","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[_fontdn]} [[Smaller text]]","result":"Smaller text (0.8rem)"},
+    "_superscript": {"type":"inline","css":"vertical-align: super","validate":"none","regex":null,"group":"special","control":"toggle","label":"Superscript","default":null,"category":"Special","syntax":"_superscript","purpose":"Display text as superscript","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[_superscript]} [[2]]","result":"X²"},
+    "_subscript": {"type":"inline","css":"vertical-align: sub","validate":"none","regex":null,"group":"special","control":"toggle","label":"Subscript","default":null,"category":"Special","syntax":"_subscript","purpose":"Display text as subscript","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[_subscript]} [[2]]","result":"H₂O"},
+    "_fontsize": {"type":"inline","css":"font-size: {value}rem !important","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"styling","control":"number","label":"Font Size:","default":"5.0","placeholder":"size","min":0.1,"max":10,"category":"Text Styling","syntax":"_fontsize(value)","purpose":"Set exact font size in rem units","arguments":"number","validation":"css_size","allowed_content":"Text","restrictions":"Value between 0.1 and 10","defaults":"5.0","rules":"None","errors":"Invalid number","example":"{[_fontsize(2.5)]} [[Large heading]]","result":"Large heading (2.5rem)"},
+    "_color": {"type":"inline","css":"color: {value} !important","validate":"color","regex":"RE_COLOR_PATTERN","group":"colors","control":"color","label":"Color:","default":"#000000","category":"Colors","syntax":"_color(value)","purpose":"Set text color","arguments":"color","validation":"color","allowed_content":"Text","restrictions":"Must be valid CSS color","defaults":"#000000","rules":"None","errors":"Invalid color","example":"{[_color(#e74c3c)]} [[Red text]]","result":"Red text"},
+    "_bgcolor": {"type":"inline","css":"background-color: {value}","validate":"color","regex":"RE_COLOR_PATTERN","group":"colors","control":"color","label":"Bg Color:","default":"#ffff00","category":"Colors","syntax":"_bgcolor(value)","purpose":"Set background color for inline text","arguments":"color","validation":"color","allowed_content":"Text","restrictions":"Must be valid CSS color","defaults":"#ffff00","rules":"None","errors":"Invalid color","example":"{[_bgcolor(#fff3cd)]} [[Highlighted text]]","result":"Highlighted text"},
+    "_fontfamily": {"type":"inline","css":"font-family: {value}","validate":"text","regex":null,"group":"styling","control":"select","label":"Font Family:","default":"Georgia","options":["Georgia","Arial","Verdana","Times New Roman","Courier New","Helvetica","Palatino","Garamond","Comic Sans MS","Tahoma","Trebuchet MS","Impact","Lucida Console","Monaco","Cursive"],"category":"Text Styling","syntax":"_fontfamily(value)","purpose":"Change font family","arguments":"font name","validation":"text","allowed_content":"Text","restrictions":"Must be valid font-family","defaults":"Georgia","rules":"None","errors":"Invalid font-family","example":"{[_fontfamily(Georgia)]} [[Georgia font]]","result":"Text in Georgia font"},
+    "_clickme_str": {"type":"inline","css":"class: glassbtn","validate":"none","regex":null,"group":"special","control":"toggle","label":"ClickMe","default":null,"category":"Special","syntax":"_clickme_str","purpose":"Make text clickable with glass button style","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"Must be used with ClickWord or similar","defaults":"None","rules":"None","errors":"None","example":"{[_clickme_str]} [[Clickable]]","result":"Glass button styled text"},
+    "_overline": {"type":"inline","css":"text-decoration: overline","validate":"none","regex":null,"group":"decoration","control":"toggle","label":"Overline","default":null,"category":"Text Styling","syntax":"_overline","purpose":"Add overline to text","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[_overline]} [[Overlined text]]","result":"Overlined text"},
+    "_line_through": {"type":"inline","css":"text-decoration: line-through","validate":"none","regex":null,"group":"decoration","control":"toggle","label":"Strikethrough","default":null,"category":"Text Styling","syntax":"_line_through","purpose":"Add strikethrough to text","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[_line_through]} [[~~Strikethrough text~~]]","result":"~~Strikethrough text~~"},
+    "_double_underline": {"type":"inline","css":"text-decoration: underline; text-decoration-style: double;","validate":"none","regex":null,"group":"decoration","control":"toggle","label":"Double Underline","default":null,"category":"Text Styling","syntax":"_double_underline","purpose":"Add double underline to text","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[_double_underline]} [[Double underlined]]","result":"Double underlined text"},
+    "_wavy_underline": {"type":"inline","css":"text-decoration: underline; text-decoration-style: wavy;","validate":"none","regex":null,"group":"decoration","control":"toggle","label":"Wavy Underline","default":null,"category":"Text Styling","syntax":"_wavy_underline","purpose":"Add wavy underline to text","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[_wavy_underline]} [[Wavy underlined]]","result":"Wavy underlined text"},
+    "_dotted_underline": {"type":"inline","css":"text-decoration: underline; text-decoration-style: dotted;","validate":"none","regex":null,"group":"decoration","control":"toggle","label":"Dotted Underline","default":null,"category":"Text Styling","syntax":"_dotted_underline","purpose":"Add dotted underline to text","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[_dotted_underline]} [[Dotted underlined]]","result":"Dotted underlined text"},
+    "_dashed_underline": {"type":"inline","css":"text-decoration: underline; text-decoration-style: dashed;","validate":"none","regex":null,"group":"decoration","control":"toggle","label":"Dashed Underline","default":null,"category":"Text Styling","syntax":"_dashed_underline","purpose":"Add dashed underline to text","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[_dashed_underline]} [[Dashed underlined]]","result":"Dashed underlined text"},
+    "_tab": {"type":"inline","css":"margin-left: 2em","validate":"none","regex":null,"group":"special","control":"toggle","label":"Tab","default":null,"category":"Special","syntax":"_tab","purpose":"Add a tab (2em margin-left) to text","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[_tab]} [[Tabbed text]]","result":"Tabbed text (2em indent)"},
+    "_uppercase": {"type":"inline","css":"text-transform: uppercase","validate":"none","regex":null,"group":"transformation","control":"toggle","label":"Uppercase","default":null,"category":"Text Styling","syntax":"_uppercase","purpose":"Convert text to uppercase","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[_uppercase]} [[uppercase text]]","result":"UPPERCASE TEXT"},
+    "_lowercase": {"type":"inline","css":"text-transform: lowercase","validate":"none","regex":null,"group":"transformation","control":"toggle","label":"Lowercase","default":null,"category":"Text Styling","syntax":"_lowercase","purpose":"Convert text to lowercase","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[_lowercase]} [[LOWERCASE TEXT]]","result":"lowercase text"},
+    "_capitalize": {"type":"inline","css":"text-transform: capitalize","validate":"none","regex":null,"group":"transformation","control":"toggle","label":"Capitalize","default":null,"category":"Text Styling","syntax":"_capitalize","purpose":"Capitalize each word","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[_capitalize]} [[capitalize each word]]","result":"Capitalize Each Word"},
+    "_small_caps": {"type":"inline","css":"font-variant: small-caps","validate":"none","regex":null,"group":"transformation","control":"toggle","label":"Small Caps","default":null,"category":"Text Styling","syntax":"_small_caps","purpose":"Display text in small capitals","arguments":"None","validation":"none","allowed_content":"Text","restrictions":"None","defaults":"None","rules":"None","errors":"None","example":"{[_small_caps]} [[Small Caps]]","result":"SMALL CAPS"},
+    "_letter_spacing": {"type":"inline","css":"letter-spacing: {value}","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Letter Spacing:","default":"0.1em","placeholder":"letter spacing","category":"Spacing","syntax":"_letter_spacing(value)","purpose":"Adjust spacing between letters","arguments":"size","validation":"css_size","allowed_content":"Text","restrictions":"Must be valid CSS size","defaults":"0.1em","rules":"None","errors":"Invalid CSS size","example":"{[_letter_spacing(0.2em)]} [[Expanded]]","result":"E x p a n d e d"},
+    "_word_spacing": {"type":"inline","css":"word-spacing: {value}","validate":"css_size","regex":"RE_CSS_SIZE_PATTERN","group":"spacing","control":"text","label":"Word Spacing:","default":"0.2em","placeholder":"word spacing","category":"Spacing","syntax":"_word_spacing(value)","purpose":"Adjust spacing between words","arguments":"size","validation":"css_size","allowed_content":"Text","restrictions":"Must be valid CSS size","defaults":"0.2em","rules":"None","errors":"Invalid CSS size","example":"{[_word_spacing(0.5em)]} [[Spaced words]]","result":"Spaced words"},
+    "_line_height": {"type":"inline","css":"line-height: {value}","validate":"number","regex":"RE_NUMBER_PATTERN","group":"spacing","control":"text","label":"Line Height:","default":"1.5","placeholder":"line height","category":"Spacing","syntax":"_line_height(value)","purpose":"Adjust line height (spacing between lines)","arguments":"number","validation":"number","allowed_content":"Text","restrictions":"Number between 1 and 3 recommended","defaults":"1.5","rules":"None","errors":"Invalid number","example":"{[_line_height(2.0)]} [[Double spaced text]]","result":"Double spaced text"},
+    "_font_weight": {"type":"inline","css":"font-weight: {value}","validate":"text","regex":null,"group":"fontvariations","control":"text","label":"Font Weight:","default":"700","placeholder":"font weight","category":"Text Styling","syntax":"_font_weight(value)","purpose":"Set font weight","arguments":"value","validation":"text","allowed_content":"Text","restrictions":"Value must be valid font-weight","defaults":"700","rules":"None","errors":"Invalid font-weight","example":"{[_font_weight(900)]} [[Heavy text]]","result":"Heavy text"},
+    "_text_outline": {"type":"inline","css":"-webkit-text-stroke: {value}; text-stroke: {value};","validate":"text","regex":null,"group":"fontvariations","control":"text","label":"Text Outline:","default":"1px #333","placeholder":"text outline","category":"Text Styling","syntax":"_text_outline(value)","purpose":"Add outline/stroke to text","arguments":"value","validation":"text","allowed_content":"Text","restrictions":"Must be valid text-stroke value","defaults":"1px #333","rules":"None","errors":"Invalid text-stroke","example":"{[_text_outline(2px #000); _color(#ffffff)]} [[Outlined text]]","result":"Text with outline"}
+};
+
+
+let REG_TAG = {};
+const FALLBACK_REG_TAG = {
+"nl": {"min_args": 0, "max_args": 0, "args": [], "html": "<br>", "handler": null, "type": null, "group": "Line Breaks", "category": "Base", "purpose": "Inserts a line break", "syntax": "<nl>", "allowed_content": "None", "restrictions": "None", "defaults": {}, "examples": ["Line 1<nl>Line 2"], "result": "Line break (equivalent to <br>)", "rules": "Use for single line breaks", "errors": "None", "tag_name": "nl"},
+"sp": {"min_args": 0, "max_args": 0, "args": [], "html": "\u00A0", "handler": null, "type": null, "group": "Spacing", "category": "Base", "purpose": "Inserts a non-breaking space", "syntax": "<sp>", "allowed_content": "None", "restrictions": "None", "defaults": {}, "examples": ["Hello<sp>World"], "result": "Non-breaking space", "rules": "Use to prevent line breaks between words", "errors": "None", "tag_name": "sp"},
+"tab": {"min_args": 0, "max_args": 0, "args": [], "html": "<span style=\"margin-left: 2em; display: inline-block;\">&nbsp;</span>", "handler": null, "type": null, "group": "Indentation", "category": "Base", "purpose": "Inserts a 2em indent (tab)", "syntax": "<tab>", "allowed_content": "None", "restrictions": "None", "defaults": {}, "examples": ["<tab>Indented text"], "result": "Text indented by 2em", "rules": "Use for paragraph indentation", "errors": "None", "tag_name": "tab"},
+"nlcf": {"min_args": 0, "max_args": 0, "args": [], "html": "<br clear=\"both\">", "handler": null, "type": null, "group": "Line Breaks", "category": "Base", "purpose": "Line break with clear both", "syntax": "<nlcf>", "allowed_content": "None", "restrictions": "None", "defaults": {}, "examples": ["<clickwordl='👆'><nlcf>"], "result": "Line break with clear: both", "rules": "Use after floated elements", "errors": "None", "tag_name": "nlcf"},
+"newpage": {"min_args": 0, "max_args": 0, "args": [], "html": "<div style=\"break-after: page;\"></div>", "handler": null, "type": null, "group": "Page Structure", "category": "Base", "purpose": "Forces a page break in the book", "syntax": "<NewPage>", "allowed_content": "None", "restrictions": "None", "defaults": {}, "examples": ["<NewPage>"], "result": "Insert a page break", "rules": "Place where a new page should start", "errors": "None", "tag_name": "newpage"},
+"pagedivider": {"min_args": 0, "max_args": 0, "args": [], "html": "<hr style=\"height: 1.2px; background-color: var(--text-color); opacity: 0.3; border: none;\">", "handler": null, "type": null, "group": "Page Structure", "category": "Base", "purpose": "Inserts a horizontal divider between sections", "syntax": "<PageDivider>", "allowed_content": "None", "restrictions": "None", "defaults": {}, "examples": ["<PageDivider>"], "result": "Inserts a styled horizontal line", "rules": "Use between sections for visual separation", "errors": "None", "tag_name": "pagedivider"},
+"nextpage_icon": {"min_args": 0, "max_args": 0, "args": [], "html": "<span class=\"nextPgbtn\">👉</span>", "handler": null, "type": null, "group": "Navigation", "category": "Base", "purpose": "Inserts a next page navigation icon", "syntax": "<NextPage_Icon>", "allowed_content": "None", "restrictions": "None", "defaults": {}, "examples": ["<NextPage_Icon>"], "result": "👉 emoji for next page navigation", "rules": "Use in page content for navigation", "errors": "None", "tag_name": "nextpage_icon"},
+"prevpage_icon": {"min_args": 0, "max_args": 0, "args": [], "html": "<span class=\"prevPgbtn\">👈</span>", "handler": null, "type": null, "group": "Navigation", "category": "Base", "purpose": "Inserts a previous page navigation icon", "syntax": "<PrevPage_Icon>", "allowed_content": "None", "restrictions": "None", "defaults": {}, "examples": ["<PrevPage_Icon>"], "result": "👈 emoji for previous page navigation", "rules": "Use in page content for navigation", "errors": "None", "tag_name": "prevpage_icon"},
+"ClearGlassPanel": {"min_args": 0, "max_args": 0, "args": [], "html": "<!--ClearGlassPanel-->", "handler": null, "type": null, "group": "Page Appearance", "category": "Base", "purpose": "Removes the glass effect on a page", "syntax": "<ClearGlassPanel>", "allowed_content": "Page content without glass overlay", "restrictions": "None", "defaults": {}, "examples": ["<ClearGlassPanel>"], "result": "Page background is transparent (no glass)", "rules": "Place at the top of a page", "errors": "None", "tag_name": "ClearGlassPanel"},
+"startbook": {"min_args": 0, "max_args": 0, "args": [], "html": "", "handler": null, "type": null, "group": "Book Structure", "category": "Base", "purpose": "Marks the start of the book content", "syntax": "<StartBook>", "allowed_content": "All book content after this tag", "restrictions": "Must be at the top of the file", "defaults": {}, "examples": ["<StartBook>"], "result": "Everything after is book content", "rules": "Place at the top of the .md file", "errors": "None", "tag_name": "startbook"},
+"squote": {"min_args": 0, "max_args": 0, "args": [], "html": "&#39;", "handler": null, "type": null, "group": "Escaping", "category": "Base", "purpose": "Inserts a single quote character", "syntax": "<squote>", "allowed_content": "None", "restrictions": "None", "defaults": {}, "examples": ["He said<squote>Hello<squote>"], "result": "Single quote (')", "rules": "Use to insert a single quote", "errors": "None", "tag_name": "squote"},
+"dquote": {"min_args": 0, "max_args": 0, "args": [], "html": "&quot;", "handler": null, "type": null, "group": "Escaping", "category": "Base", "purpose": "Inserts a double quote character", "syntax": "<dquote>", "allowed_content": "None", "restrictions": "None", "defaults": {}, "examples": ["He said<dquote>Hello<dquote>"], "result": "Double quote (\")", "rules": "Use to insert a double quote", "errors": "None", "tag_name": "dquote"},
+"chapter": {"min_args": 1, "max_args": 1, "args": [{"position": 1, "name": "title", "validate": ["required_text"], "regex": null, "required": true}], "html": "<div class=\"chapter-marker\" data-chapter-raw=\"{arg1}\" style=\"display: none;\"></div>", "handler": null, "type": null, "group": "Book Structure", "category": "Base", "purpose": "Marks a new chapter for TOC generation", "syntax": "<Chapter='Chapter Title'>", "allowed_content": "Text content follows the chapter tag", "restrictions": "Must be unique per chapter", "defaults": {}, "examples": ["<Chapter='The Beginning'>"], "result": "Creates a chapter marker for TOC and pagination", "rules": "Place before chapter content. Required for TOC generation.", "errors": "Error if title is empty or missing", "tag_name": "chapter"},
+"section": {"min_args": 1, "max_args": 1, "args": [{"position": 1, "name": "title", "validate": ["required_text"], "regex": null, "required": true}], "html": "<div class=\"section-marker\" data-section-raw=\"{arg1}\" style=\"display: none;\"></div>", "handler": null, "type": null, "group": "Book Structure", "category": "Base", "purpose": "Marks a section within a chapter for TOC", "syntax": "<Section='Section Title'>", "allowed_content": "Text content follows the section tag", "restrictions": "Must be inside a chapter", "defaults": {}, "examples": ["<Section='Introduction'>"], "result": "Creates a section marker for TOC", "rules": "Place inside a chapter. Nested sections allowed.", "errors": "Error if title is empty or missing", "tag_name": "section"},
+"chaptertitle": {"min_args": 0, "max_args": 1, "args": [{"position": 1, "name": "title", "validate": ["tobj_html"], "regex": null, "required": false}], "html": "<div style=\"color: #f09e5a;\"><span class=\"highlight-text\" style=\"font-size: 1.2em;\">{arg1}</span></div>", "handler": null, "type": null, "group": "Book Structure", "category": "Base", "purpose": "Displays a styled chapter title (supports TOBj/HTML)", "syntax": "<ChapterTitle='Chapter Title'>", "allowed_content": "TOBj or HTML in the title argument", "restrictions": "None", "defaults": {}, "examples": ["<ChapterTitle='{[_bold]} [[Chapter 1]]'>"], "result": "Styled chapter title with formatting", "rules": "Place after <Chapter> tag", "errors": "None", "tag_name": "chaptertitle"},
+"sectiontitle": {"min_args": 0, "max_args": 1, "args": [{"position": 1, "name": "title", "validate": ["tobj_html"], "regex": null, "required": false}], "html": "<div style=\"color: #f09e5a;\"><span class=\"highlight-text\" style=\"font-size: 1em;\">{arg1}</span></div>", "handler": null, "type": null, "group": "Book Structure", "category": "Base", "purpose": "Displays a styled section title (supports TOBj/HTML)", "syntax": "<SectionTitle='Section Title'>", "allowed_content": "TOBj or HTML in the title argument", "restrictions": "None", "defaults": {}, "examples": ["<SectionTitle='{[_italic]} [[Introduction]]'>"], "result": "Styled section title with formatting", "rules": "Place after <Section> tag", "errors": "None", "tag_name": "sectiontitle"},
+"urlatr": {"min_args": 2, "max_args": 2, "args": [{"position": 1, "name": "label", "validate": ["tobj_html"], "regex": null, "required": true}, {"position": 2, "name": "url", "validate": ["url"], "regex": "RE_URL_PATTERN", "required": true}], "html": "<div style=\"margin-left: var(--Lsafe-margin) !important; margin-right: var(--Rsafe-margin) !important;\"><a href=\"{arg2}\" class=\"book-link\" rel=\"noopener noreferrer\">{arg1}</a></div>", "handler": null, "type": null, "group": "Links", "category": "Base", "purpose": "Creates a clickable link with label", "syntax": "<URLATR='label', 'url'>", "allowed_content": "Label with TOBj/HTML, valid URL", "restrictions": "URL must be valid format", "defaults": {}, "examples": ["<URLATR='{[_bold]} [[Click here]]', 'https://example.com'>"], "result": "Styled link with clickable label", "rules": "Label supports TOBj/HTML. URL must be valid.", "errors": "Error if URL is invalid", "tag_name": "urlatr"},
+"image": {"min_args": 1, "max_args": 4, "args": [{"position": 1, "name": "filename", "validate": ["filename"], "regex": "RE_FILENAME_PATTERN", "required": true}, {"position": 2, "name": "description", "validate": ["tobj_html"], "regex": null, "required": false}, {"position": 3, "name": "size", "validate": ["image_size"], "regex": "RE_IMAGE_SIZE_PATTERN", "required": false}, {"position": 4, "name": "alignment", "validate": ["alignment"], "regex": "RE_ALIGNMENT_PATTERN", "required": false}], "html": null, "handler": "convert_inline_images_cached", "type": null, "group": "Images", "category": "Base", "purpose": "Inserts an image with caption and alignment", "syntax": "<Image='filename.jpg', 'description', 'size%', 'alignment'>", "allowed_content": "Image file, caption, size, alignment", "restrictions": "Filename must be .jpg, .jpeg, .png, etc.", "defaults": {"size": "50%", "alignment": "left"}, "examples": ["<Image='photo.jpg', 'Beautiful sunset', '60%', 'center'>"], "result": "Responsive image with caption popup", "rules": "Filename is required. Caption supports TOBj/HTML.", "errors": "Error if filename is missing or invalid format", "tag_name": "image"},
+"bbl_txt": {"min_args": 0, "max_args": 12, "args": [{"position": 1, "name": "direction", "validate": ["direction"], "regex": "RE_DIRECTION_PATTERN", "required": false}, {"position": 2, "name": "icon", "validate": ["text"], "regex": null, "required": false}, {"position": 3, "name": "top", "validate": ["css_size_or_auto"], "regex": "RE_CSS_SIZE_OR_AUTO_PATTERN", "required": false}, {"position": 4, "name": "left", "validate": ["css_size_or_auto"], "regex": "RE_CSS_SIZE_OR_AUTO_PATTERN", "required": false}, {"position": 5, "name": "bottom_gap", "validate": ["css_size"], "regex": "RE_CSS_SIZE_PATTERN", "required": false}, {"position": 6, "name": "height", "validate": ["css_size_or_auto"], "regex": "RE_CSS_SIZE_OR_AUTO_PATTERN", "required": false}, {"position": 7, "name": "width", "validate": ["css_size_or_auto"], "regex": "RE_CSS_SIZE_OR_AUTO_PATTERN", "required": false}, {"position": 8, "name": "maxheight", "validate": ["text"], "regex": null, "required": false}, {"position": 9, "name": "maxwidth", "validate": ["text"], "regex": null, "required": false}, {"position": 10, "name": "position", "validate": ["position"], "regex": "RE_POSITION_PATTERN", "required": false}, {"position": 11, "name": "textalign", "validate": ["textalign"], "regex": "RE_TEXTALIGN_PATTERN", "required": false}, {"position": 12, "name": "content", "validate": ["html_no_tobj"], "regex": null, "required": false}], "html": null, "handler": "build_flexbot_span", "type": null, "group": "Interactive Content", "category": "Base", "purpose": "Direct BubbleText popup with full control", "syntax": "<BBL-Txt='direction', 'icon', 'top', 'left', 'bottom_gap', 'height', 'width', 'maxheight', 'maxwidth', 'position', 'textalign', 'content'>", "allowed_content": "Popup supports HTML but NOT TOBj", "restrictions": "Content cannot contain TOBj", "defaults": {"direction": "floatboth", "icon": "🔹", "top": "auto", "left": "auto", "bottom_gap": "0vh", "height": "auto", "width": "auto", "position": "center-both", "textalign": "left"}, "examples": ["<BBL-Txt='floatcenter', '💬', 'auto', 'auto', '0vh', '50%', '30%', '', '', 'center-both', 'left', '<b>Bold</b> popup'>"], "result": "Fully customizable popup", "rules": "Content accepts HTML but not TOBj.", "errors": "Error if content contains TOBj", "tag_name": "bbl_txt"},
+"clickwordl": {"min_args": 4, "max_args": 4, "args": [{"position": 1, "name": "icon", "validate": ["text"], "regex": null, "required": true}, {"position": 2, "name": "height", "validate": ["clickword_size"], "regex": null, "required": true}, {"position": 3, "name": "width", "validate": ["clickword_size"], "regex": null, "required": true}, {"position": 4, "name": "content", "validate": ["html_no_tobj"], "regex": null, "required": true}], "html": null, "handler": "process_clickword_match", "type": null, "group": "Interactive Content", "category": "Base", "purpose": "Creates a left-floated popup trigger", "syntax": "<ClickWordL='icon', 'height%', 'width%', 'popup'>", "allowed_content": "Icon supports TOBj. Popup supports HTML.", "restrictions": "Popup content cannot contain TOBj", "defaults": {"height": "auto", "width": "auto"}, "examples": ["<ClickWordL='👆', '50%', '30%', 'Popup content'>"], "result": "Left-floated popup trigger", "rules": "Popup content accepts HTML but not TOBj. Use <nlcf> after to clear floats.", "errors": "Error if popup content contains TOBj", "tag_name": "clickwordl"},
+"clickwordc": {"min_args": 4, "max_args": 4, "args": [{"position": 1, "name": "icon", "validate": ["text"], "regex": null, "required": true}, {"position": 2, "name": "height", "validate": ["clickword_size"], "regex": null, "required": true}, {"position": 3, "name": "width", "validate": ["clickword_size"], "regex": null, "required": true}, {"position": 4, "name": "content", "validate": ["html_no_tobj"], "regex": null, "required": true}], "html": null, "handler": "process_clickword_match", "type": null, "group": "Interactive Content", "category": "Base", "purpose": "Creates a centered popup trigger", "syntax": "<ClickWordC='icon', 'height%', 'width%', 'popup'>", "allowed_content": "Icon supports TOBj. Popup supports HTML.", "restrictions": "Popup content cannot contain TOBj", "defaults": {"height": "auto", "width": "auto"}, "examples": ["<ClickWordC='💬', '50%', '30%', '<b>Bold</b> popup'>"], "result": "Centered popup trigger", "rules": "Popup content accepts HTML but not TOBj.", "errors": "Error if popup content contains TOBj", "tag_name": "clickwordc"},
+"clickwordr": {"min_args": 4, "max_args": 4, "args": [{"position": 1, "name": "icon", "validate": ["text"], "regex": null, "required": true}, {"position": 2, "name": "height", "validate": ["clickword_size"], "regex": null, "required": true}, {"position": 3, "name": "width", "validate": ["clickword_size"], "regex": null, "required": true}, {"position": 4, "name": "content", "validate": ["html_no_tobj"], "regex": null, "required": true}], "html": null, "handler": "process_clickword_match", "type": null, "group": "Interactive Content", "category": "Base", "purpose": "Creates a right-floated popup trigger", "syntax": "<ClickWordR='icon', 'height%', 'width%', 'popup'>", "allowed_content": "Icon supports TOBj. Popup supports HTML.", "restrictions": "Popup content cannot contain TOBj", "defaults": {"height": "auto", "width": "auto"}, "examples": ["<ClickWordR='Click Me', '', '', 'Popup content'>"], "result": "Right-floated popup trigger", "rules": "Popup content accepts HTML but not TOBj. Use <nlcf> after to clear floats.", "errors": "Error if popup content contains TOBj", "tag_name": "clickwordr"},
+"clickwordi": {"min_args": 4, "max_args": 4, "args": [{"position": 1, "name": "icon", "validate": ["text"], "regex": null, "required": true}, {"position": 2, "name": "height", "validate": ["clickword_size"], "regex": null, "required": true}, {"position": 3, "name": "width", "validate": ["clickword_size"], "regex": null, "required": true}, {"position": 4, "name": "content", "validate": ["html_no_tobj"], "regex": null, "required": true}], "html": null, "handler": "process_clickword_match", "type": null, "group": "Interactive Content", "category": "Base", "purpose": "Creates an inline text popup trigger", "syntax": "<ClickWordI='text', 'height%', 'width%', 'popup'>", "allowed_content": "Text supports TOBj. Popup supports HTML.", "restrictions": "Popup content cannot contain TOBj", "defaults": {"height": "auto", "width": "auto"}, "examples": ["<ClickWordI='{[_bold]} [[Click]]', '50%', '30%', 'Popup content'>"], "result": "Inline popup trigger in text flow", "rules": "Popup content accepts HTML but not TOBj.", "errors": "Error if popup content contains TOBj", "tag_name": "clickwordi"},
+"clickword0": {"min_args": 4, "max_args": 4, "args": [{"position": 1, "name": "icon", "validate": ["text"], "regex": null, "required": true}, {"position": 2, "name": "height", "validate": ["clickword_size"], "regex": null, "required": true}, {"position": 3, "name": "width", "validate": ["clickword_size"], "regex": null, "required": true}, {"position": 4, "name": "content", "validate": ["html_no_tobj"], "regex": null, "required": true}], "html": null, "handler": "process_clickword_match", "type": null, "group": "Interactive Content", "category": "Base", "purpose": "Creates a generic popup trigger (no float)", "syntax": "<ClickWord0='icon', 'height%', 'width%', 'popup'>", "allowed_content": "Icon supports TOBj. Popup supports HTML.", "restrictions": "Popup content cannot contain TOBj", "defaults": {"height": "auto", "width": "auto"}, "examples": ["<ClickWord0='🔹', '50%', '30%', 'Popup content'>"], "result": "Generic popup trigger (inline with safe margins)", "rules": "Popup content accepts HTML but not TOBj.", "errors": "Error if popup content contains TOBj", "tag_name": "clickword0"},
+"clickme_pointer": {"min_args": 0, "max_args": 0, "args": [], "html": "<span class=\"glassbtn\" style=\"font-size: 1em;\">👆</span>", "handler": null, "type": null, "group": "Interactive Content", "category": "Base", "purpose": "Inserts a pointing finger emoji as glass button", "syntax": "<ClickMe_pointer>", "allowed_content": "None", "restrictions": "None", "defaults": {}, "examples": ["<ClickMe_pointer>"], "result": "👆 emoji as glass button", "rules": "Use as clickable icon", "errors": "None", "tag_name": "clickme_pointer"},
+"clickme_comment": {"min_args": 0, "max_args": 0, "args": [], "html": "<span class=\"glassbtn\" style=\"font-size: 1em;\">💬</span>", "handler": null, "type": null, "group": "Interactive Content", "category": "Base", "purpose": "Inserts a comment emoji as glass button", "syntax": "<ClickMe_comment>", "allowed_content": "None", "restrictions": "None", "defaults": {}, "examples": ["<ClickMe_comment>"], "result": "💬 emoji as glass button", "rules": "Use as clickable icon", "errors": "None", "tag_name": "clickme_comment"},
+"clickme_info": {"min_args": 0, "max_args": 0, "args": [], "html": "<span class=\"glassbtn\" style=\"font-size: 1em;\">ℹ️</span>", "handler": null, "type": null, "group": "Interactive Content", "category": "Base", "purpose": "Inserts an info emoji as glass button", "syntax": "<ClickMe_info>", "allowed_content": "None", "restrictions": "None", "defaults": {}, "examples": ["<ClickMe_info>"], "result": "ℹ️ emoji as glass button", "rules": "Use as clickable icon", "errors": "None", "tag_name": "clickme_info"},
+"clickme_note": {"min_args": 0, "max_args": 0, "args": [], "html": "<span class=\"glassbtn\" style=\"font-size: 1em;\">📝</span>", "handler": null, "type": null, "group": "Interactive Content", "category": "Base", "purpose": "Inserts a note emoji as glass button", "syntax": "<ClickMe_note>", "allowed_content": "None", "restrictions": "None", "defaults": {}, "examples": ["<ClickMe_note>"], "result": "📝 emoji as glass button", "rules": "Use as clickable icon", "errors": "None", "tag_name": "clickme_note"},
+"clickme_idea": {"min_args": 0, "max_args": 0, "args": [], "html": "<span class=\"glassbtn\" style=\"font-size: 1em;\">💡</span>", "handler": null, "type": null, "group": "Interactive Content", "category": "Base", "purpose": "Inserts an idea emoji as glass button", "syntax": "<ClickMe_idea>", "allowed_content": "None", "restrictions": "None", "defaults": {}, "examples": ["<ClickMe_idea>"], "result": "💡 emoji as glass button", "rules": "Use as clickable icon", "errors": "None", "tag_name": "clickme_idea"},
+"clickme_inspect": {"min_args": 0, "max_args": 0, "args": [], "html": "<span class=\"glassbtn\" style=\"font-size: 1em;\">🔍</span>", "handler": null, "type": null, "group": "Interactive Content", "category": "Base", "purpose": "Inserts a magnifying glass emoji as glass button", "syntax": "<ClickMe_inspect>", "allowed_content": "None", "restrictions": "None", "defaults": {}, "examples": ["<ClickMe_inspect>"], "result": "🔍 emoji as glass button", "rules": "Use as clickable icon", "errors": "None", "tag_name": "clickme_inspect"},
+"clickme_pencil": {"min_args": 0, "max_args": 0, "args": [], "html": "<span class=\"glassbtn\" style=\"font-size: 1em;\">✏️</span>", "handler": null, "type": null, "group": "Interactive Content", "category": "Base", "purpose": "Inserts a pencil emoji as glass button", "syntax": "<ClickMe_pencil>", "allowed_content": "None", "restrictions": "None", "defaults": {}, "examples": ["<ClickMe_pencil>"], "result": "✏️ emoji as glass button", "rules": "Use as clickable icon", "errors": "None", "tag_name": "clickme_pencil"},
+"clickme_book": {"min_args": 0, "max_args": 0, "args": [], "html": "<span class=\"glassbtn\" style=\"font-size: 1em;\">📖</span>", "handler": null, "type": null, "group": "Interactive Content", "category": "Base", "purpose": "Inserts a book emoji as glass button", "syntax": "<ClickMe_book>", "allowed_content": "None", "restrictions": "None", "defaults": {}, "examples": ["<ClickMe_book>"], "result": "📖 emoji as glass button", "rules": "Use as clickable icon", "errors": "None", "tag_name": "clickme_book"},
+"clickme_page": {"min_args": 0, "max_args": 0, "args": [], "html": "<span class=\"glassbtn\" style=\"font-size: 1em;\">📄</span>", "handler": null, "type": null, "group": "Interactive Content", "category": "Base", "purpose": "Inserts a page emoji as glass button", "syntax": "<ClickMe_page>", "allowed_content": "None", "restrictions": "None", "defaults": {}, "examples": ["<ClickMe_page>"], "result": "📄 emoji as glass button", "rules": "Use as clickable icon", "errors": "None", "tag_name": "clickme_page"},
+"clickme_link": {"min_args": 0, "max_args": 0, "args": [], "html": "<span class=\"glassbtn\" style=\"font-size: 1em;\">🔗</span>", "handler": null, "type": null, "group": "Interactive Content", "category": "Base", "purpose": "Inserts a link emoji as glass button", "syntax": "<ClickMe_link>", "allowed_content": "None", "restrictions": "None", "defaults": {}, "examples": ["<ClickMe_link>"], "result": "🔗 emoji as glass button", "rules": "Use as clickable icon", "errors": "None", "tag_name": "clickme_link"},
+"clickme_str": {"min_args": 0, "max_args": 1, "args": [{"position": 1, "name": "text", "validate": ["text"], "regex": null, "required": false}], "html": "<span class=\"glassbtn\">{arg1}</span>", "handler": null, "type": null, "group": "Interactive Content", "category": "Base", "purpose": "Creates a glass button with custom text", "syntax": "<ClickMe_str='text'>", "allowed_content": "Button text", "restrictions": "None", "defaults": {}, "examples": ["<ClickMe_str='Click Me'>"], "result": "Glass button with custom text", "rules": "Text is optional", "errors": "None", "tag_name": "clickme_str"}
+};
+
+// ===== FALLBACK REG_CONFIG_SCHEMA =====
+let REG_CONFIG = {};
+const FALLBACK_REG_CONFIG = {
+    // ===== BASIC INFO =====
+    "SubmitterEmail": {"type": "str", "default": null, "validate": ["email"], "regex": "RE_EMAIL_PATTERN", "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", "required": true, "min": null, "max": null, "error_msg": null, "category": "Basic Info", "group": "basic", "tag_name": "SubmitterEmail", "purpose": "Email address of the book submitter", "syntax": "SubmitterEmail: user@example.com", "arguments": "email", "validation": "email", "allowed_content": "Valid email address", "restrictions": "Must be a valid email format", "defaults": "None", "example": "<SubmitterEmail='author@example.com'>", "result": "author@example.com", "rules": "Required field", "errors": "Invalid email format"},
+    "BookTitle": {"type": "str", "default": "Title", "validate": ["tobj"], "regex": null, "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "category": "Basic Info", "group": "basic", "tag_name": "BookTitle", "purpose": "Title of the book", "syntax": "BookTitle: My Book", "arguments": "text", "validation": "tobj", "allowed_content": "Text with TOBj formatting", "restrictions": "None", "defaults": "Title", "example": "<BookTitle='{[_bold]} [[My Book]]'>", "result": "My Book", "rules": "Optional", "errors": "None"},
+    "AuthorName": {"type": "str", "default": "Author Name", "validate": ["tobj"], "regex": null, "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "category": "Basic Info", "group": "basic", "tag_name": "AuthorName", "purpose": "Name of the book author", "syntax": "AuthorName: John Doe", "arguments": "text", "validation": "tobj", "allowed_content": "Text with TOBj formatting", "restrictions": "None", "defaults": "Author Name", "example": "<AuthorName='{[_italic]} [[John Doe]]'>", "result": "John Doe", "rules": "Optional", "errors": "None"},
+    "BookDescription": {"type": "str", "default": "Book Description", "validate": ["tobj"], "regex": null, "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "category": "Basic Info", "group": "basic", "tag_name": "BookDescription", "purpose": "Description of the book", "syntax": "BookDescription: A great book about...", "arguments": "text", "validation": "tobj", "allowed_content": "Text with TOBj formatting", "restrictions": "None", "defaults": "Book Description", "example": "<BookDescription='{[_italic]} [[A great story]]'>", "result": "A great story", "rules": "Optional", "errors": "None"},
+    "MetaDescription": {"type": "str", "default": "Meta Description - One liner", "validate": ["text"], "regex": null, "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "category": "Basic Info", "group": "basic", "tag_name": "MetaDescription", "purpose": "Meta description for SEO", "syntax": "MetaDescription: A one-line description", "arguments": "text", "validation": "text", "allowed_content": "Text content", "restrictions": "None", "defaults": "Meta Description - One liner", "example": "<MetaDescription='A great book about coding'>", "result": "A great book about coding", "rules": "Optional", "errors": "None"},
+    "MetaKeywords": {"type": "str", "default": "Meta Keywords #2 - one liner", "validate": ["text"], "regex": null, "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "category": "Basic Info", "group": "basic", "tag_name": "MetaKeywords", "purpose": "Meta keywords for SEO", "syntax": "MetaKeywords: keyword1, keyword2", "arguments": "text", "validation": "text", "allowed_content": "Text content", "restrictions": "None", "defaults": "Meta Keywords #2 - one liner", "example": "<MetaKeywords='book, coding, tutorial'>", "result": "book, coding, tutorial", "rules": "Optional", "errors": "None"},
+
+    // ===== COLORS =====
+    "BookPgColor": {"type": "str", "default": null, "validate": ["color"], "regex": "RE_COLOR_PATTERN", "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "category": "Colors", "group": "colors", "tag_name": "BookPgColor", "purpose": "Background color for book pages", "syntax": "BookPgColor: #ffffff", "arguments": "color", "validation": "color", "allowed_content": "Valid CSS color", "restrictions": "Must be valid hex or named color", "defaults": "None", "example": "<BookPgColor='#f5f5f5'>", "result": "#f5f5f5", "rules": "Optional", "errors": "Invalid color"},
+    "CoverBgColor": {"type": "str", "default": null, "validate": ["color"], "regex": "RE_COLOR_PATTERN", "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "category": "Colors", "group": "colors", "tag_name": "CoverBgColor", "purpose": "Background color for cover page", "syntax": "CoverBgColor: #1a1a2e", "arguments": "color", "validation": "color", "allowed_content": "Valid CSS color", "restrictions": "Must be valid hex or named color", "defaults": "None", "example": "<CoverBgColor='#1a1a2e'>", "result": "#1a1a2e", "rules": "Optional", "errors": "Invalid color"},
+    "CoverPageFontColor": {"type": "str", "default": null, "validate": ["color"], "regex": "RE_COLOR_PATTERN", "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "mode": 6, "category": "Colors", "group": "colors", "tag_name": "CoverPageFontColor", "purpose": "Font color for cover page text", "syntax": "CoverPageFontColor: #ffffff", "arguments": "color", "validation": "color", "allowed_content": "Valid CSS color", "restrictions": "Must be valid hex or named color", "defaults": "None", "example": "<CoverPageFontColor='#ffffff'>", "result": "#ffffff", "rules": "Optional", "errors": "Invalid color"},
+    "TOCFontColor": {"type": "str", "default": null, "validate": ["color"], "regex": "RE_COLOR_PATTERN", "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "mode": 6, "category": "Colors", "group": "colors", "tag_name": "TOCFontColor", "purpose": "Font color for table of contents", "syntax": "TOCFontColor: #333333", "arguments": "color", "validation": "color", "allowed_content": "Valid CSS color", "restrictions": "Must be valid hex or named color", "defaults": "None", "example": "<TOCFontColor='#333333'>", "result": "#333333", "rules": "Optional", "errors": "Invalid color"},
+    "BookFontColor": {"type": "str", "default": null, "validate": ["color"], "regex": "RE_COLOR_PATTERN", "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "mode": 6, "category": "Colors", "group": "colors", "tag_name": "BookFontColor", "purpose": "Default font color for book text", "syntax": "BookFontColor: #000000", "arguments": "color", "validation": "color", "allowed_content": "Valid CSS color", "restrictions": "Must be valid hex or named color", "defaults": "None", "example": "<BookFontColor='#000000'>", "result": "#000000", "rules": "Optional", "errors": "Invalid color"},
+    "HighlightTextFontColor": {"type": "str", "default": null, "validate": ["color"], "regex": "RE_COLOR_PATTERN", "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "mode": 7, "category": "Colors", "group": "colors", "tag_name": "HighlightTextFontColor", "purpose": "Font color for highlighted text", "syntax": "HighlightTextFontColor: #ff6b6b", "arguments": "color", "validation": "color", "allowed_content": "Valid CSS color", "restrictions": "Must be valid hex or named color", "defaults": "None", "example": "<HighlightTextFontColor='#ff6b6b'>", "result": "#ff6b6b", "rules": "Optional", "errors": "Invalid color"},
+
+    // ===== IMAGES =====
+    "BookImage": {"type": "str", "default": null, "validate": ["filename"], "regex": "RE_FILENAME_PATTERN", "pattern": "\\.(jpg|jpeg)$", "required": false, "min": null, "max": null, "error_msg": "must be a .jpg or .jpeg file", "category": "Images", "group": "images", "tag_name": "BookImage", "purpose": "Main book cover image", "syntax": "BookImage: cover.jpg", "arguments": "filename", "validation": "filename", "allowed_content": "Image filename", "restrictions": "Must be .jpg or .jpeg", "defaults": "None", "example": "<BookImage='cover.jpg'>", "result": "cover.jpg", "rules": "Optional", "errors": "must be a .jpg or .jpeg file"},
+    "CoverPageImage": {"type": "str", "default": null, "validate": ["filename"], "regex": "RE_FILENAME_PATTERN", "pattern": "\\.(jpg|jpeg)$", "required": false, "min": null, "max": null, "error_msg": "must be a .jpg or .jpeg file", "category": "Images", "group": "images", "tag_name": "CoverPageImage", "purpose": "Image for the cover page", "syntax": "CoverPageImage: cover.jpg", "arguments": "filename", "validation": "filename", "allowed_content": "Image filename", "restrictions": "Must be .jpg or .jpeg", "defaults": "None", "example": "<CoverPageImage='cover.jpg'>", "result": "cover.jpg", "rules": "Optional", "errors": "must be a .jpg or .jpeg file"},
+
+    // ===== BOOLEAN FLAGS =====
+    "SetGlassToAmorphous": {"type": "bool", "default": false, "validate": ["boolean"], "regex": "RE_BOOLEAN_PATTERN", "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "category": "Flags", "group": "flags", "tag_name": "SetGlassToAmorphous", "purpose": "Enable amorphous glass effect", "syntax": "SetGlassToAmorphous: true", "arguments": "boolean", "validation": "boolean", "allowed_content": "true or false", "restrictions": "Must be boolean", "defaults": "false", "example": "<SetGlassToAmorphous='true'>", "result": "true", "rules": "Optional", "errors": "None"},
+    "AutoPaginate": {"type": "bool", "default": true, "validate": ["boolean"], "regex": "RE_BOOLEAN_PATTERN", "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "category": "Flags", "group": "flags", "tag_name": "AutoPaginate", "purpose": "Enable automatic pagination", "syntax": "AutoPaginate: true", "arguments": "boolean", "validation": "boolean", "allowed_content": "true or false", "restrictions": "Must be boolean", "defaults": "true", "example": "<AutoPaginate='true'>", "result": "true", "rules": "Optional", "errors": "None"},
+    "TOCPageSkip": {"type": "bool", "default": false, "validate": ["boolean"], "regex": "RE_BOOLEAN_PATTERN", "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "category": "Flags", "group": "flags", "tag_name": "TOCPageSkip", "purpose": "Skip table of contents page", "syntax": "TOCPageSkip: true", "arguments": "boolean", "validation": "boolean", "allowed_content": "true or false", "restrictions": "Must be boolean", "defaults": "false", "example": "<TOCPageSkip='true'>", "result": "true", "rules": "Optional", "errors": "None"},
+    "CoverPageSkip": {"type": "bool", "default": false, "validate": ["boolean"], "regex": "RE_BOOLEAN_PATTERN", "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "category": "Flags", "group": "flags", "tag_name": "CoverPageSkip", "purpose": "Skip cover page", "syntax": "CoverPageSkip: true", "arguments": "boolean", "validation": "boolean", "allowed_content": "true or false", "restrictions": "Must be boolean", "defaults": "false", "example": "<CoverPageSkip='true'>", "result": "true", "rules": "Optional", "errors": "None"},
+    "TOCAsList": {"type": "bool", "default": true, "validate": ["boolean"], "regex": "RE_BOOLEAN_PATTERN", "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "category": "Flags", "group": "flags", "tag_name": "TOCAsList", "purpose": "Display TOC as a list", "syntax": "TOCAsList: true", "arguments": "boolean", "validation": "boolean", "allowed_content": "true or false", "restrictions": "Must be boolean", "defaults": "true", "example": "<TOCAsList='true'>", "result": "true", "rules": "Optional", "errors": "None"},
+    "ShowBookListLink": {"type": "bool", "default": false, "validate": ["boolean"], "regex": "RE_BOOLEAN_PATTERN", "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "category": "Flags", "group": "flags", "tag_name": "ShowBookListLink", "purpose": "Show link to book list", "syntax": "ShowBookListLink: true", "arguments": "boolean", "validation": "boolean", "allowed_content": "true or false", "restrictions": "Must be boolean", "defaults": "false", "example": "<ShowBookListLink='true'>", "result": "true", "rules": "Optional", "errors": "None"},
+    "SliderDisplay": {"type": "bool", "default": true, "validate": ["boolean"], "regex": "RE_BOOLEAN_PATTERN", "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "category": "Flags", "group": "flags", "tag_name": "SliderDisplay", "purpose": "Enable slider display", "syntax": "SliderDisplay: true", "arguments": "boolean", "validation": "boolean", "allowed_content": "true or false", "restrictions": "Must be boolean", "defaults": "true", "example": "<SliderDisplay='true'>", "result": "true", "rules": "Optional", "errors": "None"},
+    "ArrowDisplay": {"type": "bool", "default": false, "validate": ["boolean"], "regex": "RE_BOOLEAN_PATTERN", "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "category": "Flags", "group": "flags", "tag_name": "ArrowDisplay", "purpose": "Display navigation arrows", "syntax": "ArrowDisplay: true", "arguments": "boolean", "validation": "boolean", "allowed_content": "true or false", "restrictions": "Must be boolean", "defaults": "false", "example": "<ArrowDisplay='true'>", "result": "true", "rules": "Optional", "errors": "None"},
+    "HidePageNumber": {"type": "bool", "default": false, "validate": ["boolean"], "regex": "RE_BOOLEAN_PATTERN", "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "category": "Flags", "group": "flags", "tag_name": "HidePageNumber", "purpose": "Hide page numbers", "syntax": "HidePageNumber: true", "arguments": "boolean", "validation": "boolean", "allowed_content": "true or false", "restrictions": "Must be boolean", "defaults": "false", "example": "<HidePageNumber='true'>", "result": "true", "rules": "Optional", "errors": "None"},
+    "ResizeForMobile": {"type": "bool", "default": true, "validate": ["boolean"], "regex": "RE_BOOLEAN_PATTERN", "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "category": "Flags", "group": "flags", "tag_name": "ResizeForMobile", "purpose": "Enable mobile responsive resizing", "syntax": "ResizeForMobile: true", "arguments": "boolean", "validation": "boolean", "allowed_content": "true or false", "restrictions": "Must be boolean", "defaults": "true", "example": "<ResizeForMobile='true'>", "result": "true", "rules": "Optional", "errors": "None"},
+    "MakeMdFileCopy": {"type": "bool", "default": false, "validate": ["boolean"], "regex": "RE_BOOLEAN_PATTERN", "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "category": "Flags", "group": "flags", "tag_name": "MakeMdFileCopy", "purpose": "Create a copy of the markdown file", "syntax": "MakeMdFileCopy: true", "arguments": "boolean", "validation": "boolean", "allowed_content": "true or false", "restrictions": "Must be boolean", "defaults": "false", "example": "<MakeMdFileCopy='true'>", "result": "true", "rules": "Optional", "errors": "None"},
+    "RemoveDateLabelOnCover": {"type": "bool", "default": true, "validate": ["boolean"], "regex": "RE_BOOLEAN_PATTERN", "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "category": "Flags", "group": "flags", "tag_name": "RemoveDateLabelOnCover", "purpose": "Remove date label from cover", "syntax": "RemoveDateLabelOnCover: true", "arguments": "boolean", "validation": "boolean", "allowed_content": "true or false", "restrictions": "Must be boolean", "defaults": "true", "example": "<RemoveDateLabelOnCover='true'>", "result": "true", "rules": "Optional", "errors": "None"},
+
+    // ===== NUMERIC VALUES =====
+    "WordsPerPage": {"type": "int", "default": 1000, "validate": ["integer"], "regex": "RE_INTEGER_PATTERN", "pattern": null, "required": false, "min": 0, "max": 1000, "error_msg": "must be an integer between 0 and 1000", "category": "Numeric", "group": "numeric", "tag_name": "WordsPerPage", "purpose": "Number of words per page", "syntax": "WordsPerPage: 1000", "arguments": "integer", "validation": "integer", "allowed_content": "Integer value", "restrictions": "Between 0 and 1000", "defaults": "1000", "example": "<WordsPerPage='500'>", "result": "500", "rules": "Optional", "errors": "must be an integer between 0 and 1000"},
+    "TOCPosition": {"type": "int", "default": 0, "validate": ["integer"], "regex": "RE_INTEGER_PATTERN", "pattern": null, "required": false, "min": 0, "max": 999, "error_msg": "must be an integer between 0 and 999", "category": "Numeric", "group": "numeric", "tag_name": "TOCPosition", "purpose": "Position of table of contents", "syntax": "TOCPosition: 0", "arguments": "integer", "validation": "integer", "allowed_content": "Integer value", "restrictions": "Between 0 and 999", "defaults": "0", "example": "<TOCPosition='5'>", "result": "5", "rules": "Optional", "errors": "must be an integer between 0 and 999"},
+
+    // ===== FILE PATHS =====
+    "MDFilePath": {"type": "str", "default": null, "validate": ["relative_path"], "regex": "RE_RELATIVE_PATH_PATTERN", "pattern": null, "required": false, "min": null, "max": null, "error_msg": "must be a relative path", "validate_relative": true, "category": "File Paths", "group": "file_paths", "tag_name": "MDFilePath", "purpose": "Path to the markdown file", "syntax": "MDFilePath: ./books/", "arguments": "relative_path", "validation": "relative_path", "allowed_content": "Relative path", "restrictions": "Must be a valid relative path", "defaults": "None", "example": "<MDFilePath='./books/'>", "result": "./books/", "rules": "Optional", "errors": "must be a relative path"},
+    "MDFileName": {"type": "str", "default": null, "validate": ["text"], "regex": "RE_MD_FILENAME_PATTERN", "pattern": "\\.md$", "required": false, "min": null, "max": null, "error_msg": "must end with .md", "category": "File Paths", "group": "file_paths", "tag_name": "MDFileName", "purpose": "Name of the markdown file", "syntax": "MDFileName: book.md", "arguments": "filename", "validation": "text", "allowed_content": "Filename", "restrictions": "Must end with .md", "defaults": "None", "example": "<MDFileName='book.md'>", "result": "book.md", "rules": "Optional", "errors": "must end with .md"},
+    "MdFileCopyName": {"type": "str", "default": null, "validate": ["text"], "regex": "RE_MDX_FILENAME_PATTERN", "pattern": "\\.mdx$", "required": false, "min": null, "max": null, "error_msg": "must end with .mdx", "category": "File Paths", "group": "file_paths", "tag_name": "MdFileCopyName", "purpose": "Name of the markdown copy file", "syntax": "MdFileCopyName: book.mdx", "arguments": "filename", "validation": "text", "allowed_content": "Filename", "restrictions": "Must end with .mdx", "defaults": "None", "example": "<MdFileCopyName='book.mdx'>", "result": "book.mdx", "rules": "Optional", "errors": "must end with .mdx"},
+    "HtmlFileName": {"type": "str", "default": null, "validate": ["text"], "regex": "RE_HTML_FILENAME_PATTERN", "pattern": "\\.html$", "required": false, "min": null, "max": null, "error_msg": "must end with .html", "category": "File Paths", "group": "file_paths", "tag_name": "HtmlFileName", "purpose": "Name of the HTML output file", "syntax": "HtmlFileName: book.html", "arguments": "filename", "validation": "text", "allowed_content": "Filename", "restrictions": "Must end with .html", "defaults": "None", "example": "<HtmlFileName='book.html'>", "result": "book.html", "rules": "Optional", "errors": "must end with .html"},
+    "BookListURL": {"type": "str", "default": "", "validate": ["url"], "regex": "RE_URL_PATTERN", "pattern": null, "required": false, "min": null, "max": null, "error_msg": "must be a valid URL", "category": "File Paths", "group": "file_paths", "tag_name": "BookListURL", "purpose": "URL to the book list", "syntax": "BookListURL: https://example.com/books", "arguments": "url", "validation": "url", "allowed_content": "Valid URL", "restrictions": "Must be valid URL format", "defaults": "", "example": "<BookListURL='https://example.com/books'>", "result": "https://example.com/books", "rules": "Optional", "errors": "must be a valid URL"},
+
+    // ===== DISPLAY OPTIONS =====
+    "TitleFontSize": {"type": "str", "default": "0.8em", "validate": ["css_size"], "regex": "RE_CSS_SIZE_PATTERN", "pattern": "^\\d+(\\.\\d+)?(px|em|rem|%)$", "required": false, "min": 0.5, "max": 3.0, "error_msg": null, "category": "Display Options", "group": "display", "tag_name": "TitleFontSize", "purpose": "Font size for titles", "syntax": "TitleFontSize: 0.8em", "arguments": "css_size", "validation": "css_size", "allowed_content": "CSS size value", "restrictions": "Must be valid CSS size", "defaults": "0.8em", "example": "<TitleFontSize='1.2em'>", "result": "1.2em", "rules": "Optional", "errors": "None"},
+    "BookHeaderTitleFontSize": {"type": "str", "default": "0.8em", "validate": ["css_size"], "regex": "RE_CSS_SIZE_PATTERN", "pattern": "^\\d+(\\.\\d+)?(px|em|rem|%)$", "required": false, "min": 0.5, "max": 3.0, "error_msg": null, "category": "Display Options", "group": "display", "tag_name": "BookHeaderTitleFontSize", "purpose": "Font size for book header titles", "syntax": "BookHeaderTitleFontSize: 0.8em", "arguments": "css_size", "validation": "css_size", "allowed_content": "CSS size value", "restrictions": "Must be valid CSS size", "defaults": "0.8em", "example": "<BookHeaderTitleFontSize='1.0em'>", "result": "1.0em", "rules": "Optional", "errors": "None"},
+    "BookFontSize": {"type": "str", "default": "1em", "validate": ["css_size"], "regex": "RE_CSS_SIZE_PATTERN", "pattern": "^\\d+(\\.\\d+)?(px|em|rem|%)$", "required": false, "min": 0.5, "max": 2.5, "error_msg": null, "category": "Display Options", "group": "display", "tag_name": "BookFontSize", "purpose": "Default font size for book text", "syntax": "BookFontSize: 1em", "arguments": "css_size", "validation": "css_size", "allowed_content": "CSS size value", "restrictions": "Must be valid CSS size", "defaults": "1em", "example": "<BookFontSize='1.2em'>", "result": "1.2em", "rules": "Optional", "errors": "None"},
+    "BookFontSizeMobile390": {"type": "str", "default": "0.9em", "validate": ["css_size"], "regex": "RE_CSS_SIZE_PATTERN", "pattern": "^\\d+(\\.\\d+)?(px|em|rem|%)$", "required": false, "min": 0.5, "max": 2.0, "error_msg": null, "category": "Display Options", "group": "display", "tag_name": "BookFontSizeMobile390", "purpose": "Font size for mobile devices (390px width)", "syntax": "BookFontSizeMobile390: 0.9em", "arguments": "css_size", "validation": "css_size", "allowed_content": "CSS size value", "restrictions": "Must be valid CSS size", "defaults": "0.9em", "example": "<BookFontSizeMobile390='1.0em'>", "result": "1.0em", "rules": "Optional", "errors": "None"},
+    "DefaultDesktopImageWidth": {"type": "str", "default": "50%", "validate": ["css_size"], "regex": "RE_CSS_SIZE_PATTERN", "pattern": "^\\d+(\\.\\d+)?(px|em|rem|%)$", "required": false, "min": 0, "max": 100, "error_msg": null, "category": "Display Options", "group": "display", "tag_name": "DefaultDesktopImageWidth", "purpose": "Default image width for desktop", "syntax": "DefaultDesktopImageWidth: 50%", "arguments": "css_size", "validation": "css_size", "allowed_content": "CSS size value", "restrictions": "Must be valid CSS size", "defaults": "50%", "example": "<DefaultDesktopImageWidth='60%'>", "result": "60%", "rules": "Optional", "errors": "None"},
+    "DefaultMobileImageWidth": {"type": "str", "default": "95%", "validate": ["css_size"], "regex": "RE_CSS_SIZE_PATTERN", "pattern": "^\\d+(\\.\\d+)?(px|em|rem|%)$", "required": false, "min": 0, "max": 100, "error_msg": null, "category": "Display Options", "group": "display", "tag_name": "DefaultMobileImageWidth", "purpose": "Default image width for mobile", "syntax": "DefaultMobileImageWidth: 95%", "arguments": "css_size", "validation": "css_size", "allowed_content": "CSS size value", "restrictions": "Must be valid CSS size", "defaults": "95%", "example": "<DefaultMobileImageWidth='90%'>", "result": "90%", "rules": "Optional", "errors": "None"},
+
+    // ===== MISC =====
+    "BubbleTextPopupFontColor": {"type": "str", "default": "#b0e0ff", "validate": ["color"], "regex": "RE_COLOR_PATTERN", "pattern": "^#[0-9a-fA-F]{6}$", "required": false, "min": null, "max": null, "error_msg": "must be a valid hex color", "category": "Colors", "group": "colors", "tag_name": "BubbleTextPopupFontColor", "purpose": "Font color for BubbleText popups", "syntax": "BubbleTextPopupFontColor: #b0e0ff", "arguments": "color", "validation": "color", "allowed_content": "Valid hex color", "restrictions": "Must be valid hex color", "defaults": "#b0e0ff", "example": "<BubbleTextPopupFontColor='#ff6b6b'>", "result": "#ff6b6b", "rules": "Optional", "errors": "must be a valid hex color"},
+    "TOCTitle": {"type": "str", "default": "Table of Contents", "validate": ["text"], "regex": null, "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "category": "Text", "group": "text", "tag_name": "TOCTitle", "purpose": "Title displayed for table of contents", "syntax": "TOCTitle: Table of Contents", "arguments": "text", "validation": "text", "allowed_content": "Text content", "restrictions": "None", "defaults": "Table of Contents", "example": "<TOCTitle='Contents'>", "result": "Contents", "rules": "Optional", "errors": "None"},
+    "CoverPageEndMarker": {"type": "str", "default": "", "validate": ["text"], "regex": null, "pattern": null, "required": false, "min": null, "max": null, "error_msg": null, "category": "Text", "group": "text", "tag_name": "CoverPageEndMarker", "purpose": "Marker text at end of cover page", "syntax": "CoverPageEndMarker: ---", "arguments": "text", "validation": "text", "allowed_content": "Text content", "restrictions": "None", "defaults": "", "example": "<CoverPageEndMarker='~'>", "result": "~", "rules": "Optional", "errors": "None"},
+    "ArrowHoverWidth": {"type": "int", "default": 15, "validate": ["integer"], "regex": "RE_INTEGER_PATTERN", "pattern": null, "required": false, "min": 0, "max": 100, "error_msg": "must be an integer between 0 and 100", "category": "Numeric", "group": "numeric", "tag_name": "ArrowHoverWidth", "purpose": "Width of arrows on hover", "syntax": "ArrowHoverWidth: 15", "arguments": "integer", "validation": "integer", "allowed_content": "Integer value", "restrictions": "Between 0 and 100", "defaults": "15", "example": "<ArrowHoverWidth='20'>", "result": "20", "rules": "Optional", "errors": "must be an integer between 0 and 100"},
+    "ArrowVisibleWidth": {"type": "int", "default": 15, "validate": ["integer"], "regex": "RE_INTEGER_PATTERN", "pattern": null, "required": false, "min": 0, "max": 100, "error_msg": "must be an integer between 0 and 100", "category": "Numeric", "group": "numeric", "tag_name": "ArrowVisibleWidth", "purpose": "Visible width of arrows", "syntax": "ArrowVisibleWidth: 15", "arguments": "integer", "validation": "integer", "allowed_content": "Integer value", "restrictions": "Between 0 and 100", "defaults": "15", "example": "<ArrowVisibleWidth='20'>", "result": "20", "rules": "Optional", "errors": "must be an integer between 0 and 100"}
+};
+
+let REG_MARKDOWN = {};
+const FALLBACK_REG_MARKDOWN = {
+    "heading1": {"category": "Headings", "group": "headings", "tag_name": "heading1", "purpose": "Main heading (level 1)", "syntax": "# Heading 1", "arguments": "text", "validation": "text", "allowed_content": "Text content", "restrictions": "None", "defaults": "N/A", "examples": ["# Chapter 1"], "result": "<h1>Chapter 1</h1>", "rules": "Use for main title of the document", "errors": "None"},
+    "heading2": {"category": "Headings", "group": "headings", "tag_name": "heading2", "purpose": "Sub-heading (level 2)", "syntax": "## Heading 2", "arguments": "text", "validation": "text", "allowed_content": "Text content", "restrictions": "None", "defaults": "N/A", "examples": ["## Introduction"], "result": "<h2>Introduction</h2>", "rules": "Use for sections within chapters", "errors": "None"},
+    "heading3": {"category": "Headings", "group": "headings", "tag_name": "heading3", "purpose": "Sub-section heading (level 3)", "syntax": "### Heading 3", "arguments": "text", "validation": "text", "allowed_content": "Text content", "restrictions": "None", "defaults": "N/A", "examples": ["### Background"], "result": "<h3>Background</h3>", "rules": "Use for sub-sections", "errors": "None"},
+    "heading4": {"category": "Headings", "group": "headings", "tag_name": "heading4", "purpose": "Sub-sub-section heading (level 4)", "syntax": "#### Heading 4", "arguments": "text", "validation": "text", "allowed_content": "Text content", "restrictions": "None", "defaults": "N/A", "examples": ["#### Methodology"], "result": "<h4>Methodology</h4>", "rules": "Use for deeper sub-sections", "errors": "None"},
+    "heading5": {"category": "Headings", "group": "headings", "tag_name": "heading5", "purpose": "Sub-sub-section heading (level 5)", "syntax": "##### Heading 5", "arguments": "text", "validation": "text", "allowed_content": "Text content", "restrictions": "None", "defaults": "N/A", "examples": ["##### Data Analysis"], "result": "<h5>Data Analysis</h5>", "rules": "Use for minor sub-sections", "errors": "None"},
+    "heading6": {"category": "Headings", "group": "headings", "tag_name": "heading6", "purpose": "Sub-sub-section heading (level 6)", "syntax": "###### Heading 6", "arguments": "text", "validation": "text", "allowed_content": "Text content", "restrictions": "None", "defaults": "N/A", "examples": ["###### Notes"], "result": "<h6>Notes</h6>", "rules": "Use for minor sub-sections", "errors": "None"},
+    "bold": {"category": "Emphasis", "group": "emphasis", "tag_name": "bold", "purpose": "Make text bold", "syntax": "**bold text**", "arguments": "text", "validation": "text", "allowed_content": "Text content", "restrictions": "None", "defaults": "N/A", "examples": ["**Important text**"], "result": "<strong>Important text</strong>", "rules": "Use for strong emphasis", "errors": "None"},
+    "italic": {"category": "Emphasis", "group": "emphasis", "tag_name": "italic", "purpose": "Make text italic", "syntax": "*italic text*", "arguments": "text", "validation": "text", "allowed_content": "Text content", "restrictions": "None", "defaults": "N/A", "examples": ["*Emphasized text*"], "result": "<em>Emphasized text</em>", "rules": "Use for mild emphasis", "errors": "None"},
+    "underline": {"category": "Emphasis", "group": "emphasis", "tag_name": "underline", "purpose": "Underline text", "syntax": "<u>underlined text</u>", "arguments": "text", "validation": "text", "allowed_content": "Text content", "restrictions": "None", "defaults": "N/A", "examples": ["<u>Important</u>"], "result": "<u>Important</u>", "rules": "Use for underlining", "errors": "None"},
+    "ordered_list": {"category": "Lists", "group": "lists", "tag_name": "ordered_list", "purpose": "Create an ordered (numbered) list", "syntax": "1. First item\n2. Second item\n3. Third item", "arguments": "list items", "validation": "text", "allowed_content": "List items (numbered)", "restrictions": "Items must start with numbers", "defaults": "N/A", "examples": ["1. Step one\n2. Step two\n3. Step three"], "result": "<ol><li>Step one</li><li>Step two</li><li>Step three</li></ol>", "rules": "Number automatically increments", "errors": "None"},
+    "unordered_list": {"category": "Lists", "group": "lists", "tag_name": "unordered_list", "purpose": "Create an unordered (bulleted) list", "syntax": "- Item one\n- Item two\n- Item three", "arguments": "list items", "validation": "text", "allowed_content": "List items (bulleted)", "restrictions": "Items must start with -, *, or +", "defaults": "N/A", "examples": ["- Apples\n- Bananas\n- Oranges"], "result": "<ul><li>Apples</li><li>Bananas</li><li>Oranges</li></ul>", "rules": "Use - for bullet points", "errors": "None"},
+    "table_2x3": {"category": "Tables", "group": "tables", "tag_name": "table_2x3", "purpose": "Create a table with 2 rows and 3 columns", "syntax": "| Header 1 | Header 2 | Header 3 |\n|----------|----------|----------|\n| Row 1 Col 1 | Row 1 Col 2 | Row 1 Col 3 |\n| Row 2 Col 1 | Row 2 Col 2 | Row 2 Col 3 |", "arguments": "table cells", "validation": "text", "allowed_content": "Table cells with 2 rows, 3 columns", "restrictions": "Must have header row and separator row", "defaults": "N/A", "examples": ["| Name | Age | City |\n|------|-----|------|\n| John | 25 | NYC |\n| Jane | 30 | LA |"], "result": "<table><thead><tr><th>Name</th><th>Age</th><th>City</th></tr></thead><tbody><tr><td>John</td><td>25</td><td>NYC</td></tr><tr><td>Jane</td><td>30</td><td>LA</td></tr></tbody></table>", "rules": "Use for structured data (2 rows, 3 columns)", "errors": "None"},
+    "table_3x5": {"category": "Tables", "group": "tables", "tag_name": "table_3x5", "purpose": "Create a table with 3 rows and 5 columns", "syntax": "| Header 1 | Header 2 | Header 3 | Header 4 | Header 5 |\n|----------|----------|----------|----------|----------|\n| Row 1 Col 1 | Row 1 Col 2 | Row 1 Col 3 | Row 1 Col 4 | Row 1 Col 5 |\n| Row 2 Col 1 | Row 2 Col 2 | Row 2 Col 3 | Row 2 Col 4 | Row 2 Col 5 |\n| Row 3 Col 1 | Row 3 Col 2 | Row 3 Col 3 | Row 3 Col 4 | Row 3 Col 5 |", "arguments": "table cells", "validation": "text", "allowed_content": "Table cells with 3 rows, 5 columns", "restrictions": "Must have header row and separator row", "defaults": "N/A", "examples": ["| ID | Name | Age | City | Country |\n|----|------|-----|------|---------|\n| 1 | Alice | 25 | NYC | USA |\n| 2 | Bob | 30 | LA | USA |\n| 3 | Carol | 28 | CHI | USA |"], "result": "<table><thead><tr><th>ID</th><th>Name</th><th>Age</th><th>City</th><th>Country</th></tr></thead><tbody><tr><td>1</td><td>Alice</td><td>25</td><td>NYC</td><td>USA</td></tr><tr><td>2</td><td>Bob</td><td>30</td><td>LA</td><td>USA</td></tr><tr><td>3</td><td>Carol</td><td>28</td><td>CHI</td><td>USA</td></tr></tbody></table>", "rules": "Use for larger data tables (3 rows, 5 columns)", "errors": "None"}
+};
+
+// ============================================================
+// INTRODUCTION TAB - Load and render INTRO.md
+// ============================================================
+
+
+
+// ============================================================
+// LOAD REG_ATTR FROM SHARED JSON
+// ============================================================
+async function loadRegistry(type) {
+    const filename = type === 'REG_TAG' ? '../GW-data/REG_TAG.JSON' : 
+                     type === 'REG_ATTR' ? '../GW-data/REG_ATTR.JSON' : 
+                     type === 'REG_CONFIG' ? '../GW-data/REG_CONFIG_SCHEMA.JSON' : 
+                     '../GW-data/REG_MARKDOWN.JSON';
+    try {
+        const response = await fetch(filename);
+        if (response.ok) {
+            const data = await response.json();
+            console.log(`✅ ${type} loaded from ${filename} (${Object.keys(data).length} items)`);
+            return data;
+        } else {
+            console.warn(`⚠️ ${filename} returned ${response.status}`);
+        }
+        return {};
+    } catch (e) {
+        console.error(`❌ ERROR loading ${filename}:`, e.message);
+        return {};
+    }
+}
+
+// ============================================================
+// RENDER REGISTRY LABELS (parameterized - replaces renderRegAttrLabels)
+// ============================================================
+function renderRegistryLabels(containerId, registry) {
+    const container = document.getElementById(containerId);
+    if (!container) {
+        console.warn(`Container ${containerId} not found`);
+        return 0;
+    }
+    
+    container.innerHTML = '';
+    
+    // All categories in LOWERCASE for consistency
+    const groupEmojis = {
+        // REG_TAG categories
+        'book structure': '📚',
+        'line breaks': '↩️',
+        'indentation': '📐',
+        'spacing': '📏',
+        'page structure': '📄',
+        'page appearance': '🎨',
+        'navigation': '🧭',
+        'escaping': '🔤',
+        'links': '🔗',
+        'images': '🖼️',
+        'interactive content': '💬',
+        
+        // REG_ATTR categories
+        'alignment': '📐',
+        'background': '🎨',
+        'colors': '🎭',
+        'dimension': '📏',
+        'layout': '🧩',
+        'effects': '✨',
+        'typography': '🔤',
+        'text styling': '✍️',
+        'special': '⭐',
+        'columns': '📊',
+        'flex': '🧩',
+        'font variations': '🔤',
+        'decoration': '🎀',
+        'transformation': '🔄',
+        
+        // REG_CONFIG categories
+        'basic info': 'ℹ️',
+        'colors': '🎨',
+        'images': '🖼️',
+        'flags': '🚩',
+        'numeric': '🔢',
+        'file paths': '📁',
+        'display options': '🖥️',
+        'text': '📝',
+        
+        // REG_MARKDOWN categories
+        'headings': '📑',
+        'emphasis': '✍️',
+        'lists': '📋',
+        'tables': '📊',
+        
+        // Other
+        'other': '📌'
+    };
+    
+    const sorted = Object.entries(registry).sort((a, b) => {
+        const groupA = (a[1].group || a[1].category || 'Other').toLowerCase();
+        const groupB = (b[1].group || b[1].category || 'Other').toLowerCase();
+        if (groupA !== groupB) return groupA.localeCompare(groupB);
+        return a[0].localeCompare(b[0]);
+    });
+    
+    let currentGroup = '';
+    let count = 0;
+    
+    for (const [item, spec] of sorted) {
+        const group = (spec.group || spec.category || 'Other').toLowerCase();
+        
+        if (group !== currentGroup) {
+            currentGroup = group;
+            const emoji = groupEmojis[group] || '📌';
+            
+            // Capitalize first letter for display
+            const displayName = group.charAt(0).toUpperCase() + group.slice(1);
+            
+            const header = document.createElement('div');
+            header.style.cssText = 'font-weight: bold; font-size: 0.95rem; color: var(--bubblefontcolor); margin: 0.3em 0 0.15em 0; border-bottom: 1.5px solid rgba(79,195,247,0.3);';
+            header.textContent = `${emoji} ${displayName}`;
+            container.appendChild(header);
+        }
+        
+        const label = document.createElement('span');
+        label.textContent = item;
+        label.style.cssText = 'display: inline-block; margin: 0.05em 0.6em; cursor: pointer; color: var(--bubblefontcolor); font-size: 0.85rem; border-radius: 3px; transition: all 0.2s ease;';
+        
+        label.addEventListener('mouseenter', function() {
+            this.style.color = '#4fc3f7';
+            this.style.textDecoration = 'underline';
+        });
+        label.addEventListener('mouseleave', function() {
+            this.style.color = 'var(--bubblefontcolor)';
+            this.style.textDecoration = 'none';
+        });
+        
+        label.addEventListener('click', function() {
+            showInfoCard(item, registry);
+        });
+        
+        container.appendChild(label);
+        count++;
+    }
+    
+    return count;
+}
+
+// ============================================================
+// SHOW INFO CARD (modified to accept registry)
+// ============================================================
+function escapeHtml(text) {
+    if (!text) return text;
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function decodeHtml(str) {
+    if (!str) return str;
+    const txt = document.createElement('textarea');
+    txt.innerHTML = str;
+    return txt.value;
+}
+
+function showInfoCard(itemName, registry) {
+    const spec = registry[itemName];
+    if (!spec) {
+        console.warn('Item not found:', itemName);
+        return;
+    }
+    
+    const overlay = document.getElementById('infoCardOverlay');
+    const content = document.getElementById('infoCardContent');
+    
+    if (!overlay || !content) {
+        alert(`Item: ${itemName}\n\n${JSON.stringify(spec, null, 2)}`);
+        return;
+    }
+    
+    // Get raw example - use first example if available
+    let rawExample = 'N/A';
+    if (spec.example) {
+        rawExample = spec.example;
+    } else if (spec.examples && spec.examples.length > 0) {
+        rawExample = spec.examples[0];
+    }
+    
+    // Decode if needed
+    const displayExample = escapeHtml(rawExample);
+    const copyExample = decodeHtml(rawExample);
+    
+    const fields = [
+        // Common fields (all registries)
+        { label: 'Group', value: spec.group || spec.category || 'N/A' },
+        { label: 'Name', value: itemName },
+        { label: 'Purpose', value: spec.purpose || 'N/A' },
+        { label: 'Syntax', value: escapeHtml(spec.syntax || spec.tag_name || itemName) },
+        { label: 'Allowed Content', value: spec.allowed_content || 'None' },
+        { label: 'Restrictions', value: spec.restrictions || 'None' },
+        { label: 'Example', value: displayExample },
+        { label: 'Result', value: spec.result || 'N/A' },
+        { label: 'Rules', value: spec.rules || 'N/A' },
+        { label: 'Errors', value: spec.errors || 'None' },
+        
+        // REG_TAG specific fields
+        { label: 'Type', value: spec.type || 'N/A' },
+        { label: 'Min Args', value: spec.min_args !== undefined ? String(spec.min_args) : 'N/A' },
+        { label: 'Max Args', value: spec.max_args !== undefined ? String(spec.max_args) : 'N/A' },
+        { label: 'Arguments', value: escapeHtml(spec.arguments || spec.args ? JSON.stringify(spec.args) : 'None') },
+        { label: 'HTML', value: escapeHtml(spec.html || 'N/A') },
+        { label: 'Handler', value: spec.handler || 'N/A' },
+        { label: 'Tag Name', value: spec.tag_name || 'N/A' },
+        
+        // REG_ATTR specific fields
+        { label: 'CSS', value: spec.css || 'N/A' },
+        { label: 'Validation', value: spec.validation || spec.validate || 'None' },
+        { label: 'Regex', value: spec.regex || 'None' },
+        { label: 'Control', value: spec.control || 'N/A' },
+        { label: 'Label', value: spec.label || 'N/A' },
+        { label: 'Default', value: spec.defaults || spec.default !== null ? String(spec.default) : 'N/A' },
+        { label: 'Placeholder', value: spec.placeholder || 'N/A' },
+        { label: 'Options', value: spec.options ? JSON.stringify(spec.options) : 'N/A' },
+        { label: 'Min', value: spec.min !== undefined ? String(spec.min) : 'N/A' },
+        { label: 'Max', value: spec.max !== undefined ? String(spec.max) : 'N/A' },
+        
+        // REG_CONFIG specific fields
+        { label: 'Pattern', value: spec.pattern || 'N/A' },
+        { label: 'Required', value: spec.required !== undefined ? (spec.required ? 'True' : 'False') : 'N/A' },
+        { label: 'Error Msg', value: spec.error_msg || 'None' },
+        { label: 'Category', value: spec.category || 'N/A' },
+        { label: 'Arguments', value: spec.arguments || 'None' },
+        { label: 'Defaults', value: spec.defaults || 'None' }
+    ];
+    
+    // Build the HTML
+    let html = `<div style="padding: 0.5rem; max-height: 60vh; overflow-y: auto; word-wrap: break-word; overflow-wrap: break-word; white-space: normal;">`;
+    html += `<h3 style="color: #3a5568; margin: 0 0 0.8rem 0; font-size: 1.2rem; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 0.5rem;">📖 ${itemName}</h3>`;
+    
+    for (const field of fields) {
+        const value = field.value || 'N/A';
+        if (value !== 'N/A' && value !== 'None' && value !== '') {
+            html += `<div style="margin-bottom: 0.4rem;">
+                <div style="font-weight: bold; font-size: 0.75rem; color: #3a5568;">${field.label}:</div>
+                <div style="font-size: 0.9rem; color: #3a5568; word-wrap: break-word; padding-left: 0.3rem;">${value}</div>
+            </div>`;
+        }
+    }
+    
+    html += `</div>`;
+    content.innerHTML = html;
+    overlay.style.display = 'flex';
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    // Store COPYABLE example (DECODED)
+    const copyBtn = document.getElementById('copyExampleBtn');
+    if (copyBtn) {
+        copyBtn.dataset.example = copyExample;
+    }
+    
+    console.log(`📊 ${itemName} - Fields populated:`, fields.filter(f => f.value !== 'N/A' && f.value !== 'None' && f.value !== '').length);
+}
+
+// ============================================================
+// CLOSE INFO CARD - FIXED: Uses class removal, not inline style
+// ============================================================
+function closeInfoCard() {
+    const overlay = document.getElementById('infoCardOverlay');
+    if (overlay) {
+        overlay.style.display = 'none';
+        overlay.classList.remove('active');
+    }
+}
+// ============================================================
+// COPY EXAMPLE TO CLIPBOARD
+// ============================================================
+function copyExampleToClipboard() {
+    const copyBtn = document.getElementById('copyExampleBtn');
+    if (!copyBtn) return;
+    
+    const example = copyBtn.dataset.example || '';
+    if (!example || example === 'N/A') {
+        // Show feedback that there's nothing to copy
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = '❌ No example to copy';
+        setTimeout(() => {
+            copyBtn.textContent = originalText;
+        }, 1500);
+        return;
+    }
+    
+    // Copy the example to clipboard
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(example).then(() => {
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = '✅ Copied!';
+            setTimeout(() => {
+                copyBtn.textContent = originalText;
+            }, 1500);
+        }).catch(() => {
+            fallbackCopyExample(example);
+        });
+    } else {
+        fallbackCopyExample(example);
+    }
+}
+
+// ============================================================
+// FALLBACK COPY (for older browsers)
+// ============================================================
+function fallbackCopyExample(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.top = '-1000px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        const copyBtn = document.getElementById('copyExampleBtn');
+        if (copyBtn) {
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = '✅ Copied!';
+            setTimeout(() => {
+                copyBtn.textContent = originalText;
+            }, 1500);
+        }
+    } catch (err) {
+        console.error('Copy failed:', err);
+    }
+    document.body.removeChild(textarea);
+}
+
+    // ===== STEP 3: ADD THIS CODE =====
+// ============================================================
+// LOAD AND RENDER INTRO.MD (MINIMAL)
+// ============================================================
+
+let md = null;
+
+function initMarkdownIt() {
+    if (typeof window.markdownit !== 'function') return false;
+    try {
+        md = window.markdownit({ html: true, linkify: true, typographer: true, breaks: false });
+        md.enable(['list', 'emphasis', 'heading', 'table']);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
+async function loadIntroGuide() {
+    const container = document.getElementById('introContent');
+    if (!container) return;
+    
+    const url = BASE_URL ? `${BASE_URL}/GW-forms/INTRO.MD` : '../GW-forms/INTRO.MD';
+    
+    try {
+        const response = await fetch(url);
+        if (!response.ok) return;
+        const markdown = await response.text();
+        if (!md && !initMarkdownIt()) return;
+        container.innerHTML = md.render(markdown);
+    } catch (e) {
+        // Silent fail
+    }
+}
+
+// ============================================================
+// EVENT LISTENERS - ADD THIS AT THE BOTTOM OF YOUR SCRIPT
+// ============================================================
+
+// Make sure these are attached after the DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Close button
+    const closeBtn = document.getElementById('closeInfoCardBtn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeInfoCard();
+        });
+    }
+    
+    // Copy button
+    const copyBtn = document.getElementById('copyExampleBtn');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            copyExampleToClipboard();
+        });
+    }
+    
+    // Click outside the card to close (on the overlay)
+    const overlay = document.getElementById('infoCardOverlay');
+    if (overlay) {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeInfoCard();
+            }
+        });
+    }
+    
+    // ESC key to close
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeInfoCard();
+        }
+    });
+});
+
+// ============================================================
+// IFRAME RESIZE
+// ============================================================
+function sendActivePageHeight() {
+    if (window.top === window) return;
+    var height = document.body.scrollHeight + 60;
+    window.top.postMessage({ type: 'iframeResize', height: height }, '*');
+}
+
+// ============================================================
+// TAB SWITCHING
+// ============================================================
+const tabs = document.querySelectorAll('.tab');
+const panels = {
+    about: document.getElementById('panel-about'),
+    intro: document.getElementById('panel-intro'),  // ← ADD THIS
+    config: document.getElementById('panel-config'),
+    custom: document.getElementById('panel-custom'),
+    tobj: document.getElementById('panel-tobj'),
+    markdown: document.getElementById('panel-markdown')
+};
+
+// ===== SAFE TAB SWITCHING (with error checking) =====
+tabs.forEach(tab => {
+    tab.addEventListener('click', function() {
+        const tabName = this.dataset.tab;
+        
+        // Update tabs
+        tabs.forEach(t => {
+            if (t) t.classList.remove('active');
+        });
+        if (this) this.classList.add('active');
+
+        // Update panels - with safety checks
+        Object.keys(panels).forEach(key => {
+            if (panels[key]) {  // ← CHECK IF EXISTS
+                panels[key].classList.remove('active');
+            }
+        });
+        
+        // Show selected panel - with safety check
+        if (panels[tabName]) {  // ← CHECK IF EXISTS
+            panels[tabName].classList.add('active');
+        }
+
+        // Load INTRO.MD if Introduction tab
+        if (tabName === 'intro') {
+            loadIntroGuide();
+        }
+
+        setTimeout(sendActivePageHeight, 100);
+        setTimeout(sendActivePageHeight, 300);
+        setTimeout(sendActivePageHeight, 500);
+    });
+});
+
+// ============================================================
+// INITIALIZATION
+// ============================================================
+async function initTrainer() {
+    console.log('🔴 Initializing Trainer...');
+    
+    // Load REG_ATTR
+    const REG_ATTR = await loadRegistry('REG_ATTR');
+    window.REG_ATTR = REG_ATTR;
+    renderRegistryLabels('regAttrContainer', REG_ATTR);
+    
+    // Load REG_TAG
+    const REG_TAG = await loadRegistry('REG_TAG');
+    window.REG_TAG = REG_TAG;
+    renderRegistryLabels('regTagContainer', REG_TAG);
+    
+    // Load REG_CONFIG
+    const REG_CONFIG = await loadRegistry('REG_CONFIG');
+    window.REG_CONFIG = REG_CONFIG;
+    renderRegistryLabels('regConfigContainer', REG_CONFIG);
+    
+    // Load REG_MARKDOWN
+    const REG_MARKDOWN = await loadRegistry('REG_MARKDOWN');
+    window.REG_MARKDOWN = REG_MARKDOWN;
+    renderRegistryLabels('regMarkdownContainer', REG_MARKDOWN);
+    
+    // ===== LOAD INTRO.MD =====
+    await loadIntroGuide();
+    
+    // Send initial height
+    setTimeout(sendActivePageHeight, 500);
+    
+    console.log('✅ WebBookTrainer fully initialized');
+}
+
+// ============================================================
+// EVENT LISTENERS (with safe null checks)
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize the trainer
+    initTrainer();
+    
+    // Event listeners (safe)
+    const closeBtn = document.getElementById('closeInfoCardBtn');
+    if (closeBtn) closeBtn.addEventListener('click', closeInfoCard);
+    
+    const copyBtn = document.getElementById('copyExampleBtn');
+    if (copyBtn) copyBtn.addEventListener('click', copyExampleToClipboard);
+    
+    const overlay = document.getElementById('infoCardOverlay');
+    if (overlay) {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) closeInfoCard();
+        });
+    }
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeInfoCard();
+    });
+});
+
+// ResizeObserver
+try {
+    new ResizeObserver(function() { 
+        sendActivePageHeight(); 
+    }).observe(document.body);
+} catch(e) {
+    console.log('ResizeObserver not supported');
+}
+</script>
+</body>
+</html>
