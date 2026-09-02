@@ -192,13 +192,12 @@
   
   {[_bold; _color(#1a5276)]} [[🌟 Key Highlights]]<nl><nl>
   
-  {[__ibgcolor(#f8f9fa); __width(40%); __iborder(1px solid #dee2e6); __irounded ]} [[
     • Using BookMaker requires no technical expertise – it's designed for authors, not programmers.
 
     • This interactive guide is built entirely with BookMaker, showcasing the very possibilities it offers.
   
     • Nothing to download – it works seamlessly on all devices.
-  ]]
+
 
   <nlcf>
   {[__center; _italic; _color(#c0392b); _bold]} [[• Completely free to use, with no hidden costs or subscriptions.]]
@@ -215,8 +214,6 @@
 
   {[_bold; _color(#1a7a3a)]} [[🎯 Styling Features]]<nl><nl>
 
-  {[__ibgcolor(#f8f9fa); __width(40%); __iborder(1px solid #dee2e6); __irounded]} [[
-
       {[_bold]} [[• Color Palettes:]] {[_italic]} [[Choose background colors for your book's cover and inner pages, or use custom images with an elegant amorphous glass overlay. Set font colors for the cover, TOC, and content – all from a simple color picker.]]
       
       {[_bold]} [[• Bookmarks:]] {[_italic]} [[Auto-generate shareable bookmark links for every page in your book.]]
@@ -226,7 +223,6 @@
       {[_bold]} [[• Rich Styling:]] {[_italic]} [[Beyond colors, apply bold, italic, underline, superscript, subscript, indented paragraphs, and much more.]]
       
       {[_bold]} [[• Interactive Notation:]] {[_italic]} [[Add popup notes to clickable words and phrases – perfect for definitions, commentary, or links – all while keeping readers on the page and maintaining context. Ideal for glossaries, appendices, and footnotes.]]
-  ]]
 
   <nlcf>
   {[__center; _bold; _fontsize(1.1); _color(#6c3483)]} [[🎨 Your book, your style.]]
@@ -242,7 +238,6 @@
 
   {[_bold; _color(#6c3483)]} [[📋 Five Simple Steps]]<nl><nl>
 
-  {[__ibgcolor(#f8f9fa); __width(40%); __iborder(1px solid #dee2e6); __irounded]} [[
 
       {[_bold]} [[1️⃣ Prepare your manuscript:]] {[_italic]} [[If you're using a word processor or other writing software, save your manuscript as a text (ASCII) file with a .md extension. (Word processor, PDF, and EPUB formats are not currently supported.)]]
       
@@ -253,7 +248,7 @@
       {[_bold]} [[4️⃣ Review and Refine:]] {[_italic]} [[Open your webbook in any browser to preview and refine the styling before publishing.]]
       
       {[_bold]} [[5️⃣ Publish and share:]] {[_italic]} [[Upload the .html file to your website and share the link with your readers.]]
-  ]]
+
   <nlcf>
   {[__center; _bold; _fontsize(1.1);  _color(#6c3483)]} [[📥 SELF-PUBLISH WITH BOOKMAKER]]
 
