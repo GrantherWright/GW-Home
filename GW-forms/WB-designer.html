@@ -291,26 +291,72 @@ button:hover { background: #2fa0d0; }
     color: var(--bubblefontcolor);
 }
 
+#blockRadios {
+    text-align: left !important;
+    width: 100% !important;
+}
+
+#blockRadios > div {
+    justify-content: flex-start !important;
+}
+
 .radio-group {
     border: 1px solid rgba(255,255,255,0.3);
     border-radius: 4px;
     padding: 0.1rem 0.3rem;
     margin: 0 0.2rem 0.2rem 0;
-    display: inline-block;
+    display: block !important;
     color: var(--bubblefontcolor);
+    text-align: left !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
 }
+
+.radio-group > div {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    width: 100% !important;
+}
+
 .radio-group label {
-    display: inline-flex;
-    align-items: center;
+    display: inline-flex !important;
     gap: 0.3rem;
     margin-right: 0.3rem;
+    font-size: .85em !important;
+    text-align: left !important;
     color: var(--bubblefontcolor);
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
 }
+
 legend {
     font-weight: bold;
     padding: 0 0.1rem;
+    font-size: .85em;
     color: var(--bubblefontcolor);
-    font-size: 1.0rem !important;
+}
+
+@media (max-width: 768px) {
+    .radio-group > div {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        justify-content: flex-start !important;
+    }
+    .radio-group label {
+        font-size: 0.75em;
+    }
+}
+@media (max-width: 415px) {
+    .radio-group > div {
+
+    }
+    .radio-group label {
+        font-size: 0.7em;
+    }
 }
 
 .section {
@@ -448,6 +494,7 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
         font-size: 0.9rem;
     }
 }
+
 </style>
 </head>
 <body>
@@ -1602,6 +1649,7 @@ function validatePresets() {
         div.style.display = 'flex';
         div.style.flexWrap = 'wrap';
         div.style.gap = '0.5rem';
+        div.style.alignItems = 'center';
         const radios = [];
         options.forEach(opt => {
             const label = document.createElement('label');
@@ -1781,8 +1829,15 @@ function validatePresets() {
                     checkRow.appendChild(wrapper);
 
                 } else {
-                    const cb = addCheckbox(checkRow, 'chk_' + item.replace(/__/g, ''), item);
+                    const wrapper = document.createElement('div');
+                    wrapper.style.cssText = 'display: inline-flex; align-items: center; gap: 0.3rem;';
+                    const cb = addCheckbox(wrapper, 'chk_' + item.replace(/__/g, ''), '');
                     blockCheckboxes[item] = cb;
+                    const labelSpan = document.createElement('span');
+                    labelSpan.textContent = item;
+                    labelSpan.style.fontSize = '0.85rem';
+                    wrapper.appendChild(labelSpan);
+                    checkRow.appendChild(wrapper);
                 }
             });
 
@@ -1946,8 +2001,15 @@ function validatePresets() {
                     checkRow.appendChild(wrapper);
 
                 } else {
-                    const cb = addCheckbox(checkRow, 'chk_' + item.replace(/__i/g, ''), item);
+                    const wrapper = document.createElement('div');
+                    wrapper.style.cssText = 'display: inline-flex; align-items: center; gap: 0.3rem;';
+                    const cb = addCheckbox(wrapper, 'chk_' + item.replace(/__i/g, ''), '');
                     ibCheckboxes[item] = cb;
+                    const labelSpan = document.createElement('span');
+                    labelSpan.textContent = item;
+                    labelSpan.style.fontSize = '0.85rem';
+                    wrapper.appendChild(labelSpan);
+                    checkRow.appendChild(wrapper);
                 }
             });
 
@@ -2170,8 +2232,15 @@ function validatePresets() {
                     checkRow.appendChild(wrapper);
 
                 } else {
-                    const cb = addCheckbox(checkRow, 'chk_' + item.replace(/\(\)/g, ''), item);
+                    const wrapper = document.createElement('div');
+                    wrapper.style.cssText = 'display: inline-flex; align-items: center; gap: 0.3rem;';
+                    const cb = addCheckbox(wrapper, 'chk_' + item.replace(/\(\)/g, ''), '');
                     inlineCheckboxes[item] = cb;
+                    const labelSpan = document.createElement('span');
+                    labelSpan.textContent = item;
+                    labelSpan.style.fontSize = '0.85rem';
+                    wrapper.appendChild(labelSpan);
+                    checkRow.appendChild(wrapper);
                 }
             });
 
