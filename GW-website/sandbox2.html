@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BookMaker — Web-Native Publishing Engine</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    .book-card {
+      min-height: 500px;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    .prose blockquote {
+      border-left: 4px solid #0284c7;
+      padding-left: 1rem;
+      font-style: italic;
+      color: #475569;
+      background: #f8fafc;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      border-radius: 0 0.375rem 0.375rem 0;
+    }
+  </style>
+</head>
+<body class="bg-[#F4F7F4] text-slate-800 min-h-screen flex flex-col font-sans antialiased">
+
+  <header class="bg-white border-b border-slate-200/80 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 bg-[#0284c7] rounded-lg flex items-center justify-center text-white font-bold font-serif shadow-sm">B</div>
+        <span class="text-xl font-bold font-serif text-slate-900 tracking-tight">BookMaker</span>
+        <span class="text-xs font-sans font-medium text-slate-600 bg-[#EAF0EB] px-2.5 py-0.5 rounded-full border border-slate-200/60">v1.0</span>
+      </div>
+      
+      <nav class="hidden md:flex items-center space-x-6 text-sm font-medium text-slate-600">
+        <a href="#offer" class="hover:text-slate-900 transition-colors">What It Offers</a>
+        <a href="#problem" class="hover:text-slate-900 transition-colors">Problems Solved</a>
+        <a href="#revenue" class="hover:text-slate-900 transition-colors">Revenue</a>
+        <a href="#reader" class="hover:text-slate-900 transition-colors">Reader Experience</a>
+        <a href="#sandbox" class="hover:text-slate-900 transition-colors">Interactive Studio</a>
+      </nav>
+
+      <div class="flex items-center space-x-3">
+        <a href="#sandbox" class="px-4 py-1.5 text-xs md:text-sm bg-[#0284c7] hover:bg-[#0369a1] text-white rounded-lg font-medium transition shadow-sm">Try Interactive Studio</a>
+      </div>
+    </div>
+  </header>
+
+  <section id="offer" class="max-w-7xl mx-auto px-6 pt-12 pb-10 text-center">
+    <span class="inline-block px-3 py-1 bg-[#EAF0EB] text-slate-700 text-xs font-semibold rounded-full uppercase tracking-wider mb-4 border border-slate-200/60">
+      Web-First Publishing Engine
+    </span>
+    <h1 class="text-4xl md:text-5xl font-serif font-bold text-slate-900 leading-tight max-w-4xl mx-auto">
+      Publish Your Manuscript Directly to the Web. Zero Formatting Pain.
+    </h1>
+    <p class="text-base md:text-lg text-slate-600 max-w-3xl mx-auto mt-4 leading-relaxed">
+      BookMaker compiles your plain Markdown text into fast, paginated, and beautifully styled web-books. Host directly on your custom domain with complete control over your content.
+    </p>
+    <div class="mt-6 flex flex-col sm:flex-row justify-center gap-4">
+      <a href="#sandbox" class="px-6 py-3 bg-[#0284c7] hover:bg-[#0369a1] text-white font-medium rounded-lg transition shadow-sm">Test in Interactive Studio</a>
+      <a href="#architecture-diagram" class="px-6 py-3 bg-[#EAF0EB] hover:bg-[#dce6dd] text-slate-800 font-medium rounded-lg transition">View System Architecture</a>
+    </div>
+  </section>
+
+  <section id="problem" class="max-w-7xl mx-auto px-6 py-10">
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-8 md:p-12 shadow-sm">
+      <h2 class="text-2xl md:text-3xl font-serif font-bold text-slate-900 mb-6 text-center">The Problem With Traditional Self-Publishing</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-[#F4F7F4] p-6 rounded-xl border border-slate-200/60">
+          <h3 class="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
+            <span class="text-red-500 font-bold">✕</span> Traditional EPUB / Platform Gatekeepers
+          </h3>
+          <ul class="space-y-2 text-sm text-slate-600">
+            <li>• Complex EPUB/MOBI formatting conversion pipeline errors.</li>
+            <li>• Locked inside proprietary store ecosystems and app stores.</li>
+            <li>• Clunky layout rendering and limited typography customization.</li>
+            <li>• Slow update cycles when fixing typos or updating chapters.</li>
+          </ul>
+        </div>
+
+        <div class="bg-[#EAF0EB] p-6 rounded-xl border border-slate-200/60">
+          <h3 class="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
+            <span class="text-emerald-600 font-bold">✓</span> The BookMaker Web Advantage
+          </h3>
+          <ul class="space-y-2 text-sm text-slate-700">
+            <li>• Pure Markdown input parses instantly into semantic HTML5.</li>
+            <li>• Own your domain, reader relationships, and website traffic.</li>
+            <li>• Responsive, fluid layouts for desktop, tablet, and mobile browsers.</li>
+            <li>• Instant live updates—fix text or push new content in seconds.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="architecture-diagram" class="max-w-7xl mx-auto px-6 py-6">
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm text-center">
+      <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">BookMaker UI & Conversion System Architecture</h3>
+      <div class="overflow-hidden rounded-xl border border-slate-200/60 bg-[#F4F7F4]">
+        <img src="bookmaker-architecture.png" alt="BookMaker Website UI Sketches and Architecture Diagram" class="w-full h-auto object-cover max-h-[600px] mx-auto" onerror="this.onerror=null; this.parentElement.innerHTML='<p class=\'p-8 text-xs text-slate-500 italic\'>[ Saved Diagram Preview: Place <b>bookmaker-architecture.png</b> in the same folder to render system architecture diagram ]</p>';">
+      </div>
+    </div>
+  </section>
+
+  <section id="revenue" class="max-w-7xl mx-auto px-6 py-10">
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-8 md:p-12 shadow-sm">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        <div>
+          <span class="text-xs font-bold text-[#0284c7] uppercase tracking-wider">Direct Monetization</span>
+          <h2 class="text-2xl md:text-3xl font-serif font-bold text-slate-900 mt-2 mb-4">Keep Up to 100% of Your Royalties</h2>
+          <p class="text-sm md:text-base text-slate-600 leading-relaxed mb-4">
+            Traditional ebook marketplaces take 30% to 35% cut of every sale while locking you out of direct communication with your readers.
+          </p>
+          <p class="text-sm md:text-base text-slate-600 leading-relaxed">
+            Publishing web-native books on your own domain allows you to connect direct payment gateways like Stripe or Paddle, capture reader emails, and build an audience you own entirely.
+          </p>
+        </div>
+
+        <div class="bg-[#EAF0EB] p-6 rounded-xl border border-slate-200/60 space-y-4">
+          <div class="bg-white p-4 rounded-lg shadow-2xs flex justify-between items-center">
+            <span class="text-sm font-semibold text-slate-700">Traditional Store Platform Fee</span>
+            <span class="text-sm font-bold text-red-500">30% – 35% Royalty Cut</span>
+          </div>
+          <div class="bg-white p-4 rounded-lg shadow-2xs flex justify-between items-center border-2 border-[#0284c7]">
+            <span class="text-sm font-semibold text-slate-900">BookMaker Direct Web Sales</span>
+            <span class="text-sm font-bold text-emerald-600">100% Royalty Potential</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="reader" class="max-w-7xl mx-auto px-6 py-10">
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-8 md:p-12 shadow-sm text-center">
+      <h2 class="text-2xl md:text-3xl font-serif font-bold text-slate-900 mb-4">A Game Changer for Reader Experience</h2>
+      <p class="text-sm md:text-base text-slate-600 max-w-2xl mx-auto mb-8">
+        No app downloads, file syncing, or unzipping required. Readers simply open your book's URL in any browser.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
+        <div class="p-5 bg-[#F4F7F4] rounded-xl border border-slate-200/60">
+          <h3 class="font-bold text-slate-900 mb-2">Zero Friction Access</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Instant loading on smartphones, tablets, or desktop browsers with clean URLs.</p>
+        </div>
+        <div class="p-5 bg-[#F4F7F4] rounded-xl border border-slate-200/60">
+          <h3 class="font-bold text-slate-900 mb-2">Custom Reader Themes</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Built-in Light, Dark, and Sepia reading themes with responsive typography.</p>
+        </div>
+        <div class="p-5 bg-[#F4F7F4] rounded-xl border border-slate-200/60">
+          <h3 class="font-bold text-slate-900 mb-2">Browser-Native Tools</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Dynamic table of contents, paginated navigation, and instant keyword searching.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="flow-diagram" class="max-w-7xl mx-auto px-6 py-6">
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm text-center">
+      <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">BookMaker Author Journey & Conversion Flow</h3>
+      <div class="overflow-hidden rounded-xl border border-slate-200/60 bg-[#F4F7F4]">
+        <img src="conversion-flow.png" alt="BookMaker Conversion Flow Diagram" class="w-full h-auto object-cover max-h-[500px] mx-auto" onerror="this.onerror=null; this.parentElement.innerHTML='<p class=\'p-8 text-xs text-slate-500 italic\'>[ Saved Diagram Preview: Place <b>conversion-flow.png</b> in the same folder to render conversion flow diagram ]</p>';">
+      </div>
+    </div>
+  </section>
+
+  <section class="max-w-7xl mx-auto px-6 pt-10 pb-4 text-center">
+    <div class="bg-[#EAF0EB] rounded-2xl p-8 border border-slate-200/80">
+      <h2 class="text-2xl md:text-3xl font-serif font-bold text-slate-900">Experience BookMaker Live</h2>
+      <p class="text-sm md:text-base text-slate-600 max-w-2xl mx-auto mt-2">
+        Test our interactive studio below. Paste or drop your Markdown text on the left to see your web book render instantly on the right.
+      </p>
+    </div>
+  </section>
+
+  <main id="sandbox" class="flex-1 max-w-7xl w-full mx-auto px-6 py-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <section class="bg-white rounded-2xl border border-slate-200/80 p-5 flex flex-col shadow-sm">
+      <div class="flex justify-between items-center mb-3">
+        <div class="flex items-center space-x-2">
+          <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full"></span>
+          <label for="markdown-input" class="text-xs font-bold text-slate-700 uppercase tracking-wider">Markdown Input Source</label>
+        </div>
+        <span class="text-xs text-slate-500">Drag & drop a <code class="bg-slate-100 px-1 rounded text-slate-700">.md</code> file</span>
+      </div>
+      
+      <textarea id="markdown-input" class="flex-1 w-full p-4 bg-[#F4F7F4]/40 border border-slate-200 rounded-xl font-mono text-xs md:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0284c7] resize-none leading-relaxed min-h-[380px]" placeholder="Paste or type Markdown manuscript here..."></textarea>
+      
+      <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500 font-sans">
+        <span id="stat-words">0 words</span>
+        <button onclick="loadSample()" class="px-3 py-1 bg-[#EAF0EB] hover:bg-[#dce6dd] text-slate-700 rounded-md font-medium transition">Reload Sample</button>
+        <span id="stat-chars">0 characters</span>
+      </div>
+    </section>
+
+    <section class="bg-[#EAF0EB]/60 rounded-2xl border border-slate-200/80 p-5 flex flex-col shadow-sm">
+      <div class="flex justify-between items-center mb-3">
+        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-[#0284c7]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+          Live Web-Book Render
+        </span>
+        
+        <div class="flex items-center space-x-1.5 bg-white px-2 py-1 rounded-lg border border-slate-200/80 text-xs shadow-2xs">
+          <button onclick="setTheme('light')" id="theme-btn-light" class="px-2.5 py-1 rounded-md font-medium bg-slate-100 text-slate-900">Light</button>
+          <button onclick="setTheme('sepia')" id="theme-btn-sepia" class="px-2.5 py-1 rounded-md font-medium text-slate-600 hover:bg-slate-50">Sepia</button>
+          <button onclick="setTheme('dark')" id="theme-btn-dark" class="px-2.5 py-1 rounded-md font-medium text-slate-600 hover:bg-slate-50">Dark</button>
+        </div>
+      </div>
+
+      <div id="book-viewport" class="flex-1 flex flex-col justify-between">
+        <div id="page-card" class="book-card bg-white rounded-xl p-8 border border-slate-200/80 shadow-sm flex-1 flex flex-col justify-between">
+          <div id="page-content" class="prose prose-slate max-w-none font-serif leading-relaxed text-slate-800">
+            </div>
+
+          <div class="pt-6 mt-6 border-t border-slate-100 flex justify-between items-center text-xs text-slate-400 font-sans">
+            <span id="book-title-footer">BookMaker Engine</span>
+            <span id="page-number-footer">Page 1</span>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center mt-4 pt-1">
+          <button id="prev-btn" onclick="changePage(-1)" class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs md:text-sm font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition">
+            &larr; Previous Page
+          </button>
+          <span id="pagination-info" class="text-xs font-semibold text-slate-600">Page 1 of 1</span>
+          <button id="next-btn" onclick="changePage(1)" class="px-4 py-2 bg-[#0284c7] text-white rounded-lg text-xs md:text-sm font-medium hover:bg-[#0369a1] disabled:opacity-40 disabled:cursor-not-allowed transition shadow-sm">
+            Next Page &rarr;
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="bg-white border-t border-slate-200/80 mt-12 py-8">
+    <div class="max-w-7xl mx-auto px-6 text-center text-xs text-slate-500 space-y-2">
+      <p>BookMaker Digital Publishing Engine &copy; 2026. Built for Web-First Authors.</p>
+      <p>Convert Markdown manuscripts to browser-native books hosted on custom domains.</p>
+    </div>
+  </footer>
+
+  <script>
+    let pages = [];
+    let currentPage = 0;
+
+    const editor = document.getElementById('markdown-input');
+    const contentArea = document.getElementById('page-content');
+    const paginationInfo = document.getElementById('pagination-info');
+    const pageNumFooter = document.getElementById('page-number-footer');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const statWords = document.getElementById('stat-words');
+    const statChars = document.getElementById('stat-chars');
+
+    const sampleMarkdown = `# Chapter 1: The Web-First Author
+
+For decades, self-publishing authors were forced to compress their creativity into rigid, closed e-reader formats. Formatting standard EPUB files often meant wrestling with outdated layout engines.
+
+> "The web is the most accessible, flexible publishing surface ever created. It is time books lived there natively."
+
+### Why Web-Native Books Win
+
+1. **Zero Gatekeepers:** Publish directly on your own custom domain or web server.
+2. **Beautiful Typography:** Take advantage of dynamic CSS, custom fonts, and responsive layouts.
+3. **Instant Revisions:** Fix a typo or update a chapter in seconds without re-submitting files.
+
+---
+
+# Chapter 2: Automated Structure Engine
+
+BookMaker parses standard Markdown markup into semantic HTML5 landmarks. Headings become navigable chapters, blockquotes receive custom callout treatments, and dynamic tables of contents are created automatically.
+
+### Clean Code, Zero Hassle
+
+Write in plain text, push to your repository, and let BookMaker turn raw Markdown into a beautifully paginated web experience for your readers.`;
+
+    function init() {
+      editor.value = sampleMarkdown;
+      renderMarkdown();
+
+      editor.addEventListener('input', renderMarkdown);
+
+      editor.addEventListener('dragover', (e) => e.preventDefault());
+      editor.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const file = e.dataTransfer.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (evt) => {
+            editor.value = evt.target.result;
+            renderMarkdown();
+          };
+          reader.readAsText(file);
+        }
+      });
+    }
+
+    function renderMarkdown() {
+      const rawText = editor.value;
+
+      const words = rawText.trim() ? rawText.trim().split(/\s+/).length : 0;
+      statWords.innerText = `${words} words`;
+      statChars.innerText = `${rawText.length} characters`;
+
+      const parsedHtml = marked.parse(rawText);
+      const sections = parsedHtml.split(/(?=<h[1-2]>|<hr>)/i).filter(s => s.trim().length > 0);
+      
+      pages = sections.length > 0 ? sections : ["<p class='text-slate-400 italic'>Start typing Markdown to render preview...</p>"];
+      currentPage = 0;
+      updatePage();
+    }
+
+    function updatePage() {
+      contentArea.innerHTML = pages[currentPage] || '';
+      pageNumFooter.innerText = `Page ${currentPage + 1}`;
+      paginationInfo.innerText = `Page ${currentPage + 1} of ${pages.length}`;
+      
+      prevBtn.disabled = currentPage === 0;
+      nextBtn.disabled = currentPage >= pages.length - 1;
+    }
+
+    function changePage(direction) {
+      if (currentPage + direction >= 0 && currentPage + direction < pages.length) {
+        currentPage += direction;
+        updatePage();
+      }
+    }
+
+    function loadSample() {
+      editor.value = sampleMarkdown;
+      renderMarkdown();
+    }
+
+    function setTheme(theme) {
+      const card = document.getElementById('page-card');
+      const lightBtn = document.getElementById('theme-btn-light');
+      const sepiaBtn = document.getElementById('theme-btn-sepia');
+      const darkBtn = document.getElementById('theme-btn-dark');
+
+      [lightBtn, sepiaBtn, darkBtn].forEach(btn => {
+        btn.className = "px-2.5 py-1 rounded-md font-medium text-slate-600 hover:bg-slate-50";
+      });
+
+      if (theme === 'sepia') {
+        card.style.background = '#FBF0D9';
+        card.style.color = '#5F4B32';
+        card.style.borderColor = '#E2D5BA';
+        sepiaBtn.className = "px-2.5 py-1 rounded-md font-medium bg-[#F5E5C0] text-[#5F4B32]";
+      } else if (theme === 'dark') {
+        card.style.background = '#1E293B';
+        card.style.color = '#F8FAFC';
+        card.style.borderColor = '#334155';
+        darkBtn.className = "px-2.5 py-1 rounded-md font-medium bg-slate-800 text-white";
+      } else {
+        card.style.background = '#FFFFFF';
+        card.style.color = '#1E293B';
+        card.style.borderColor = '#E2E8F0';
+        lightBtn.className = "px-2.5 py-1 rounded-md font-medium bg-slate-100 text-slate-900";
+      }
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
