@@ -1,0 +1,1861 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BookMaker – Unified</title>
+<style>
+:root {
+    --bubblefontcolor: #1e293b;
+    --bookfontcolor: #1e293b;
+    --bg-sage: #f4f7f4;
+    --bg-tint: #eaf0eb;
+    --accent-blue: #0284c7;
+    --accent-blue-hover: #0369a1;
+    --border-color: #e2e8f0;
+}
+
+* {
+    font-size: 0.95rem;
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: auto;
+}
+body {
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    color: #1e293b;
+    line-height: 1.4;
+    background: transparent !important;
+}
+.builder {
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    padding: 0.75rem;
+    margin: 0;
+    background: transparent !important;
+}
+
+.form-page {
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: var(--bg-tint);
+    height: auto !important;
+    overflow: visible !important;
+}
+
+.glassbtn {
+    background: #ffffff !important;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    padding: 4px 12px;
+    margin: 2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--bubblefontcolor);
+    display: inline-block;
+    font-size: 0.9rem !important;
+    font-weight: 600;
+}
+.glassbtn:hover {
+    background: var(--bg-tint) !important;
+    border-color: #cbd5e1;
+}
+
+.builder label,
+.field-group label {
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--bubblefontcolor);
+}
+
+input, select, textarea {
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.4rem 0.6rem;
+    color: #1e293b;
+    background: #ffffff;
+    font-size: 0.9rem !important;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+textarea {
+    resize: vertical;
+    overflow-y: auto;
+    min-height: 40px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.85rem !important;
+}
+
+button {
+    background: var(--accent-blue);
+    border: none;
+    border-radius: 8px;
+    padding: 0.4rem 1rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: #ffffff;
+    font-size: 0.9rem !important;
+    transition: background-color 0.2s ease;
+}
+button:hover { background: var(--accent-blue-hover); }
+
+.field-group {
+    margin-bottom: 0.5rem;
+}
+
+.flex-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.flex-row > * {
+    flex: 1 1 200px;
+    min-width: 150px;
+}
+
+.error {
+    color: #e11d48;
+    font-size: 0.8rem;
+    margin-top: 0.1rem;
+}
+
+/* ===== TABS ===== */
+.tab-container {
+    display: flex;
+    flex-wrap: wrap;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 0.75rem;
+    gap: 0.3rem;
+}
+.tab {
+    padding: 0.4rem 1.2rem;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    background: rgba(255, 255, 255, 0.5);
+    color: #64748b;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+.tab:hover {
+    background: #ffffff;
+    color: #1e293b;
+}
+.tab.active {
+    background: #ffffff;
+    color: var(--accent-blue);
+    border: 1px solid var(--border-color);
+    border-bottom: 2px solid var(--accent-blue);
+}
+.tab-panel {
+    display: none;
+    padding: 0.3rem 0;
+}
+.tab-panel.active {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+    min-height: 100px;
+}
+
+/* ===== SECTION DIVIDER ===== */
+.section-divider {
+    font-weight: 700;
+    margin: 0.4rem 0 0.3rem 0;
+    color: var(--bubblefontcolor);
+    font-size: 0.95rem;
+    border-left: 3px solid var(--accent-blue);
+    padding-left: 0.5rem;
+}
+
+/* ===== RAISED PANEL ===== */
+.RaisedPnl {
+    background: #ffffff;
+    color: var(--bookfontcolor);
+    border-radius: 8px;
+    padding: 0.6rem;
+    margin-top: 0.4rem;
+    margin-bottom: 0.4rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--border-color);
+}
+
+/* ===== WHITE BORDERED SECTION ===== */
+.section-border {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.6rem;
+    margin-bottom: 0.5rem;
+    background: #ffffff;
+}
+
+/* ===== WHITE BORDERED CONTENT GROUP ===== */
+.content-group {
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.5rem;
+    margin-top: 0.3rem;
+    margin-bottom: 0.3rem;
+    background: var(--bg-sage);
+}
+
+#outputBubble {
+    background: #ffffff;
+    border-radius: 6px;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    display: none;
+    margin-top: 0.3rem;
+}
+#output {
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.85rem;
+    color: #0f172a;
+}
+
+#previewContent {
+    background: #f8fafc;
+    padding: 0.5rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    overflow: auto;
+    max-height: none;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    width: 100% !important;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    border: 1px solid var(--border-color);
+    color: #0f172a;
+}
+
+#copyTagsFeedback, #convertStatus {
+    font-size: 0.85rem;
+    margin-top: 0.2rem;
+}
+
+/* ===== TEMPLATE DISPLAY ===== */
+#templateDisplay {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.6rem;
+    margin-top: 0.4rem;
+    margin-bottom: 0.4rem;
+}
+#templateContent {
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.85rem;
+    background: #f8fafc;
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    color: #0f172a;
+}
+.template-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 0.3rem;
+}
+
+/* ===== INSTRUCTION BUBBLE ===== */
+.instruction-bubble {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 0.6rem 0.8rem;
+    margin-top: 0.6rem;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: 0.85rem;
+    color: var(--bubblefontcolor);
+    line-height: 1.4;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+.instruction-bubble .emoji {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+.instruction-bubble .text {
+    flex: 1;
+}
+.instruction-bubble .text strong {
+    color: var(--accent-blue);
+}
+
+/* ===== COLOR CONTROLS ===== */
+.color-control-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.1rem;
+}
+.color-control-row input[type="color"] {
+    width: 36px;
+    height: 30px;
+    padding: 0;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+.color-control-row input[type="text"] {
+    width: 80px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+.color-control-row label {
+    font-size: 0.85rem !important;
+    font-weight: normal !important;
+    margin: 0 !important;
+    display: inline !important;
+}
+.color-control-row div {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+/* ============================================================
+   GLOBAL TABLE & LIST STYLES - One line per item
+   ============================================================ */
+
+/* ===== BASE TABLE STYLES ===== */
+table { width: 100%; max-width: 100%; table-layout: fixed; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; border-collapse: collapse; margin: 0.8em 0; font-size: 0.9em; border: 1px solid #ddd; display: table; box-sizing: border-box; }
+th, td { border: 1px solid #ddd; padding: 0.4em 0.6em; text-align: left; max-width: 200px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; vertical-align: top; box-sizing: border-box; }
+th { background: #f7faf9; font-weight: 600; }
+
+/* ===== TABLE CONTAINER ===== */
+.table-container { width: 100%; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0.5em 0; box-sizing: border-box; }
+.table-container::-webkit-scrollbar { height: 6px; }
+.table-container::-webkit-scrollbar-thumb { border-radius: 4px; background: rgba(0,0,0,0.2); }
+.table-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }
+
+/* ===== BASE LIST STYLES ===== */
+ul, ol { margin: 0.6em 0 0.6em 1.8em; padding-left: 0.5em; }
+li { margin: 0.2em 0; line-height: 1.6; }
+ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
+
+/* ===== INTRO CONTENT OVERRIDES ===== */
+#introContent table { font-size: 0.9em; }
+#introContent th, #introContent td { max-width: 200px; }
+#introContent ul, #introContent ol { margin: 0.6em 0 0.6em 1.8em; }
+#introContent li { margin: 0.2em 0; line-height: 1.6; }
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 768px) { table { font-size: 0.75em; } th, td { padding: 0.3em 0.4em; max-width: 120px; word-break: break-all; } .table-container { overflow-x: auto; } }
+@media (max-width: 415px) { table { font-size: 0.65em; } th, td { padding: 0.2em 0.3em; max-width: 80px; word-break: break-all; } }
+
+/* ===== BOOK9 SPECIFIC ===== */
+.page table, .page .table-container table { width: 100%; max-width: 100%; table-layout: fixed; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; }
+.page th, .page td { max-width: 150px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; }
+.page ul, .page ol { margin: 0.6em 0 0.6em 1.8em; }
+.page li { margin: 0.2em 0; line-height: 1.6; }
+
+/* ===== DESIGNER SPECIFIC ===== */
+#previewContent table, #previewContent .table-container table { width: 100%; max-width: 100%; table-layout: fixed; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; }
+#previewContent th, #previewContent td { max-width: 150px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; }
+#previewContent ul, #previewContent ol { margin: 0.6em 0 0.6em 1.8em; }
+#previewContent li { margin: 0.2em 0; line-height: 1.6; }
+#previewContent th, #previewContent td { max-width: 150px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; }
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 768px) { table { font-size: 0.75em; } th, td { padding: 0.3em 0.4em; max-width: 120px; word-break: break-all; } .table-container { overflow-x: auto; } }
+@media (max-width: 415px) { table { font-size: 0.65em; } th, td { padding: 0.2em 0.3em; max-width: 80px; word-break: break-all; } }
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 415px) {
+    .builder {
+        padding: 0.2rem;
+    }
+    .form-page {
+        padding: 0.2rem;
+    }
+    .RaisedPnl {
+        padding: 0.3rem !important;
+    }
+    .section-border {
+        padding: 0.2rem;
+    }
+    .content-group {
+        padding: 0.2rem;
+    }
+    .color-control-row input[type="color"] {
+        width: 30px !important;
+        height: 26px !important;
+    }
+    .color-control-row input[type="text"] {
+        width: 60px !important;
+    }
+    .flex-row {
+        gap: 0.3rem;
+    }
+    .flex-row > * {
+        flex: 1 1 100%;
+        min-width: 100%;
+    }
+    input, select, textarea {
+        font-size: 0.9rem !important;
+    }
+    .tab {
+        padding: 0.2rem 0.6rem;
+        font-size: 0.9rem;
+    }
+    .preview-container {
+        min-height: 250px;
+        max-height: 400px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="builder">
+    <h3>📘 BookMaker – WebBook Builder</h3>
+
+    <!-- ===== MAIN FORM PAGE ===== -->
+    <div class="form-page">
+
+        <!-- ===== TABS ===== -->
+        <div class="tab-container">
+            <div class="tab active" data-tab="about">ℹ️ About</div>
+            <div class="tab" data-tab="config">📖 Book Config</div>
+            <div class="tab" data-tab="template">📝 Template</div>
+            <div class="tab" data-tab="webbook">🌐 WebBook</div>
+        </div>
+
+        <!-- ===== TAB 0: ABOUT ===== -->
+        <div class="tab-panel active" id="panel-about">
+            <div class="section-border">
+                <div class="section-divider">ℹ️ About BookMaker</div>
+                <div class="content-group">
+                    <p style="margin: 0.3rem 0; line-height: 1.6; color: var(--bubblefontcolor);">
+                        <strong>BookMaker</strong> converts your Markdown manuscript into a beautifully styled, 
+                        interactive HTML eBook — no coding required.
+                    </p>
+                    
+                    <div style="margin: 0.5rem 0; padding: 0.3rem 0.5rem; background: rgba(79,195,247,0.08); border-radius: 6px;">
+                        <div style="font-weight: bold; color: var(--bubblefontcolor); margin-bottom: 0.2rem;">📖 Book Config</div>
+                        <p style="margin: 0.1rem 0; font-size: 0.9rem; color: #444; line-height: 1.5;">
+                            Set your book's <strong>metadata</strong> (title, author, description), 
+                            <strong>colors</strong> (page background, font, TOC, cover), 
+                            <strong>pagination</strong> (auto-paginate toggle, words per page), 
+                            and <strong>TOC settings</strong> (position, style, skip options). 
+                            All settings are automatically saved in your browser.
+                        </p>
+                    </div>
+
+                    <div style="margin: 0.5rem 0; padding: 0.3rem 0.5rem; background: rgba(79,195,247,0.08); border-radius: 6px;">
+                        <div style="font-weight: bold; color: var(--bubblefontcolor); margin-bottom: 0.2rem;">📝 Template</div>
+                        <p style="margin: 0.1rem 0; font-size: 0.9rem; color: #444; line-height: 1.5;">
+                            Generate a complete <strong>.md template</strong> that includes all your configuration 
+                            tags (BookTitle, AuthorName, colors, etc.) plus a chapter structure. 
+                            <strong>Download</strong> it as a .md file, <strong>copy</strong> it to your clipboard, 
+                            or save your settings as a <strong>.cfg file</strong> to share or reuse later.
+                        </p>
+                    </div>
+
+                    <div style="margin: 0.5rem 0; padding: 0.3rem 0.5rem; background: rgba(79,195,247,0.08); border-radius: 6px;">
+                        <div style="font-weight: bold; color: var(--bubblefontcolor); margin-bottom: 0.2rem;">🌐 WebBook</div>
+                        <p style="margin: 0.1rem 0; font-size: 0.9rem; color: #444; line-height: 1.5;">
+                            Upload your <strong>.md manuscript</strong> (merged with the template), 
+                            preview the first 50 lines, and <strong>convert</strong> it to a fully functional 
+                            HTML eBook. The output includes <strong>pagination</strong>, 
+                            <strong>Table of Contents</strong>, <strong>interactive popups</strong>, 
+                            <strong>responsive design</strong>, and all your custom styling.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== INSTRUCTION BUBBLE ===== -->
+            <div class="instruction-bubble" style="margin-top: 0.5rem;">
+                <span class="emoji">🚀</span>
+                <div class="text">
+                    <strong>Ready to create your book?</strong> Start by filling in your book details in the 
+                    <strong>Book Config</strong> tab above, then click <strong>Template</strong> to generate 
+                    your manuscript template. When you're ready, go to <strong>WebBook</strong> to upload 
+                    and convert your book to HTML.
+                </div>
+            </div>
+        </div>
+        <!-- ===== TAB 1: BOOK CONFIG ===== -->
+        <div class="tab-panel" id="panel-config">
+
+            <!-- ===== LOAD SETTINGS ===== -->
+            <div class="content-group">
+                <button id="loadCfgBtn" class="glassbtn" style="background:#f59e0b;">📂 Load settings (.cfg)</button>
+            </div>
+
+            <!-- ===== BOOK METADATA ===== -->
+            <div class="section-border">
+                <div class="section-divider">📖 Book Information</div>
+                
+                <div class="content-group">
+                    <div class="field-group">
+                        <label for="SubmitterEmail">Submitter Email</label>
+                        <input type="email" id="SubmitterEmail" placeholder="you@example.com">
+                        <div id="SubmitterEmailError" class="error" style="display:none;"></div>
+                    </div>
+
+                    <div class="flex-row">
+                        <div class="field-group">
+                            <label for="BookTitle">Book Title <span style="color:#e11d48;">*</span></label>
+                            <input type="text" id="BookTitle" placeholder="">
+                            <div id="BookTitleError" class="error" style="display:none;"></div>
+                        </div>
+                        <div class="field-group">
+                            <label for="AuthorName">Author Name <span style="color:#e11d48;">*</span></label>
+                            <input type="text" id="AuthorName" placeholder="">
+                            <div id="AuthorNameError" class="error" style="display:none;"></div>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="BookDescription">Book Description <span style="color:#e11d48;">*</span></label>
+                        <textarea id="BookDescription" rows="3" placeholder="Place your book description here" maxlength="127"></textarea>
+                        <div id="BookDescriptionError" class="error" style="display:none;"></div>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="MetaDescription">Meta Description</label>
+                        <textarea id="MetaDescription" rows="2" placeholder="BOOK Introduction"></textarea>
+                        <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.1rem;">Recommended: 150–160 characters.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== PAGINATION ===== -->
+            <div class="section-border">
+                <div class="section-divider">📄 Pagination Settings</div>
+
+                <div class="content-group">
+                    <div class="flex-row">
+                        <div class="field-group">
+                            <label for="AutoPaginate">AutoPaginate</label>
+                            <select id="AutoPaginate">
+                                <option value="">-- Use Default (False) --</option>
+                                <option value="true">True</option>
+                                <option value="false">False</option>
+                            </select>
+                        </div>
+                        <div class="field-group">
+                            <label for="WordsPerPage">Words Per Page</label>
+                            <select id="WordsPerPage">
+                                <option value="">-- Use Default (200) --</option>
+                                <option value="200">200</option>
+                                <option value="250">250</option>
+                                <option value="300">300</option>
+                                <option value="350">350</option>
+                                <option value="400">400</option>
+                                <option value="450">450</option>
+                                <option value="500">500</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== COLORS ===== -->
+            <div class="section-border">
+                <div class="section-divider">🎨 Color Settings <span style="font-weight: normal;">(optional)</span></div>
+
+                <div class="content-group">
+                    <div class="flex-row">
+                        <div class="field-group" style="flex: 1 1 200px; min-width: 160px;">
+                            <label>Book Page Background</label>
+                            <div class="color-control-row">
+                                <input type="color" id="BookPgColor" value="#ffffff">
+                                <input type="text" id="BookPgColor_hex" placeholder="#RRGGBB">
+                                <div>
+                                    <input type="checkbox" id="BookPgColor_default">
+                                    <label for="BookPgColor_default">Default</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-group" style="flex: 1 1 200px; min-width: 160px;">
+                            <label>Cover Page Background</label>
+                            <div class="color-control-row">
+                                <input type="color" id="CoverBgColor" value="#ffffff">
+                                <input type="text" id="CoverBgColor_hex" placeholder="#RRGGBB">
+                                <div>
+                                    <input type="checkbox" id="CoverBgColor_default">
+                                    <label for="CoverBgColor_default">Default</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-group" style="flex: 1 1 200px; min-width: 160px;">
+                            <label>Cover Page Font Color</label>
+                            <div class="color-control-row">
+                                <input type="color" id="CoverPageFontColor" value="#ffffff">
+                                <input type="text" id="CoverPageFontColor_hex" placeholder="#RRGGBB">
+                                <div>
+                                    <input type="checkbox" id="CoverPageFontColor_default">
+                                    <label for="CoverPageFontColor_default">Default</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-group" style="flex: 1 1 200px; min-width: 160px;">
+                            <label>TOC Font Color</label>
+                            <div class="color-control-row">
+                                <input type="color" id="TOCFontColor" value="#ffffff">
+                                <input type="text" id="TOCFontColor_hex" placeholder="#RRGGBB">
+                                <div>
+                                    <input type="checkbox" id="TOCFontColor_default">
+                                    <label for="TOCFontColor_default">Default</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-group" style="flex: 1 1 200px; min-width: 160px;">
+                            <label>Book Font Color</label>
+                            <div class="color-control-row">
+                                <input type="color" id="BookFontColor" value="#ffffff">
+                                <input type="text" id="BookFontColor_hex" placeholder="#RRGGBB">
+                                <div>
+                                    <input type="checkbox" id="BookFontColor_default">
+                                    <label for="BookFontColor_default">Default</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-group">
+                    <div class="field-group">
+                        <label for="SetGlassToAmorphous">Set Each Page Glass to Amorphous</label>
+                        <select id="SetGlassToAmorphous">
+                            <option value="">-- Use Default (True) --</option>
+                            <option value="true">True (glass effect)</option>
+                            <option value="false">False (clear/transparent)</option>
+                        </select>
+                        <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.1rem;">When True, pages have the amorphous glass effect.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== BACKGROUND IMAGES ===== -->
+            <div class="section-border">
+                <div class="section-divider">🖼️ Background Art <span style="font-weight: normal;">(optional)</span></div>
+
+                <div class="content-group">
+                    <div class="flex-row">
+                        <div class="field-group">
+                            <label for="BookImage">Content Page Art</label>
+                            <input type="text" id="BookImage" placeholder="content-page-art.jpg">
+                            <div style="font-size: 0.7rem; color: #64748b; margin-top: 0.1rem;">.jpg or .jpeg</div>
+                        </div>
+                        <div class="field-group">
+                            <label for="CoverPageImage">Cover Page Art</label>
+                            <input type="text" id="CoverPageImage" placeholder="cover-page-art.jpg">
+                            <div style="font-size: 0.7rem; color: #64748b; margin-top: 0.1rem;">.jpg or .jpeg</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== TOC & BOOK LIST ===== -->
+            <div class="section-border">
+                <div class="section-divider">📑 Table of Contents & Book List</div>
+
+                <div class="content-group">
+                    <div class="flex-row">
+                        <div class="field-group" style="flex: 1 1 220px; min-width: 180px;">
+                            <label for="TOCPageSkip">Skip Table of Contents (TOC) Page</label>
+                            <select id="TOCPageSkip">
+                                <option value="">-- Use Default (False) --</option>
+                                <option value="true">True</option>
+                                <option value="false">False</option>
+                            </select>
+                        </div>
+                        <div class="field-group" style="flex: 1 1 220px; min-width: 180px;">
+                            <label for="TOCPosition">TOC Position <span style="font-weight: normal; font-size: 0.8rem;">(0‑based, default 0)</span></label>
+                            <input type="number" id="TOCPosition" min="0" max="999" value="0">
+                        </div>
+                        <div class="field-group" style="flex: 1 1 220px; min-width: 180px;">
+                            <label for="TOCAsList">TOC as List (instead of buttons)</label>
+                            <select id="TOCAsList">
+                                <option value="">-- Use Default (False) --</option>
+                                <option value="true">True</option>
+                                <option value="false">False</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-group">
+                    <div class="flex-row">
+                        <div class="field-group" style="flex: 1 1 220px; min-width: 180px;">
+                            <label for="CoverPageSkip">Skip Cover Page</label>
+                            <select id="CoverPageSkip">
+                                <option value="">-- Use Default (False) --</option>
+                                <option value="true">True</option>
+                                <option value="false">False</option>
+                            </select>
+                        </div>
+                        <div class="field-group" style="flex: 1 1 220px; min-width: 180px;">
+                            <label for="ShowBookListLink">Show Books List Button (📚)</label>
+                            <select id="ShowBookListLink">
+                                <option value="">-- Use Default (False) --</option>
+                                <option value="true">True</option>
+                                <option value="false">False</option>
+                            </select>
+                        </div>
+                        <div class="field-group" style="flex: 1 1 220px; min-width: 180px;">
+                            <label for="BookListURL">Book List URL</label>
+                            <input type="text" id="BookListURL" placeholder="https://example.com" disabled style="opacity: 0.6;">
+                        </div>
+                    </div>
+                    <!-- ===== INSTRUCTION BUBBLE ===== -->
+                    <div class="instruction-bubble">
+                        <span class="emoji">💡</span>
+                        <div class="text">
+                            <strong>Next Steps:</strong> Click on the <i>Template</i> Tab above to generate a template for your manuscript based on the above selections.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ===== END TAB 1 ===== -->
+
+        <!-- ===== TAB 2: TEMPLATE ===== -->
+        <div class="tab-panel" id="panel-template">
+
+            <!-- ===== ACTIONS ===== -->
+            <div class="section-border">
+                <div class="section-divider">⚙️ Actions & Output</div>
+
+                <div class="content-group">
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.3rem;">
+                        <button id="generateBtn" class="glassbtn" style="background:#10b981;">📝 Generate Template</button>
+                    </div>
+
+                    <div id="outputBubble">
+                        <div id="output"></div>
+                    </div>
+                    <div id="copyTagsFeedback"></div>
+                </div>
+
+                <!-- ===== TEMPLATE DISPLAY ===== -->
+                <div id="templateDisplay" style="display: none; margin-top: 0.3rem;">
+                    <hr>
+                    <div style="font-weight: bold; color: var(--bubblefontcolor); margin-bottom: 0.2rem;">📄 Book Template</div>
+                    <div id="templateContent" style="white-space: pre-wrap; word-break: break-all; font-family: monospace; font-size: 0.85rem; background: rgba(255,255,255,0.3); padding: 0.3rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);"></div>
+                    <div class="template-actions" style="display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.3rem;">
+                        <button id="downloadTemplateBtn" class="glassbtn" style="background:#8b5cf6;">📥 Download Template (.md)</button>
+                        <button id="copyTemplateBtn" class="glassbtn" style="background:#3b82f6;">📋 Copy Template</button>
+                    </div>
+                    <div id="templateFeedback" style="font-size: 0.85rem; margin-top: 0.2rem;"></div>
+                    
+                    <!-- ===== DOWNLOAD SETTINGS WITH FILENAME ===== -->
+                    <div style="margin-top: 0.8rem; padding: 0.5rem; background: rgba(0,0,0,0.05); border-radius: 8px; border: 1px solid rgba(0,0,0,0.1);">
+                        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;">
+                            <div style="flex: 1; min-width: 200px;">
+                                <label for="cfgFilename" style="font-size: 0.85rem; font-weight: bold; color: var(--bubblefontcolor); display: block; margin-bottom: 0.1rem;">📁 Filename for settings:</label>
+                                <style> 
+                                    #cfgFilename::placeholder { color: #d7d4d4 !important; opacity: 1 !important; }
+                                </style>
+                                <input type="text" id="cfgFilename" placeholder="my-book-settings" style="width: 100%; padding: 0.3rem 0.5rem; border: 1px solid #ccc; border-radius: 4px; color: #000; background: rgba(255,255,255,0.95);">
+                                <div id="cfgFilenameError" style="font-size: 0.75rem; color: #e11d48; margin-top: 0.1rem; display: none;"></div>
+                            </div>
+                            <div style="flex-shrink: 0;">
+                                <button id="downloadConfigBtn" class="glassbtn" style="background:#3b82f6; padding: 0.3rem 0.8rem;">📥 Download Settings (.cfg)</button>
+                            </div>
+                        </div>
+                        <div id="cfgStatus" style="font-size: 0.85rem; margin-top: 0.3rem; color: var(--bubblefontcolor);"></div>
+                    </div>
+                    
+                    <!-- ===== INSTRUCTION BUBBLE ===== -->
+                    <div class="instruction-bubble" style="margin-top: 0.8rem;">
+                        <span class="emoji">💡</span>
+                        <div class="text">
+                            <strong>Next Steps:</strong> Download the template (<strong>.md</strong>) to your downloads folder, then merge it with your existing book content. 
+                            Save the combined file as <strong>YourBookName.md</strong> to use with BookMaker. Click the <i>Webbook</i> Tab above and download your book.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- ===== END TAB 2 ===== -->
+
+        <!-- ===== TAB 3: WEBBOOK ===== -->
+        <div class="tab-panel" id="panel-webbook">
+
+            <!-- ===== FILE UPLOAD ===== -->
+            <div class="content-group" id="fileUploadSection">
+                <div style="font-weight: bold; margin-bottom: 0.2rem; color: var(--bubblefontcolor);">📂 Select <strong>YourBookName.md</strong> file</div>
+                <input type="file" id="mdFileInput" accept=".md" style="margin-bottom: 0.2rem; width: auto; display: inline-block;">
+                <div id="fileError" class="error"></div>
+                <div id="step3Container" style="display: none; margin-top: 0.3rem;">
+                    <button id="processFileBtn" class="glassbtn" style="background:#3b82f6;">⚙️ Process book file</button>
+                </div>
+                <div id="previewArea" style="margin-top: 0.3rem; display: none;">
+                    <div style="font-weight: bold; font-size:0.85rem;">Preview <span style="font-weight: normal;">(first 50 lines)</span></div>
+                    <pre id="previewContent"></pre>
+                </div>
+                <div id="step4Container" style="margin-top: 0.3rem; display: none;">
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.3rem;">
+                        <button id="convertDownloadBtn" class="glassbtn" style="background:#8b5cf6;">⬇️ Convert & download book (.html)</button>
+                    </div>
+                </div>
+                <div id="convertStatus"></div>
+            </div>
+
+        </div>
+        <!-- ===== END TAB 3 ===== -->
+
+    </div>
+</div>
+
+<script>
+    // ========== BOOKMAKER SCRIPT ==========
+    // ->> API router
+    // Determine which API to use
+    // const API_URL = 'http://127.0.0.1:5000/convert';
+
+    //AUtodetect
+    // const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    // ? 'http://127.0.0.1:5000/convert'
+    //: 'https://grantherwright.pythonanywhere.com/convert';
+
+    //PythonANywhere - GrantherWright
+    const API_URL = 'https://grantherwright.pythonanywhere.com/convert';
+
+
+    console.log('🔴 API_URL:', API_URL);
+
+    // ===== CFG FILENAME VALIDATION =====
+    function isValidFilename(filename) {
+    // Check if empty
+    if (!filename || filename.trim() === '') {
+        return { valid: false, error: 'Filename cannot be empty.' };
+    }
+    
+    // Remove spaces for validation
+    const clean = filename.trim();
+    
+    // Check for invalid characters (allow letters, numbers, hyphens, underscores, dots)
+    const validPattern = /^[a-zA-Z0-9\-_.]+$/;
+    if (!validPattern.test(clean)) {
+        return { 
+            valid: false, 
+            error: 'Only letters, numbers, hyphens (-), underscores (_), and dots (.) are allowed.' 
+        };
+    }
+    
+    // Check length
+    if (clean.length < 1 || clean.length > 100) {
+        return { valid: false, error: 'Filename must be between 1 and 100 characters.' };
+    }
+    
+    // Check for reserved names (Windows)
+    const reserved = ['CON', 'PRN', 'AUX', 'NUL', 'COM1', 'COM2', 'COM3', 'COM4', 'COM5', 'COM6', 'COM7', 'COM8', 'COM9', 'LPT1', 'LPT2', 'LPT3', 'LPT4', 'LPT5', 'LPT6', 'LPT7', 'LPT8', 'LPT9'];
+    if (reserved.includes(clean.toUpperCase())) {
+        return { valid: false, error: 'Reserved filename. Please choose a different name.' };
+    }
+    
+    return { valid: true, error: '' };
+}
+
+    (function() {
+        'use strict';
+
+        // ===== BOOK TEMPLATE CONSTANT =====
+        var BookTemplate = `<StartBook>
+            <Chapter='Chapter 1'>
+            <ChapterTitle='Chapter 1'>
+
+
+            /// Optional
+            <Section='Section 1'>
+            <SectionTitle='Section 1'>
+
+
+            <PageDivider>
+            <NewPage>
+            <Chapter='Chapter 2'>
+            <ChapterTitle='Chapter 2'>
+
+
+            <PageDivider>
+            <NewPage>
+            <Chapter='Chapter 3'>
+            <ChapterTitle='Chapter 3'>`;
+
+        var colorFields = [
+            { key: 'BookPgColor', label: 'Book Page Background Color' },
+            { key: 'CoverBgColor', label: 'Cover Page Background Color' },
+            { key: 'CoverPageFontColor', label: 'Cover Page Font Color' },
+            { key: 'TOCFontColor', label: 'TOC Font Color' },
+            { key: 'BookFontColor', label: 'Book Font Color' }
+        ];
+
+        // ============================================================
+        // TAB SWITCHING
+        // ============================================================
+        const tabs = document.querySelectorAll('.tab');
+        const panels = {
+            config: document.getElementById('panel-config'),
+            template: document.getElementById('panel-template'),
+            webbook: document.getElementById('panel-webbook'),
+            about: document.getElementById('panel-about')
+        };
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabName = this.dataset.tab;
+                
+                // Remove active class from all tabs
+                tabs.forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tab
+                this.classList.add('active');
+
+                // Hide all panels
+                Object.keys(panels).forEach(key => {
+                    panels[key].classList.remove('active');
+                });
+                // Show the selected panel
+                panels[tabName].classList.add('active');
+
+                // Resize iframe after tab switch
+                setTimeout(sendHeight, 100);
+                setTimeout(sendHeight, 300);
+                setTimeout(sendHeight, 500);
+            });
+        });
+
+        // ===== COLOR SYNC =====
+        function setupColorSync(colorPickerId, hexInputId, defaultCheckboxId) {
+            var colorPicker = document.getElementById(colorPickerId);
+            var hexInput = document.getElementById(hexInputId);
+            var defaultCheckbox = document.getElementById(defaultCheckboxId);
+            if (!colorPicker || !hexInput) return;
+            var updating = false;
+
+            function syncFromHex() {
+                if (updating) return;
+                var hex = hexInput.value.trim();
+                if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+                    updating = true;
+                    colorPicker.value = hex;
+                    updating = false;
+                    if (defaultCheckbox && defaultCheckbox.checked) {
+                        defaultCheckbox.checked = false;
+                        hexInput.disabled = false;
+                        colorPicker.disabled = false;
+                    }
+                } else if (hex === "") {
+                    updating = true;
+                    colorPicker.value = '#ffffff';
+                    updating = false;
+                    if (defaultCheckbox && defaultCheckbox.checked) {
+                        defaultCheckbox.checked = false;
+                    }
+                }
+                if (defaultCheckbox) {
+                    if (defaultCheckbox.checked) {
+                        hexInput.disabled = true;
+                        colorPicker.disabled = true;
+                    } else {
+                        hexInput.disabled = false;
+                        colorPicker.disabled = false;
+                    }
+                }
+            }
+
+            function syncFromColorPicker() {
+                if (updating) return;
+                var picked = colorPicker.value;
+                updating = true;
+                hexInput.value = picked;
+                updating = false;
+                if (defaultCheckbox && defaultCheckbox.checked) {
+                    defaultCheckbox.checked = false;
+                    hexInput.disabled = false;
+                    colorPicker.disabled = false;
+                }
+            }
+
+            function syncFromDefaultCheckbox() {
+                if (defaultCheckbox) {
+                    if (defaultCheckbox.checked) {
+                        hexInput.disabled = true;
+                        colorPicker.disabled = true;
+                        hexInput.value = '';
+                    } else {
+                        hexInput.disabled = false;
+                        colorPicker.disabled = false;
+                    }
+                }
+            }
+
+            hexInput.addEventListener('input', syncFromHex);
+            hexInput.addEventListener('change', syncFromHex);
+            colorPicker.addEventListener('input', syncFromColorPicker);
+            if (defaultCheckbox) {
+                defaultCheckbox.addEventListener('change', syncFromDefaultCheckbox);
+            }
+            syncFromHex();
+        }
+
+        // ===== IFRAME RESIZE =====
+        function sendActivePageHeight() {
+            if (window.top === window) return;
+            var height = document.body.scrollHeight + 60;
+            window.top.postMessage({ type: 'iframeResize', height: height }, '*');
+        }
+
+        // ===== INIT COLOR SYNC =====
+        window.addEventListener('load', function() {
+            setupColorSync('BookPgColor', 'BookPgColor_hex', 'BookPgColor_default');
+            setupColorSync('CoverBgColor', 'CoverBgColor_hex', 'CoverBgColor_default');
+            setupColorSync('CoverPageFontColor', 'CoverPageFontColor_hex', 'CoverPageFontColor_default');
+            setupColorSync('TOCFontColor', 'TOCFontColor_hex', 'TOCFontColor_default');
+            setupColorSync('BookFontColor', 'BookFontColor_hex', 'BookFontColor_default');
+            setTimeout(sendActivePageHeight, 100);
+            restoreFormState();
+        });
+
+        // ===== LOCAL STORAGE SAVE/RESTORE =====
+        function saveFormState() {
+            var formData = {};
+            var textFields = ['SubmitterEmail', 'BookTitle', 'AuthorName', 'BookDescription', 'MetaDescription', 'BookImage', 'CoverPageImage', 'BookListURL', 'TOCPosition'];
+            for (var i = 0; i < textFields.length; i++) {
+                var el = document.getElementById(textFields[i]);
+                if (el) formData[textFields[i]] = el.value;
+            }
+            var selects = ['AutoPaginate', 'WordsPerPage', 'TOCPageSkip', 'CoverPageSkip', 'TOCAsList', 'ShowBookListLink', 'SetGlassToAmorphous'];
+            for (var j = 0; j < selects.length; j++) {
+                var el = document.getElementById(selects[j]);
+                if (el) formData[selects[j]] = el.value;
+            }
+            for (var k = 0; k < colorFields.length; k++) {
+                var key = colorFields[k].key;
+                var defaultCheck = document.getElementById(key + '_default');
+                var hexInput = document.getElementById(key + '_hex');
+                if (defaultCheck) formData[key + '_default'] = defaultCheck.checked;
+                if (hexInput) formData[key + '_hex'] = hexInput.value;
+            }
+            localStorage.setItem('bookFormState', JSON.stringify(formData));
+        }
+
+        function restoreFormState() {
+            var saved = localStorage.getItem('bookFormState');
+            if (!saved) return;
+            try {
+                var formData = JSON.parse(saved);
+                var textFields = ['SubmitterEmail', 'BookTitle', 'AuthorName', 'BookDescription', 'MetaDescription', 'BookImage', 'CoverPageImage', 'BookListURL', 'TOCPosition'];
+                for (var i = 0; i < textFields.length; i++) {
+                    var key = textFields[i];
+                    if (formData[key] !== undefined) {
+                        var el = document.getElementById(key);
+                        if (el) el.value = formData[key];
+                    }
+                }
+                var selects = ['AutoPaginate', 'WordsPerPage', 'TOCPageSkip', 'CoverPageSkip', 'TOCAsList', 'ShowBookListLink', 'SetGlassToAmorphous'];
+                for (var j = 0; j < selects.length; j++) {
+                    var key = selects[j];
+                    if (formData[key] !== undefined) {
+                        var el = document.getElementById(key);
+                        if (el) el.value = formData[key];
+                    }
+                }
+                for (var k = 0; k < colorFields.length; k++) {
+                    var key = colorFields[k].key;
+                    var defaultChecked = formData[key + '_default'];
+                    var hexValue = formData[key + '_hex'];
+                    var defaultCheck = document.getElementById(key + '_default');
+                    var hexInput = document.getElementById(key + '_hex');
+                    var colorPicker = document.getElementById(key);
+                    if (defaultCheck && defaultChecked !== undefined) {
+                        defaultCheck.checked = defaultChecked;
+                        var evt = document.createEvent('Event');
+                        evt.initEvent('change', true, true);
+                        defaultCheck.dispatchEvent(evt);
+                    }
+                    if (hexInput && hexValue !== undefined) {
+                        hexInput.value = hexValue;
+                        if (colorPicker && /^#[0-9A-Fa-f]{6}$/.test(hexValue)) {
+                            colorPicker.value = hexValue;
+                        }
+                    }
+                }
+                updateBookListURLState();
+            } catch(e) { console.warn('Failed to restore state', e); }
+        }
+
+        // ===== ATTACH SAVE LISTENERS =====
+        function attachSaveListeners() {
+            var allFields = document.querySelectorAll('input, select, textarea');
+            for (var i = 0; i < allFields.length; i++) {
+                allFields[i].addEventListener('change', function() { saveFormState(); });
+                allFields[i].addEventListener('input', function() { saveFormState(); });
+            }
+            for (var j = 0; j < colorFields.length; j++) {
+                var chk = document.getElementById(colorFields[j].key + '_default');
+                if (chk) {
+                    chk.addEventListener('change', function() { saveFormState(); });
+                }
+            }
+        }
+        attachSaveListeners();
+
+        // ===== LOAD CFG =====
+        function loadCfgFile(file) {
+            return new Promise(function(resolve, reject) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var content = e.target.result;
+                    if (!/^[\x20-\x7E\r\n]*$/.test(content)) {
+                        reject(new Error('File contains non-ASCII characters.'));
+                        return;
+                    }
+                    try {
+                        resolve(atob(content));
+                    } catch (err) {
+                        reject(new Error('Invalid Base64 encoding.'));
+                    }
+                };
+                reader.onerror = function() { reject(new Error('Error reading file.')); };
+                reader.readAsText(file, 'UTF-8');
+            });
+        }
+
+        // ===== PARSE TAGS =====
+        function parseTagsAndPopulate(tagString) {
+            tagString = tagString.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+            // Helper to process tab tags (matches pre_clean)
+            function processTabTags(value) {
+                if (!value) return value;
+                // Convert <tab> to span with 2em margin-left
+                return value.replace(/<tab>/gi, '<span style="margin-left: 2em; display: inline-block;">&nbsp;</span>');
+            }
+
+            var textFields = ['SubmitterEmail', 'BookTitle', 'AuthorName', 'BookDescription', 'MetaDescription', 'BookImage', 'CoverPageImage', 'BookListURL', 'TOCPosition'];
+            for (var i = 0; i < textFields.length; i++) {
+                var el = document.getElementById(textFields[i]);
+                if (el) el.value = '';
+            }
+
+            var selects = ['AutoPaginate', 'WordsPerPage', 'TOCPageSkip', 'CoverPageSkip', 'TOCAsList', 'ShowBookListLink', 'SetGlassToAmorphous'];
+            for (var j = 0; j < selects.length; j++) {
+                var sel = document.getElementById(selects[j]);
+                if (sel) sel.value = '';
+            }
+
+            for (var k = 0; k < colorFields.length; k++) {
+                var field = colorFields[k];
+                var defaultCheck = document.getElementById(field.key + '_default');
+                var hexInput = document.getElementById(field.key + '_hex');
+                var colorPicker = document.getElementById(field.key);
+                if (defaultCheck) defaultCheck.checked = false;
+                if (hexInput) hexInput.value = '';
+                if (colorPicker) colorPicker.value = '#ffffff';
+            }
+
+            var lines = tagString.split('\n');
+            for (var m = 0; m < lines.length; m++) {
+                var trimmed = lines[m].trim();
+                if (trimmed.startsWith('<') && trimmed.endsWith('>')) {
+                    var match = trimmed.match(/<(\w+)=['"]([^'"]*)['"]>/i);
+                    if (match) {
+                        var key = match[1];
+                        var value = match[2];
+                        var el = document.getElementById(key);
+                        if (el) {
+                            if (el.tagName === 'SELECT') {
+                                var options = el.options;
+                                var found = false;
+                                for (var o = 0; o < options.length; o++) {
+                                    if (options[o].value.toLowerCase() === value.toLowerCase()) {
+                                        el.selectedIndex = o;
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                                if (!found) {
+                                    for (var o2 = 0; o2 < options.length; o2++) {
+                                        if (options[o2].text.trim().toLowerCase() === value.toLowerCase()) {
+                                            el.selectedIndex = o2;
+                                            found = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (!found) el.value = '';
+                            } else if (el.type === 'color') {
+                                var hexInput2 = document.getElementById(el.id + '_hex');
+                                if (hexInput2) hexInput2.value = value;
+                                el.value = value;
+                            } else {
+                                el.value = processTabTags(value);
+                            }
+                        }
+                    }
+                }
+            }
+
+            updateBookListURLState();
+            currentTags = tagString;
+            var outputDiv = document.getElementById('output');
+            var outputBubble = document.getElementById('outputBubble');
+            if (outputDiv) outputDiv.textContent = currentTags;
+            if (outputBubble) outputBubble.style.display = 'block';
+            sendActivePageHeight();
+            saveFormState();
+        }
+
+        var currentTags = "";
+
+        // ===== UPDATE BOOK LIST URL STATE =====
+        function updateBookListURLState() {
+            var showBookListSelect = document.getElementById('ShowBookListLink');
+            var urlInput = document.getElementById('BookListURL');
+            if (!showBookListSelect || !urlInput) return;
+            var isTrue = showBookListSelect.value === 'true' || showBookListSelect.value === 'True';
+            urlInput.disabled = !isTrue;
+            if (urlInput.disabled) {
+                urlInput.value = '';
+                urlInput.style.opacity = '0.6';
+            } else {
+                urlInput.style.opacity = '1';
+            }
+        }
+
+        // ===== VALIDATION =====
+        function validateTextField(fieldId, fieldName) {
+            var input = document.getElementById(fieldId);
+            var errorDiv = document.getElementById(fieldId + 'Error');
+            if (!errorDiv) return true;
+            var val = input.value.trim();
+            if (val === '') {
+                errorDiv.textContent = fieldName + ' is required.';
+                errorDiv.style.display = 'block';
+                return false;
+            } else {
+                errorDiv.style.display = 'none';
+                return true;
+            }
+        }
+
+        function validateImageExtension(value) {
+            if (!value) return true;
+            return /\.(jpg|jpeg)$/i.test(value);
+        }
+
+        // ===== DOM ELEMENTS =====
+        var genBtn = document.getElementById('generateBtn');
+        var clearBtn = document.getElementById('clearBtn');
+        var loadCfgBtn = document.getElementById('loadCfgBtn');
+        var copyTagsBtn = document.getElementById('copyTagsBtn');
+        var outputDiv = document.getElementById('output');
+        var outputBubble = document.getElementById('outputBubble');
+        var mdFileInput = document.getElementById('mdFileInput');
+        var fileError = document.getElementById('fileError');
+        var processFileBtn = document.getElementById('processFileBtn');
+        var previewArea = document.getElementById('previewArea');
+        var previewContent = document.getElementById('previewContent');
+        var convertDownloadBtn = document.getElementById('convertDownloadBtn');
+        var downloadConfigBtn = document.getElementById('downloadConfigBtn');
+        var convertStatusDiv = document.getElementById('convertStatus');
+        var fileUploadSection = document.getElementById('fileUploadSection');
+        var step3Container = document.getElementById('step3Container');
+        var step4Container = document.getElementById('step4Container');
+        var templateDisplay = document.getElementById('templateDisplay');
+        var templateContent = document.getElementById('templateContent');
+        var templateFeedback = document.getElementById('templateFeedback');
+
+        // ===== GENERATE =====
+        if (genBtn) {
+            genBtn.onclick = function() {
+                if (!validateTextField('BookTitle','Book Title') || !validateTextField('AuthorName','Author Name') || !validateTextField('BookDescription','Book Description')) {
+                    outputDiv.textContent = 'Please fill all required fields.';
+                    outputBubble.style.display = 'block';
+                    templateDisplay.style.display = 'none';
+                    return;
+                }
+                var bookImage = document.getElementById('BookImage') ? document.getElementById('BookImage').value.trim() : '';
+                var coverImage = document.getElementById('CoverPageImage') ? document.getElementById('CoverPageImage').value.trim() : '';
+                if (!validateImageExtension(bookImage) || !validateImageExtension(coverImage)) {
+                    outputDiv.textContent = 'Invalid image extension (must be .jpg or .jpeg)';
+                    outputBubble.style.display = 'block';
+                    templateDisplay.style.display = 'none';
+                    return;
+                }
+
+                var showBookList = document.getElementById('ShowBookListLink').value === 'true';
+                var bookListUrlRaw = document.getElementById('BookListURL').value.trim();
+                if (showBookList && !bookListUrlRaw) {
+                    outputDiv.textContent = 'Book List URL is required when "Show Books List Button" is True.';
+                    outputBubble.style.display = 'block';
+                    templateDisplay.style.display = 'none';
+                    return;
+                }
+                var bookListUrl = bookListUrlRaw;
+                if (bookListUrl) {
+                    var urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/i;
+                    if (!urlPattern.test(bookListUrl)) {
+                        outputDiv.textContent = 'Invalid Book List URL.';
+                        outputBubble.style.display = 'block';
+                        templateDisplay.style.display = 'none';
+                        return;
+                    }
+                    if (!/^https?:\/\//i.test(bookListUrl)) {
+                        bookListUrl = 'https://' + bookListUrl;
+                    }
+                }
+
+                var tags = [];
+                function tag(k, v) {
+                    var value = String(v);
+                    value = value.replace(/<squote>/g, "\\'");
+                    value = value.replace(/<dquote>/g, '\\"');
+                    // Convert <tab> tags in the value to proper HTML (matches pre_clean)
+                    value = value.replace(/<tab>/gi, '<span style="margin-left: 2em; display: inline-block;">&nbsp;</span>');
+                    return '<' + k + "='" + value + "'>\n";
+                }
+
+                tags.push(tag('SubmitterEmail', document.getElementById('SubmitterEmail').value.trim()));
+                tags.push(tag('BookTitle', document.getElementById('BookTitle').value.trim()));
+                tags.push(tag('AuthorName', document.getElementById('AuthorName').value.trim()));
+                tags.push(tag('BookDescription', document.getElementById('BookDescription').value.trim()));
+                tags.push(tag('MetaDescription', document.getElementById('MetaDescription').value.trim()));
+
+                var autoSelect = document.getElementById('AutoPaginate');
+                if (autoSelect && autoSelect.value !== '') tags.push(tag('AutoPaginate', autoSelect.value === 'true' ? 'True' : 'False'));
+                var wordsSelect = document.getElementById('WordsPerPage');
+                if (wordsSelect && wordsSelect.value !== '') tags.push(tag('WordsPerPage', wordsSelect.value));
+
+                var tocPageSkip = document.getElementById('TOCPageSkip').value;
+                if (tocPageSkip !== '') tags.push(tag('TOCPageSkip', tocPageSkip === 'true' ? 'True' : 'False'));
+                var tocPosition = document.getElementById('TOCPosition').value;
+                tags.push(tag('TOCPosition', tocPosition || '0'));
+                var coverPageSkip = document.getElementById('CoverPageSkip').value;
+                if (coverPageSkip !== '') tags.push(tag('CoverPageSkip', coverPageSkip === 'true' ? 'True' : 'False'));
+                var tocAsList = document.getElementById('TOCAsList').value;
+                if (tocAsList !== '') tags.push(tag('TOCAsList', tocAsList === 'true' ? 'True' : 'False'));
+                var showBookListLink = document.getElementById('ShowBookListLink').value;
+                if (showBookListLink !== '') tags.push(tag('ShowBookListLink', showBookListLink === 'true' ? 'True' : 'False'));
+                if (bookListUrl) tags.push(tag('BookListURL', bookListUrl));
+
+                var glassSelect = document.getElementById('SetGlassToAmorphous');
+                if (glassSelect && glassSelect.value !== '') {
+                    tags.push(tag('SetGlassToAmorphous', glassSelect.value === 'true' ? 'True' : 'False'));
+                }
+
+                for (var i = 0; i < colorFields.length; i++) {
+                    var key = colorFields[i].key;
+                    var defaultCheck = document.getElementById(key + '_default');
+                    var hexInput = document.getElementById(key + '_hex');
+                    if (defaultCheck && !defaultCheck.checked && hexInput && hexInput.value.trim() !== '') {
+                        var hexVal = hexInput.value.trim();
+                        if (/^#[0-9A-Fa-f]{6}$/.test(hexVal)) {
+                            tags.push(tag(key, hexVal));
+                        }
+                    }
+                }
+                if (bookImage) tags.push(tag('BookImage', bookImage));
+                if (coverImage) tags.push(tag('CoverPageImage', coverImage));
+
+                // ===== ADD BOOK TEMPLATE =====
+                var fullContent = tags.join('') + '\n' + BookTemplate;
+                
+                currentTags = fullContent;
+                
+                // ===== SHOW TEMPLATE DISPLAY ONLY =====
+                if (templateDisplay && templateContent) {
+                    templateContent.textContent = fullContent;
+                    templateDisplay.style.display = 'block';
+                }
+                
+                // ===== HIDE OUTPUT BUBBLE =====
+                outputBubble.style.display = 'none';
+                
+                // File upload section is always visible
+                
+                mdFileInput.value = '';
+                fileError.textContent = '';
+                previewArea.style.display = 'none';
+                step3Container.style.display = 'none';
+                step4Container.style.display = 'none';
+                window.modifiedMarkdown = null;
+                sendActivePageHeight();
+                saveFormState();
+            };
+        }
+
+        // ===== CLEAR =====
+        if (clearBtn) {
+            clearBtn.onclick = function() {
+                var fields = ['SubmitterEmail', 'BookTitle', 'AuthorName', 'BookDescription', 'MetaDescription', 'BookImage', 'CoverPageImage', 'BookListURL', 'TOCPosition'];
+                for (var i = 0; i < fields.length; i++) {
+                    var el = document.getElementById(fields[i]);
+                    if (el) el.value = '';
+                }
+                var selects = ['AutoPaginate', 'WordsPerPage', 'TOCPageSkip', 'CoverPageSkip', 'TOCAsList', 'ShowBookListLink', 'SetGlassToAmorphous'];
+                for (var j = 0; j < selects.length; j++) {
+                    var sel = document.getElementById(selects[j]);
+                    if (sel) sel.value = '';
+                }
+                for (var k = 0; k < colorFields.length; k++) {
+                    var key = colorFields[k].key;
+                    var defaultCheck = document.getElementById(key + '_default');
+                    var hexInput = document.getElementById(key + '_hex');
+                    var colorPicker = document.getElementById(key);
+                    if (defaultCheck) defaultCheck.checked = false;
+                    if (hexInput) hexInput.value = '';
+                    if (colorPicker) colorPicker.value = '#ffffff';
+                }
+                var errs = ['SubmitterEmailError', 'BookTitleError', 'AuthorNameError', 'BookDescriptionError'];
+                for (var e = 0; e < errs.length; e++) {
+                    var err = document.getElementById(errs[e]);
+                    if (err) err.style.display = 'none';
+                }
+                outputDiv.textContent = '';
+                outputBubble.style.display = 'none';
+                // File upload section is always visible
+                mdFileInput.value = '';
+                fileError.textContent = '';
+                previewArea.style.display = 'none';
+                step3Container.style.display = 'none';
+                step4Container.style.display = 'none';
+                if (templateDisplay) templateDisplay.style.display = 'none';
+                if (templateContent) templateContent.textContent = '';
+                window.modifiedMarkdown = null;
+                currentTags = '';
+                if (convertStatusDiv) convertStatusDiv.textContent = '';
+                sendActivePageHeight();
+                saveFormState();
+            };
+        }
+
+        // ===== LOAD CFG =====
+        if (loadCfgBtn) {
+            loadCfgBtn.onclick = function() {
+                var input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.cfg';
+                input.onchange = function(e) {
+                    var file = e.target.files[0];
+                    if (!file) return;
+                    loadCfgFile(file).then(function(decoded) {
+                        parseTagsAndPopulate(decoded);
+                        if (convertStatusDiv) {
+                            convertStatusDiv.innerHTML = '✓ Settings loaded from ' + file.name + '.';
+                            convertStatusDiv.style.color = '#4caf50';
+                        }
+                        if (templateDisplay) templateDisplay.style.display = 'none';
+                        if (templateContent) templateContent.textContent = '';
+                    }).catch(function(err) {
+                        if (convertStatusDiv) {
+                            convertStatusDiv.innerHTML = '✗ ' + err.message;
+                            convertStatusDiv.style.color = '#ff6b6b';
+                        }
+                    });
+                };
+                input.click();
+            };
+        }
+
+        // ===== COPY TAGS =====
+        if (copyTagsBtn) {
+            copyTagsBtn.onclick = function() {
+                var tags = outputDiv ? outputDiv.textContent : '';
+                if (!tags || tags.trim() === '') {
+                    var fb = document.getElementById('copyTagsFeedback');
+                    if (fb) { fb.textContent = '❌ No settings to copy. Generate template first.'; fb.style.color = '#800000'; setTimeout(function(){ fb.textContent = ''; }, 3000); }
+                    return;
+                }
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(tags).then(function() {
+                        var fb = document.getElementById('copyTagsFeedback');
+                        if (fb) { fb.textContent = '✓ Settings copied!'; fb.style.color = '#006400'; setTimeout(function(){ fb.textContent = ''; }, 3000); }
+                    }).catch(function(err) {
+                        var fb = document.getElementById('copyTagsFeedback');
+                        if (fb) { fb.textContent = '✗ Copy failed: ' + err.message; fb.style.color = '#800000'; setTimeout(function(){ fb.textContent = ''; }, 3000); }
+                    });
+                } else {
+                    var textarea = document.createElement('textarea');
+                    textarea.value = tags;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    try {
+                        document.execCommand('copy');
+                        var fb = document.getElementById('copyTagsFeedback');
+                        if (fb) { fb.textContent = '✓ Settings copied!'; fb.style.color = '#006400'; setTimeout(function(){ fb.textContent = ''; }, 3000); }
+                    } catch (err) {
+                        var fb = document.getElementById('copyTagsFeedback');
+                        if (fb) { fb.textContent = '✗ Copy failed: ' + err.message; fb.style.color = '#800000'; setTimeout(function(){ fb.textContent = ''; }, 3000); }
+                    }
+                    document.body.removeChild(textarea);
+                }
+            };
+        }
+
+        // ===== DOWNLOAD TEMPLATE =====
+        var downloadTemplateBtn = document.getElementById('downloadTemplateBtn');
+        if (downloadTemplateBtn) {
+            downloadTemplateBtn.onclick = function() {
+                if (!templateContent || !templateContent.textContent.trim()) {
+                    if (templateFeedback) { templateFeedback.textContent = '❌ No template content to download.'; templateFeedback.style.color = '#ff6b6b'; }
+                    return;
+                }
+                
+                // Generate filename with date
+                var now = new Date();
+                var dateStr = now.getFullYear() + 
+                              String(now.getMonth() + 1).padStart(2, '0') + 
+                              String(now.getDate()).padStart(2, '0') + '_' +
+                              String(now.getHours()).padStart(2, '0') + 
+                              String(now.getMinutes()).padStart(2, '0');
+                var filename = 'BookMakerTemplate-' + dateStr + '.md';
+                
+                try {
+                    var blob = new Blob([templateContent.textContent], { type: 'text/markdown;charset=utf-8' });
+                    var url = URL.createObjectURL(blob);
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    if (templateFeedback) { 
+                        templateFeedback.textContent = '✓ Template downloaded as ' + filename; 
+                        templateFeedback.style.color = '#4caf50';
+                        setTimeout(function() { templateFeedback.textContent = ''; }, 5000);
+                    }
+                } catch (err) {
+                    if (templateFeedback) { 
+                        templateFeedback.textContent = '✗ Failed to download: ' + err.message; 
+                        templateFeedback.style.color = '#ff6b6b';
+                    }
+                }
+            };
+        }
+
+        // ===== COPY TEMPLATE =====
+        var copyTemplateBtn = document.getElementById('copyTemplateBtn');
+        if (copyTemplateBtn) {
+            copyTemplateBtn.onclick = function() {
+                if (!templateContent || !templateContent.textContent.trim()) {
+                    if (templateFeedback) { templateFeedback.textContent = '❌ No template content to copy.'; templateFeedback.style.color = '#ff6b6b'; }
+                    return;
+                }
+                
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(templateContent.textContent).then(function() {
+                        if (templateFeedback) { 
+                            templateFeedback.textContent = '✓ Template copied to clipboard!'; 
+                            templateFeedback.style.color = '#4caf50';
+                            setTimeout(function() { templateFeedback.textContent = ''; }, 3000);
+                        }
+                    }).catch(function(err) {
+                        if (templateFeedback) { 
+                            templateFeedback.textContent = '✗ Copy failed: ' + err.message; 
+                            templateFeedback.style.color = '#ff6b6b';
+                        }
+                    });
+                } else {
+                    // Fallback
+                    var textarea = document.createElement('textarea');
+                    textarea.value = templateContent.textContent;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    try {
+                        document.execCommand('copy');
+                        if (templateFeedback) { 
+                            templateFeedback.textContent = '✓ Template copied to clipboard!'; 
+                            templateFeedback.style.color = '#4caf50';
+                            setTimeout(function() { templateFeedback.textContent = ''; }, 3000);
+                        }
+                    } catch (err) {
+                        if (templateFeedback) { 
+                            templateFeedback.textContent = '✗ Copy failed: ' + err.message; 
+                            templateFeedback.style.color = '#ff6b6b';
+                        }
+                    }
+                    document.body.removeChild(textarea);
+                }
+            };
+        }
+
+        // ===== PROCESS FILE =====
+        var MAX_MD_FILE_SIZE_BYTES = 0.5 * 1024 * 1024;
+
+        if (mdFileInput) {
+            mdFileInput.addEventListener('change', function() {
+                if (mdFileInput.files && mdFileInput.files.length > 0) {
+                    step3Container.style.display = 'block';
+                } else {
+                    step3Container.style.display = 'none';
+                    step4Container.style.display = 'none';
+                }
+                sendActivePageHeight();
+            });
+        }
+
+        if (processFileBtn) {
+            processFileBtn.onclick = function() {
+                var file = mdFileInput.files[0];
+                if (!file) { fileError.textContent = 'Please select a .md file.'; return; }
+                if (!file.name.toLowerCase().endsWith('.md')) { fileError.textContent = 'File must have .md extension.'; return; }
+                if (file.size > MAX_MD_FILE_SIZE_BYTES) {
+                    var limitKB = (MAX_MD_FILE_SIZE_BYTES / 1024).toFixed(0);
+                    var fileSizeKB = (file.size / 1024).toFixed(1);
+                    fileError.textContent = 'File size exceeds ' + limitKB + ' KB (' + fileSizeKB + ' KB).';
+                    return;
+                }
+                window.currentOriginalFileName = file.name.replace(/\.md$/i, '');
+
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var content = e.target.result;
+                    var asciiContent = content
+                        .replace(/[\u2018\u2019]/g, "'")
+                        .replace(/[\u201C\u201D]/g, '"')
+                        .replace(/\u2026/g, '...')
+                        .replace(/\u2013/g, '-')
+                        .replace(/\u2014/g, '--')
+                        .replace(/\u00A0/g, ' ');
+                    content = asciiContent;
+                    var hasChapter = /<chapter\s*=/i.test(content);
+                    if (!hasChapter) {
+                        fileError.innerHTML = '⚠️ Warning: No &lt;CHAPTER&gt; tag found. Without a chapter tag, there will be no Table of Contents page.';
+                    } else {
+                        fileError.textContent = '';
+                    }
+
+                    // Use the file content as-is without adding settings
+                    var modifiedContent = content;
+
+                    var lines = modifiedContent.split(/\r?\n/);
+                    var first50 = lines.slice(0, 50).join('\n');
+                    if (lines.length > 50) first50 += '\n... (truncated)';
+                    previewContent.textContent = first50;
+                    previewArea.style.display = 'block';
+                    window.modifiedMarkdown = modifiedContent;
+                    step4Container.style.display = 'block';
+                    sendActivePageHeight();
+                };
+                reader.onerror = function() { fileError.textContent = 'Error reading file.'; };
+                reader.readAsText(file, 'UTF-8');
+            };
+        }
+
+        // xxxx
+        // ===== DOWNLOAD CONFIG BUTTON =====
+        if (downloadConfigBtn) {
+            downloadConfigBtn.onclick = function() {
+                const filenameInput = document.getElementById('cfgFilename');
+                const errorDiv = document.getElementById('cfgFilenameError');
+                const statusDiv = document.getElementById('cfgStatus');
+                
+                // Get and validate filename
+                const rawFilename = filenameInput ? filenameInput.value.trim() : '';
+                const validation = isValidFilename(rawFilename);
+                
+                // Show/hide error
+                if (errorDiv) {
+                    if (!validation.valid) {
+                        errorDiv.textContent = validation.error;
+                        errorDiv.style.display = 'block';
+                        statusDiv.textContent = '';
+                        return;
+                    } else {
+                        errorDiv.style.display = 'none';
+                    }
+                }
+                
+                // Check if template has been generated
+                var contentToSave = currentTags || '';
+                if (!contentToSave || contentToSave.trim() === '') {
+                    if (statusDiv) {
+                        statusDiv.innerHTML = '⚠️ No settings to download. Click "Generate Template" first.';
+                        statusDiv.style.color = '#e67e22';
+                    }
+                    return;
+                }
+                
+                try {
+                    // Encode as Base64
+                    var base64Content = btoa(unescape(encodeURIComponent(contentToSave)));
+                    
+                    // Use filename from input or fallback
+                    var baseName = rawFilename || window.currentOriginalFileName || 'settings';
+                    
+                    // Create file with .cfg extension
+                    var blob = new Blob([base64Content], { type: 'text/plain;charset=utf-8' });
+                    var url = URL.createObjectURL(blob);
+                    
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.download = baseName + '.cfg';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    
+                    // Clean up after a delay
+                    setTimeout(function() {
+                        URL.revokeObjectURL(url);
+                    }, 100);
+                    
+                    if (statusDiv) {
+                        statusDiv.innerHTML = '✅ Settings saved as ' + baseName + '.cfg';
+                        statusDiv.style.color = '#4caf50';
+                    }
+                } catch (err) {
+                    if (statusDiv) {
+                        statusDiv.innerHTML = '❌ Failed to save settings: ' + err.message;
+                        statusDiv.style.color = '#ff6b6b';
+                    }
+                    console.error('Download error:', err);
+                }
+            };
+        }
+
+        // ===== CONVERT & DOWNLOAD =====
+        if (convertDownloadBtn) {
+            convertDownloadBtn.onclick = function() {
+                if (!window.modifiedMarkdown || window.modifiedMarkdown.trim().length === 0) {
+                    if (convertStatusDiv) {
+                        convertStatusDiv.innerHTML = '❌ No content to upload. Select a .md file and click "Process file" first.';
+                        convertStatusDiv.style.color = '#ff6b6b';
+                    }
+                    return;
+                }
+                var fileInput = document.getElementById('mdFileInput');
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    if (convertStatusDiv) {
+                        convertStatusDiv.innerHTML = '❌ No file selected. Choose a .md file.';
+                        convertStatusDiv.style.color = '#ff6b6b';
+                    }
+                    return;
+                }
+                var originalFileName = fileInput.files[0].name.replace(/\.md$/i, '');
+                var emailInput = document.getElementById('SubmitterEmail');
+                var submitterEmail = emailInput ? emailInput.value.trim() : '';
+                var desiredFileName = originalFileName + '.md';
+                convertDownloadBtn.disabled = true;
+
+
+
+                fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        markdown: window.modifiedMarkdown,
+                        filename: desiredFileName,
+                        email: submitterEmail
+                    })
+                }).then(function(response) {
+                    var contentType = response.headers.get('content-type') || '';
+                    if (contentType.includes('application/json')) {
+                        return response.json().then(function(json) {
+                            if (response.status === 429) {
+                                var msg = '❌ ' + json.error;
+                                if (json.limit_crossed) msg += '\nLimit crossed: ' + json.limit_crossed + '. Wait ' + json.wait_seconds + 's.';
+                                if (json.remaining) msg += '\nRemaining: minute: ' + json.remaining.minute + ', hour: ' + json.remaining.hour + ', day: ' + json.remaining.day;
+                                if (convertStatusDiv) { convertStatusDiv.innerHTML = msg; convertStatusDiv.style.color = '#ff6b6b'; }
+                            } else if (response.ok && json.status === 'success') {
+                                if (convertStatusDiv) { convertStatusDiv.innerHTML = '✓ File uploaded and saved: ' + json.filename; convertStatusDiv.style.color = '#4caf50'; }
+                            } else {
+                                var errMsg = json.error || json.message || 'Unknown error';
+                                if (json.details) errMsg += '\n\nDetails:\n' + json.details;
+                                if (convertStatusDiv) { convertStatusDiv.innerHTML = '✗ ' + errMsg; convertStatusDiv.style.color = '#ff6b6b'; }
+                            }
+                            convertDownloadBtn.disabled = false;
+                        });
+                    } else if (response.ok && contentType.includes('text/html')) {
+                        return response.blob().then(function(blob) {
+                            var url = URL.createObjectURL(blob);
+                            var a = document.createElement('a');
+                            a.href = url;
+                            a.download = desiredFileName.replace(/\.md$/, '.html');
+                            a.click();
+                            URL.revokeObjectURL(url);
+                            if (convertStatusDiv) {
+                                var sizeMsg = '✓ Conversion successful – HTML downloaded.';
+                                var mdSize = response.headers.get('X-Markdown-Size');
+                                var htmlSize = response.headers.get('X-Html-Size');
+                                if (mdSize && htmlSize) {
+                                    sizeMsg += '\nMarkdown: ' + (mdSize / 1024).toFixed(1) + ' KB, HTML: ' + (htmlSize / 1024).toFixed(1) + ' KB.';
+                                }
+                                var remMin = response.headers.get('X-RateLimit-Remaining-Minute');
+                                var remHour = response.headers.get('X-RateLimit-Remaining-Hour');
+                                var remDay = response.headers.get('X-RateLimit-Remaining-Day');
+                                if (remMin && remHour && remDay) {
+                                    sizeMsg += '\nRemaining requests: ' + remMin + ' per minute, ' + remHour + ' per hour, ' + remDay + ' per day.';
+                                }
+                                convertStatusDiv.innerHTML = sizeMsg;
+                                convertStatusDiv.style.color = '#4caf50';
+                            }
+                            convertDownloadBtn.disabled = false;
+                        });
+                    } else {
+                        return response.text().then(function(text) {
+                            if (convertStatusDiv) {
+                                convertStatusDiv.innerHTML = '✗ Error (' + response.status + '): ' + text.substring(0, 500);
+                                convertStatusDiv.style.color = '#ff6b6b';
+                            }
+                            convertDownloadBtn.disabled = false;
+                        });
+                    }
+                }).catch(function(err) {
+                    if (convertStatusDiv) {
+                        convertStatusDiv.innerHTML = '✗ Network error: ' + err.message;
+                        convertStatusDiv.style.color = '#ff6b6b';
+                    }
+                    convertDownloadBtn.disabled = false;
+                });
+            };
+        }
+
+        // ===== SHOW BOOK LIST DEPENDENCY =====
+        document.getElementById('ShowBookListLink').addEventListener('change', function() {
+            updateBookListURLState();
+            saveFormState();
+        });
+
+        // ===== INIT =====
+        outputBubble.style.display = 'none';
+        step3Container.style.display = 'none';
+        step4Container.style.display = 'none';
+        if (templateDisplay) templateDisplay.style.display = 'none';
+        if (convertStatusDiv) convertStatusDiv.textContent = '';
+        // Force file upload section to be visible
+        if (fileUploadSection) fileUploadSection.style.display = 'block';
+
+        // File upload section is always visible
+
+        var resizeObserver = new ResizeObserver(function() { sendActivePageHeight(); });
+        resizeObserver.observe(document.body);
+
+        sendActivePageHeight();
+        window.addEventListener('load', function() { sendActivePageHeight(); });
+
+        window.currentOriginalFileName = '';
+
+    })();
+</script>
+
+</body>
+</html>
