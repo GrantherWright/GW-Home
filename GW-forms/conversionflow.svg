@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="620" viewBox="0 0 1500 620">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="6" flood-opacity=".10"/>
+    </filter>
+    <marker id="arrow" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto">
+      <path d="M0,0 L11,5.5 L0,11 Z" fill="#94a3b8"/>
+    </marker>
+    <style>
+      .heading { font: 700 24px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif; fill:#1e293b; }
+      .num { font: 700 16px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif; }
+      .title { font: 650 17px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif; fill:#1e293b; }
+      .body { font: 13px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif; fill:#475569; }
+      .arrow { fill:none; stroke:#94a3b8; stroke-width:2.5; marker-end:url(#arrow); }
+    </style>
+  </defs>
+
+  <rect width="1500" height="620" fill="#fbfcfb"/>
+
+  <!-- Main container -->
+  <rect x="28" y="25" width="1444" height="570" rx="24" fill="#ffffff" stroke="#d7dee7" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="750" y="70" text-anchor="middle" class="heading">BOOKMAKER AUTHOR JOURNEY &amp; CONVERSION FLOW</text>
+
+  <!-- arrows -->
+  <path class="arrow" d="M256 275 H276"/>
+  <path class="arrow" d="M498 275 H518"/>
+  <path class="arrow" d="M740 275 H760"/>
+  <path class="arrow" d="M982 275 H1002"/>
+  <path class="arrow" d="M1224 275 H1244"/>
+
+  <!-- S1 -->
+  <g filter="url(#shadow)">
+    <rect x="50" y="125" width="220" height="300" rx="18" fill="#f5f7fa" stroke="#cbd5e1" stroke-width="2"/>
+  </g>
+  <circle cx="78" cy="157" r="18" fill="#e2e8f0"/>
+  <text x="78" y="163" text-anchor="middle" class="num" fill="#475569">1</text>
+  <text x="65" y="205" class="title">Draft Manuscript</text>
+  <line x1="65" y1="222" x2="255" y2="222" stroke="#dbe2ea"/>
+  <text x="65" y="253" class="body">• Write in standard Markdown</text>
+  <text x="65" y="281" class="body">• Structure chapters &amp; sections</text>
+  <text x="65" y="309" class="body">• Keep clean, plain text</text>
+  <text x="65" y="327" class="body">  sources</text>
+
+  <!-- S2 -->
+  <g filter="url(#shadow)">
+    <rect x="292" y="125" width="220" height="300" rx="18" fill="#eaf6f2" stroke="#7bc6b5" stroke-width="2"/>
+  </g>
+  <circle cx="320" cy="157" r="18" fill="#cceee5"/>
+  <text x="320" y="163" text-anchor="middle" class="num" fill="#16766a">2</text>
+  <text x="307" y="205" class="title">Apply TOBj Expressions</text>
+  <line x1="307" y1="222" x2="497" y2="222" stroke="#c9e4dd"/>
+  <text x="307" y="253" class="body">• Use Designer &amp; Builder</text>
+  <text x="307" y="281" class="body">  Studios</text>
+  <text x="307" y="309" class="body">• Add custom colors &amp; margins</text>
+  <text x="307" y="337" class="body">• Attach ClickWord popups</text>
+
+  <!-- S3 -->
+  <g filter="url(#shadow)">
+    <rect x="534" y="125" width="220" height="300" rx="18" fill="#f5f7fa" stroke="#cbd5e1" stroke-width="2"/>
+  </g>
+  <circle cx="562" cy="157" r="18" fill="#e2e8f0"/>
+  <text x="562" y="163" text-anchor="middle" class="num" fill="#475569">3</text>
+  <text x="549" y="205" class="title">Compile Web-Book</text>
+  <line x1="549" y1="222" x2="739" y2="222" stroke="#dbe2ea"/>
+  <text x="549" y="253" class="body">• Process via PythonAnywhere API</text>
+  <text x="549" y="281" class="body">• Compute dynamic pagination</text>
+  <text x="549" y="309" class="body">• Build interactive HTML5 pages</text>
+
+  <!-- S4 -->
+  <g filter="url(#shadow)">
+    <rect x="776" y="125" width="220" height="300" rx="18" fill="#eaf6f2" stroke="#7bc6b5" stroke-width="2"/>
+  </g>
+  <circle cx="804" cy="157" r="18" fill="#cceee5"/>
+  <text x="804" y="163" text-anchor="middle" class="num" fill="#16766a">4</text>
+  <text x="791" y="205" class="title">Review &amp; Test</text>
+  <line x1="791" y1="222" x2="981" y2="222" stroke="#c9e4dd"/>
+  <text x="791" y="253" class="body">• Test live popups &amp; triggers</text>
+  <text x="791" y="281" class="body">• Check light/sepia/dark themes</text>
+  <text x="791" y="309" class="body">• Verify mobile page pagination</text>
+
+  <!-- S5 -->
+  <g filter="url(#shadow)">
+    <rect x="1018" y="125" width="220" height="300" rx="18" fill="#f5f7fa" stroke="#cbd5e1" stroke-width="2"/>
+  </g>
+  <circle cx="1046" cy="157" r="18" fill="#e2e8f0"/>
+  <text x="1046" y="163" text-anchor="middle" class="num" fill="#475569">5</text>
+  <text x="1033" y="205" class="title">Publish Directly</text>
+  <line x1="1033" y1="222" x2="1223" y2="222" stroke="#dbe2ea"/>
+  <text x="1033" y="253" class="body">• Deploy to GitHub Pages</text>
+  <text x="1033" y="281" class="body">• Link custom domain via</text>
+  <text x="1033" y="299" class="body">  Cloudflare</text>
+  <text x="1033" y="327" class="body">• Instant updates in real time</text>
+
+  <!-- S6 -->
+  <g filter="url(#shadow)">
+    <rect x="1260" y="125" width="220" height="300" rx="18" fill="#f0fdf4" stroke="#86c99b" stroke-width="2"/>
+  </g>
+  <circle cx="1288" cy="157" r="18" fill="#d9f6e1"/>
+  <text x="1288" y="163" text-anchor="middle" class="num" fill="#15803d">6</text>
+  <text x="1275" y="205" class="title">Direct Monetization</text>
+  <line x1="1275" y1="222" x2="1465" y2="222" stroke="#ccebd5"/>
+  <text x="1275" y="253" class="body">• Connect Stripe or Paddle</text>
+  <text x="1275" y="281" class="body">• Capture direct reader emails</text>
+  <text x="1275" y="309" class="body">• Keep up to 100% of royalties</text>
+
+  <!-- Footer flow cue -->
+  <text x="750" y="500" text-anchor="middle" class="body" style="font-size:14px;fill:#64748b">
+    Draft → Style → Compile → Test → Publish → Monetize
+  </text>
+</svg>

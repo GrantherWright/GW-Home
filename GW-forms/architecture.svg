@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="470" viewBox="0 0 1400 470">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-opacity=".10"/>
+    </filter>
+    <style>
+      .title { font: 600 17px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif; fill:#263238; }
+      .subtitle { font: 13px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif; fill:#607d8b; }
+      .box-title { font: 600 15px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif; fill:#263238; }
+      .body { font: 12px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif; fill:#546e7a; }
+      .arrow { fill:none; stroke:#90a4ae; stroke-width:2.2; marker-end:url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M0,0 L9,4.5 L0,9 Z" fill="#90a4ae"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1400" height="470" fill="#fbfcfb"/>
+
+  <!-- Connecting arrows -->
+  <path class="arrow" d="M302 235 H338"/>
+  <path class="arrow" d="M622 235 H658"/>
+  <path class="arrow" d="M942 235 H978"/>
+
+  <!-- Column 1 -->
+  <g filter="url(#shadow)">
+    <rect x="35" y="25" width="285" height="410" rx="18" fill="#eef0ff" stroke="#a9b0e6" stroke-width="1.2"/>
+  </g>
+  <text x="55" y="54" class="title">1. Author input</text>
+  <text x="55" y="73" class="subtitle">Manuscript layer</text>
+
+  <rect x="54" y="90" width="247" height="91" rx="10" fill="#f8f8ff" stroke="#b8bde5"/>
+  <text x="69" y="112" class="box-title">Raw markdown</text>
+  <text x="69" y="132" class="body">Chapter content,</text>
+  <text x="69" y="148" class="body">prose, section headers</text>
+
+  <rect x="54" y="191" width="247" height="101" rx="10" fill="#f8f8ff" stroke="#b8bde5"/>
+  <text x="69" y="213" class="box-title">TOBj styling expressions</text>
+  <text x="69" y="233" class="body">Custom tags, colors,</text>
+  <text x="69" y="249" class="body">margins, layout attrs</text>
+
+  <rect x="54" y="302" width="247" height="100" rx="10" fill="#f8f8ff" stroke="#b8bde5"/>
+  <text x="69" y="324" class="box-title">Media &amp; metadata</text>
+  <text x="69" y="344" class="body">Title, author, cover,</text>
+  <text x="69" y="360" class="body">popup definitions</text>
+
+  <!-- Column 2 -->
+  <g filter="url(#shadow)">
+    <rect x="340" y="25" width="285" height="410" rx="18" fill="#e7f7f2" stroke="#8fc9ba" stroke-width="1.2"/>
+  </g>
+  <text x="360" y="54" class="title">2. Compilation engine</text>
+  <text x="360" y="73" class="subtitle">Flask / PythonAnywhere</text>
+
+  <rect x="359" y="90" width="247" height="91" rx="10" fill="#f3fcf9" stroke="#9bcdbf"/>
+  <text x="374" y="112" class="box-title">Markdown &amp; TOBj parser</text>
+  <text x="374" y="132" class="body">Converts tags into</text>
+  <text x="374" y="148" class="body">semantic HTML</text>
+
+  <rect x="359" y="191" width="247" height="101" rx="10" fill="#f3fcf9" stroke="#9bcdbf"/>
+  <text x="374" y="213" class="box-title">Layout &amp; pagination</text>
+  <text x="374" y="233" class="body">Page splits, text flow,</text>
+  <text x="374" y="249" class="body">auto table of contents</text>
+
+  <rect x="359" y="302" width="247" height="100" rx="10" fill="#f3fcf9" stroke="#9bcdbf"/>
+  <text x="374" y="324" class="box-title">Interactive trigger engine</text>
+  <text x="374" y="344" class="body">ClickWord, bubbletext,</text>
+  <text x="374" y="360" class="body">media popups</text>
+
+  <!-- Column 3 -->
+  <g filter="url(#shadow)">
+    <rect x="645" y="25" width="285" height="410" rx="18" fill="#fff0eb" stroke="#e1ad9a" stroke-width="1.2"/>
+  </g>
+  <text x="665" y="54" class="title">3. Front-end runtime</text>
+  <text x="665" y="73" class="subtitle">Web-book output</text>
+
+  <rect x="664" y="90" width="247" height="91" rx="10" fill="#fff8f5" stroke="#dfaa97"/>
+  <text x="679" y="112" class="box-title">Semantic HTML5</text>
+  <text x="679" y="132" class="body">main, article, nav,</text>
+  <text x="679" y="148" class="body">header landmarks</text>
+
+  <rect x="664" y="191" width="247" height="101" rx="10" fill="#fff8f5" stroke="#dfaa97"/>
+  <text x="679" y="213" class="box-title">CSS3 variables</text>
+  <text x="679" y="233" class="body">Sage/mint, sky-blue</text>
+  <text x="679" y="249" class="body">theme, typography</text>
+
+  <rect x="664" y="302" width="247" height="100" rx="10" fill="#fff8f5" stroke="#dfaa97"/>
+  <text x="679" y="324" class="box-title">Vanilla JS reader engine</text>
+  <text x="679" y="344" class="body">Navigation, TOC drawer,</text>
+  <text x="679" y="360" class="body">light/sepia/dark modes</text>
+
+  <!-- Column 4 -->
+  <g filter="url(#shadow)">
+    <rect x="950" y="25" width="285" height="410" rx="18" fill="#f2f3ec" stroke="#b9bdad" stroke-width="1.2"/>
+  </g>
+  <text x="970" y="54" class="title">4. Hosting &amp; deployment</text>
+
+  <rect x="969" y="145" width="247" height="91" rx="10" fill="#f8f9f4" stroke="#b9bdad"/>
+  <text x="984" y="167" class="box-title">GitHub Pages / custom domain</text>
+  <text x="984" y="187" class="body">Hosts compiled web-books</text>
+  <text x="984" y="203" class="body">grantherwright.com</text>
+
+  <rect x="969" y="255" width="247" height="101" rx="10" fill="#f8f9f4" stroke="#b9bdad"/>
+  <text x="984" y="277" class="box-title">Cloudflare DNS / SaaS pipeline</text>
+  <text x="984" y="297" class="body">Domain routing, Clerk JWT,</text>
+  <text x="984" y="313" class="body">live server updates</text>
+</svg>
