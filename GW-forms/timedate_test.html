@@ -167,20 +167,6 @@
                     }
 
                     window.openSignInPopup = function() {
-                        // Check if user is already logged in
-                        if (clerk.user) {
-                            const statusDiv = document.getElementById('status');
-                            statusDiv.textContent = '✅ You are already logged in from another location!';
-                            statusDiv.style.color = '#16a34a';
-                            setTimeout(() => {
-                                if (clerk.user) {
-                                    statusDiv.textContent = '✅ Authenticated';
-                                    statusDiv.style.color = '#16a34a';
-                                }
-                            }, 3000);
-                            return;
-                        }
-
                         const signInUrl = ACCOUNTS_DOMAIN + '/sign-in?redirect_url=' +
                             encodeURIComponent(window.location.origin + '/GW-forms/login-complete.html');
 
