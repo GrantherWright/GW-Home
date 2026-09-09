@@ -13,32 +13,72 @@
     html {
       scroll-behavior: smooth;
     }
+
+    /* ===== AUTH STYLES ===== */
+    #auth {
+        background: white;
+        padding: 12px 18px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    #auth button {
+        padding: 6px 16px;
+        border: none;
+        border-radius: 6px;
+        background: #0284c7;
+        color: white;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.2s;
+    }
+    #auth button:hover {
+        background: #0369a1;
+    }
+    #auth button.logout {
+        background: #0284c7;
+        color: white;
+    }
+    #auth button.logout:hover {
+        background: #0369a1;
+    }
+    #auth .profile-link:hover {
+        background: #e0e7ff;
+        text-decoration: underline;
+    }
+    #status {
+        font-size: 13px;
+        color: #666;
+        margin: 8px 0 12px 0;
+    }
   </style>
 </head>
 <body class="bg-[#F4F7F4] text-slate-800 min-h-screen flex flex-col font-sans antialiased">
 
   <header class="bg-white border-b border-slate-200/80 sticky top-0 z-50 shadow-2xs">
-    <div class="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <img src="logo.svg" alt="BookMaker Logo" class="w-8 h-8 object-contain" />
-        <span class="text-xl font-bold font-serif text-slate-900 tracking-tight">BookMaker</span>
-        <span class="text-xs font-sans font-medium text-slate-600 bg-[#EAF0EB] px-2.5 py-0.5 rounded-full border border-slate-200/60">v1.0</span>
-      </div>
-      
-      <nav class="hidden md:flex items-center space-x-6 text-sm font-medium text-slate-600">
-        <a href="#offer" class="hover:text-slate-900 transition-colors">What It Offers</a>
-        <a href="#problem" class="hover:text-slate-900 transition-colors">Problems Solved</a>
-        <a href="#revenue" class="hover:text-slate-900 transition-colors">Revenue & Royalties</a>
-        <a href="#reader" class="hover:text-slate-900 transition-colors">Reader Experience</a>
-      </nav>
+      <div class="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between">
+          <!-- Left: Logo -->
+          <div class="flex items-center space-x-3">
+              <img src="logo.svg" alt="BookMaker Logo" class="w-8 h-8 object-contain" />
+              <span class="text-xl font-bold font-serif text-slate-900 tracking-tight">BookMaker</span>
+              <span class="text-xs font-sans font-medium text-slate-600 bg-[#EAF0EB] px-2.5 py-0.5 rounded-full border border-slate-200/60">v1.0</span>
+          </div>
 
-      <div class="flex items-center space-x-3">
-        <button onclick="handleLogin()" class="px-4 py-1.5 text-xs md:text-sm bg-[#0284c7] hover:bg-[#0369a1] text-white rounded-lg font-medium transition shadow-sm flex items-center gap-1.5">
-          <span>Login</span>
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
-        </button>
+          <!-- Center: Navigation -->
+          <nav class="hidden md:flex items-center space-x-6 text-sm font-medium text-slate-600">
+              <a href="#offer" class="hover:text-slate-900 transition-colors">What It Offers</a>
+              <a href="#problem" class="hover:text-slate-900 transition-colors">Problems Solved</a>
+              <a href="#revenue" class="hover:text-slate-900 transition-colors">Revenue & Royalties</a>
+              <a href="#reader" class="hover:text-slate-900 transition-colors">Reader Experience</a>
+          </nav>
+
+          <!-- Right: Auth (Login/Logout) -->
+          <div id="auth"></div>
+          <div id="status"></div>
       </div>
-    </div>
   </header>
 
   <section id="offer" class="max-w-7xl mx-auto px-6 pt-16 pb-12 text-center scroll-mt-20">
@@ -213,15 +253,14 @@
     </div>
   </div>
 
-  <script>
+<script>
     const modal = document.getElementById('studioModal');
     const iframe = document.getElementById('studioIframe');
     const modalTitle = document.getElementById('studioModalTitle');
 
-    function handleLogin() {
-      // Connect to Clerk auth or direct login redirect
-      window.location.href = 'https://grantherwright.com/login';
-    }
+    // function handleLogin() {  <-- DELETE THIS
+    //   window.location.href = 'https://grantherwright.com/login';
+    // }
 
     function openStudioModal(studioType) {
       if (studioType === 'builder') {
@@ -260,7 +299,145 @@
         iframe.style.height = e.data.height + 'px';
       }
     });
-  </script>
+</script>
+
+<!-- ============================================================ -->
+<!-- CLERK AUTHENTICATION SCRIPT                                   -->
+<!-- ============================================================ -->
+<script>
+    const clerkPublishableKey = 'pk_test_c2V0LXRvcnRvaXNlLTMxODkuY2xlcmsuYWNjb3VudHMuZGV2JA';
+    const ACCOUNTS_DOMAIN = 'https://set-tortoise-3189.accounts.dev';
+    let popupWindow = null;
+
+    // Listen for reload message from popup
+    window.addEventListener('message', function(event) {
+        if (event.data === 'clerk_login_reload') {
+            window.location.reload();
+        }
+    });
+
+    (function() {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
+        script.async = true;
+        script.setAttribute('data-clerk-publishable-key', clerkPublishableKey);
+
+        script.addEventListener('load', async function() {
+            try {
+                await window.Clerk.load();
+                const clerk = window.Clerk;
+                window.clerk = clerk;
+
+                function updateAuthUI() {
+                    const authDiv = document.getElementById('auth');
+                    const statusDiv = document.getElementById('status');
+
+                    if (clerk.user) {
+                      const profileImageUrl = clerk.user.imageUrl || clerk.user.profileImageUrl;
+
+                      authDiv.innerHTML = `
+                          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                              ${profileImageUrl ? `<img src="${profileImageUrl}" alt="Profile" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">` : ''}
+                              <button onclick="handleLogout()" style="padding: 6px 16px; border: none; border-radius: 6px; background: #0284c7; color: white; cursor: pointer; font-size: 14px; transition: background 0.2s;" onmouseover="this.style.background='#0369a1'" onmouseout="this.style.background='#0284c7'">Logout</button>
+                              <button onclick="openProfilePopup()" style="background: transparent; border: none; cursor: pointer; color: #0284c7; font-size: 1.2rem; padding: 0;">ⓘ</button>
+                          </div>
+                      `;
+                      statusDiv.textContent = `${clerk.user.primaryEmailAddress?.emailAddress || clerk.user.emailAddress}`;
+                      statusDiv.style.color = '#16a34a';
+                      statusDiv.style.fontWeight = '500';
+                      if (popupWindow && !popupWindow.closed) {
+                          popupWindow.close();
+                          popupWindow = null;
+                      }
+                    } else {
+                        authDiv.innerHTML = `<button onclick="openSignInPopup()" style="padding: 6px 16px; border: none; border-radius: 6px; background: #0284c7; color: white; cursor: pointer; font-size: 14px; transition: background 0.2s;" onmouseover="this.style.background='#0369a1'" onmouseout="this.style.background='#0284c7'">Login</button>`;
+                        statusDiv.textContent = '🔒 Not logged in';
+                        statusDiv.style.color = '#999';
+                        statusDiv.style.fontWeight = 'normal';
+                    }
+                }
+
+                window.handleLogout = async function() {
+                    await clerk.signOut();
+                    window.location.href = 'https://grantherwright.com/GW-forms/GW-landingpage.html';
+                };
+
+                window.openSignInPopup = function() {
+                    const signInUrl = ACCOUNTS_DOMAIN + '/sign-in?redirect_url=' +
+                        encodeURIComponent(window.location.origin + '/GW-forms/login-complete.html');
+
+                    const width = 450;
+                    const height = 600;
+                    const left = (screen.width - width) / 2;
+                    const top = (screen.height - height) / 2;
+
+                    popupWindow = window.open(
+                        signInUrl,
+                        'Clerk Sign In',
+                        `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+                    );
+
+                    if (!popupWindow || popupWindow.closed) {
+                        alert('Popup was blocked. Redirecting to sign-in page...');
+                        window.location.href = signInUrl;
+                        return;
+                    }
+
+                    const checkPopup = setInterval(() => {
+                        if (popupWindow && popupWindow.closed) {
+                            clearInterval(checkPopup);
+                            if (clerk.user) {
+                                updateAuthUI();
+                            }
+                        }
+                    }, 1000);
+                };
+
+                window.openProfilePopup = function() {
+                    const profileUrl = ACCOUNTS_DOMAIN + '/user';
+                    const width = 450;
+                    const height = 600;
+                    const left = (screen.width - width) / 2;
+                    const top = (screen.height - height) / 2;
+
+                    popupWindow = window.open(
+                        profileUrl,
+                        'Profile Settings',
+                        `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+                    );
+
+                    if (!popupWindow || popupWindow.closed) {
+                        alert('Popup was blocked. Redirecting to profile page...');
+                        window.location.href = profileUrl;
+                        return;
+                    }
+
+                    const checkPopup = setInterval(() => {
+                        if (popupWindow && popupWindow.closed) {
+                            clearInterval(checkPopup);
+                            if (!clerk.user) {
+                                updateAuthUI();
+                            }
+                        }
+                    }, 1000);
+                };
+
+                clerk.addListener(() => {
+                    updateAuthUI();
+                });
+
+                updateAuthUI();
+
+            } catch (error) {
+                console.error('Failed to initialize Clerk:', error);
+                document.getElementById('status').textContent = '❌ Clerk initialization failed: ' + error.message;
+                document.getElementById('status').style.color = '#dc2626';
+            }
+        });
+
+        document.body.appendChild(script);
+    })();
+</script>
 
 </body>
 </html>
