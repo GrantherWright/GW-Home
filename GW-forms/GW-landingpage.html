@@ -377,8 +377,9 @@
                         `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
                     );
 
+                    // If popup was blocked or failed, open in same window
                     if (!popupWindow || popupWindow.closed) {
-                        alert('Popup was blocked. Redirecting to sign-in page...');
+                        // Don't alert or redirect - just open in current window
                         window.location.href = signInUrl;
                         return;
                     }
