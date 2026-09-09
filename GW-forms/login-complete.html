@@ -7,12 +7,17 @@
     <h2>✅ Login Complete</h2>
     <p>Refreshing main page...</p>
     <script>
+        // This works on local, GitHub, and PythonAnywhere
         if (window.opener) {
-            window.opener.postMessage('clerk_login_reload', '*');
+            // Direct reload - works everywhere
+            window.opener.location.reload();
+        } else {
+            // Fallback: reload this page (shouldn't happen)
+            window.location.reload();
         }
         setTimeout(function() {
             window.close();
-        }, 300);
+        }, 500);
     </script>
 </body>
 </html>
