@@ -1735,7 +1735,34 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
         // ===== CONVERT & DOWNLOAD =====
         if (convertDownloadBtn) {
             convertDownloadBtn.onclick = function() {
+                console.log('🔍 Convert button clicked');
+
+                // ===== CHECK IF USER IS LOGGED IN =====
+                console.log('🔍 Checking clerk.user:', window.clerk ? window.clerk.user : 'clerk not defined');
+
+                if (!window.clerk || !window.clerk.user) {
+                    console.log('❌ User not logged in - showing login message');
+                    if (convertStatusDiv) {
+                        convertStatusDiv.innerHTML = '⚠️ Please login first to convert your book.';
+                        convertStatusDiv.style.color = '#e67e22';
+                        convertStatusDiv.style.fontWeight = '500';
+                        convertStatusDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    // Try to open the login popup
+                    if (typeof openSignInPopup === 'function') {
+                        console.log('🔍 Opening login popup');
+                        openSignInPopup();
+                    } else {
+                        console.log('❌ openSignInPopup not found');
+                        window.location.href = 'https://grantherwright.com/GW-forms/GW-landingpage.html';
+                    }
+                    return;
+                }
+
+                console.log('✅ User is logged in:', window.clerk.user.primaryEmailAddress?.emailAddress);
+
                 if (!window.modifiedMarkdown || window.modifiedMarkdown.trim().length === 0) {
+                    console.log('❌ No content to upload');
                     if (convertStatusDiv) {
                         convertStatusDiv.innerHTML = '❌ No content to upload. Select a .md file and click "Process file" first.';
                         convertStatusDiv.style.color = '#ff6b6b';
@@ -1744,6 +1771,7 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
                 }
                 var fileInput = document.getElementById('mdFileInput');
                 if (!fileInput.files || fileInput.files.length === 0) {
+                    console.log('❌ No file selected');
                     if (convertStatusDiv) {
                         convertStatusDiv.innerHTML = '❌ No file selected. Choose a .md file.';
                         convertStatusDiv.style.color = '#ff6b6b';
@@ -1756,7 +1784,8 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
                 var desiredFileName = originalFileName + '.md';
                 convertDownloadBtn.disabled = true;
 
-
+                console.log('🔍 Sending fetch to:', API_URL);
+                console.log('🔍 Filename:', desiredFileName);
 
                 fetch(API_URL, {
                     method: 'POST',
@@ -1767,6 +1796,25 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
                         email: submitterEmail
                     })
                 }).then(function(response) {
+                    console.log('🔍 Response status:', response.status);
+
+                    // ===== CHECK FOR AUTHENTICATION ERROR (401) =====
+                    if (response.status === 401) {
+                        console.log('❌ 401 Unauthorized - User not logged in');
+                        if (convertStatusDiv) {
+                            convertStatusDiv.innerHTML = '⚠️ Please login first to convert your book.';
+                            convertStatusDiv.style.color = '#e67e22';
+                            convertStatusDiv.style.fontWeight = '500';
+                            convertStatusDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                        if (typeof openSignInPopup === 'function') {
+                            console.log('🔍 Opening login popup (401 response)');
+                            openSignInPopup();
+                        }
+                        convertDownloadBtn.disabled = false;
+                        return;
+                    }
+
                     var contentType = response.headers.get('content-type') || '';
                     if (contentType.includes('application/json')) {
                         return response.json().then(function(json) {
@@ -1820,6 +1868,7 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
                         });
                     }
                 }).catch(function(err) {
+                    console.error('❌ Network error:', err);
                     if (convertStatusDiv) {
                         convertStatusDiv.innerHTML = '✗ Network error: ' + err.message;
                         convertStatusDiv.style.color = '#ff6b6b';
