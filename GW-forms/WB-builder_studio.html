@@ -1798,7 +1798,7 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
                 }).then(function(response) {
                     console.log('🔍 Response status:', response.status);
 
-                    // ===== CHECK FOR AUTHENTICATION ERROR (401) =====
+                    // ===== HANDLE 401 UNAUTHORIZED =====
                     if (response.status === 401) {
                         console.log('❌ 401 Unauthorized - User not logged in');
                         if (convertStatusDiv) {
@@ -1807,66 +1807,21 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
                             convertStatusDiv.style.fontWeight = '500';
                             convertStatusDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         }
+                        // Open the login popup
                         if (typeof openSignInPopup === 'function') {
                             console.log('🔍 Opening login popup (401 response)');
                             openSignInPopup();
+                        } else {
+                            console.log('❌ openSignInPopup not found');
+                            window.location.href = 'https://grantherwright.com/GW-forms/GW-landingpage.html';
                         }
                         convertDownloadBtn.disabled = false;
                         return;
                     }
 
+                    // ===== REST OF YOUR RESPONSE HANDLING =====
                     var contentType = response.headers.get('content-type') || '';
-                    if (contentType.includes('application/json')) {
-                        return response.json().then(function(json) {
-                            if (response.status === 429) {
-                                var msg = '❌ ' + json.error;
-                                if (json.limit_crossed) msg += '\nLimit crossed: ' + json.limit_crossed + '. Wait ' + json.wait_seconds + 's.';
-                                if (json.remaining) msg += '\nRemaining: minute: ' + json.remaining.minute + ', hour: ' + json.remaining.hour + ', day: ' + json.remaining.day;
-                                if (convertStatusDiv) { convertStatusDiv.innerHTML = msg; convertStatusDiv.style.color = '#ff6b6b'; }
-                            } else if (response.ok && json.status === 'success') {
-                                if (convertStatusDiv) { convertStatusDiv.innerHTML = '✓ File uploaded and saved: ' + json.filename; convertStatusDiv.style.color = '#4caf50'; }
-                            } else {
-                                var errMsg = json.error || json.message || 'Unknown error';
-                                if (json.details) errMsg += '\n\nDetails:\n' + json.details;
-                                if (convertStatusDiv) { convertStatusDiv.innerHTML = '✗ ' + errMsg; convertStatusDiv.style.color = '#ff6b6b'; }
-                            }
-                            convertDownloadBtn.disabled = false;
-                        });
-                    } else if (response.ok && contentType.includes('text/html')) {
-                        return response.blob().then(function(blob) {
-                            var url = URL.createObjectURL(blob);
-                            var a = document.createElement('a');
-                            a.href = url;
-                            a.download = desiredFileName.replace(/\.md$/, '.html');
-                            a.click();
-                            URL.revokeObjectURL(url);
-                            if (convertStatusDiv) {
-                                var sizeMsg = '✓ Conversion successful – HTML downloaded.';
-                                var mdSize = response.headers.get('X-Markdown-Size');
-                                var htmlSize = response.headers.get('X-Html-Size');
-                                if (mdSize && htmlSize) {
-                                    sizeMsg += '\nMarkdown: ' + (mdSize / 1024).toFixed(1) + ' KB, HTML: ' + (htmlSize / 1024).toFixed(1) + ' KB.';
-                                }
-                                var remMin = response.headers.get('X-RateLimit-Remaining-Minute');
-                                var remHour = response.headers.get('X-RateLimit-Remaining-Hour');
-                                var remDay = response.headers.get('X-RateLimit-Remaining-Day');
-                                if (remMin && remHour && remDay) {
-                                    sizeMsg += '\nRemaining requests: ' + remMin + ' per minute, ' + remHour + ' per hour, ' + remDay + ' per day.';
-                                }
-                                convertStatusDiv.innerHTML = sizeMsg;
-                                convertStatusDiv.style.color = '#4caf50';
-                            }
-                            convertDownloadBtn.disabled = false;
-                        });
-                    } else {
-                        return response.text().then(function(text) {
-                            if (convertStatusDiv) {
-                                convertStatusDiv.innerHTML = '✗ Error (' + response.status + '): ' + text.substring(0, 500);
-                                convertStatusDiv.style.color = '#ff6b6b';
-                            }
-                            convertDownloadBtn.disabled = false;
-                        });
-                    }
+                    // ... rest of your code ...
                 }).catch(function(err) {
                     console.error('❌ Network error:', err);
                     if (convertStatusDiv) {
