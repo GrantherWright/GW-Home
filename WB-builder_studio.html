@@ -1741,13 +1741,10 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
         // ===== CONVERT & DOWNLOAD =====
         if (convertDownloadBtn) {
             convertDownloadBtn.onclick = function() {
-                console.log('🔍 Convert button clicked');
 
                 // ===== CHECK IF USER IS LOGGED IN =====
-                console.log('🔍 Checking clerk.user:', window.parent.clerk ? window.parent.clerk.user : 'clerk not defined');
 
                 if (!window.parent.clerk || !window.parent.clerk.user) {
-                    console.log('❌ User not logged in - showing login message');
                     if (convertStatusDiv) {
                         convertStatusDiv.innerHTML = '⚠️ Please login first to convert your book.';
                         convertStatusDiv.style.color = '#e67e22';
@@ -1756,18 +1753,12 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
                     }
                     // Call the parent's login popup (stays in the modal)
                     if (typeof window.parent.openSignInPopup === 'function') {
-                        console.log('🔍 Opening login popup from parent');
                         window.parent.openSignInPopup();
-                    } else {
-                        console.log('❌ parent.openSignInPopup not found');
-                    }
+                    } 
                     return;
                 }
 
-                console.log('✅ User is logged in:', window.parent.clerk.user.primaryEmailAddress?.emailAddress);
-
                 if (!window.modifiedMarkdown || window.modifiedMarkdown.trim().length === 0) {
-                    console.log('❌ No content to upload');
                     if (convertStatusDiv) {
                         convertStatusDiv.innerHTML = '❌ No content to upload. Select a .md file and click "Process file" first.';
                         convertStatusDiv.style.color = '#ff6b6b';
@@ -1776,7 +1767,6 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
                 }
                 var fileInput = document.getElementById('mdFileInput');
                 if (!fileInput.files || fileInput.files.length === 0) {
-                    console.log('❌ No file selected');
                     if (convertStatusDiv) {
                         convertStatusDiv.innerHTML = '❌ No file selected. Choose a .md file.';
                         convertStatusDiv.style.color = '#ff6b6b';
@@ -1789,15 +1779,11 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
                 var desiredFileName = originalFileName + '.md';
                 convertDownloadBtn.disabled = true;
 
-                console.log('🔍 Sending fetch to:', API_URL);
-                console.log('🔍 Filename:', desiredFileName);
-
                 // ===== GET TOKEN AND SEND FETCH WITH AUTH HEADER =====
                 (async function() {
                     try {
                         const token = await window.parent.clerk.session?.getToken();
                         if (!token) {
-                            console.log('❌ No token available');
                             if (convertStatusDiv) {
                                 convertStatusDiv.innerHTML = '⚠️ Please login first to convert your book.';
                                 convertStatusDiv.style.color = '#e67e22';
@@ -1808,8 +1794,6 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
                             convertDownloadBtn.disabled = false;
                             return;
                         }
-
-                        console.log('🔑 Token obtained, sending request...');
 
                         const response = await fetch(API_URL, {
                             method: 'POST',
@@ -1824,11 +1808,8 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
                             })
                         });
 
-                        console.log('🔍 Response status:', response.status);
-
                         // ===== HANDLE 401 UNAUTHORIZED =====
                         if (response.status === 401) {
-                            console.log('❌ 401 Unauthorized - Token may be expired');
                             if (convertStatusDiv) {
                                 convertStatusDiv.innerHTML = '⚠️ Session expired. Please login again.';
                                 convertStatusDiv.style.color = '#e67e22';
