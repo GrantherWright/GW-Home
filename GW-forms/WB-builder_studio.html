@@ -1748,12 +1748,12 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
                         convertStatusDiv.style.fontWeight = '500';
                         convertStatusDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
-                    if (typeof openSignInPopup === 'function') {
-                        console.log('🔍 Opening login popup');
-                        openSignInPopup();
+                    // Call the parent's login popup (stays in the modal)
+                    if (typeof window.parent.openSignInPopup === 'function') {
+                        console.log('🔍 Opening login popup from parent');
+                        window.parent.openSignInPopup();
                     } else {
-                        console.log('❌ openSignInPopup not found');
-                        window.location.href = 'https://grantherwright.com/GW-forms/GW-landingpage.html';
+                        console.log('❌ parent.openSignInPopup not found');
                     }
                     return;
                 }
@@ -1796,8 +1796,8 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
                                 convertStatusDiv.innerHTML = '⚠️ Please login first to convert your book.';
                                 convertStatusDiv.style.color = '#e67e22';
                             }
-                            if (typeof openSignInPopup === 'function') {
-                                openSignInPopup();
+                            if (typeof window.parent.openSignInPopup === 'function') {
+                                window.parent.openSignInPopup();
                             }
                             convertDownloadBtn.disabled = false;
                             return;
@@ -1809,7 +1809,7 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${token}`   // <-- THIS WAS MISSING
+                                'Authorization': `Bearer ${token}`
                             },
                             body: JSON.stringify({
                                 markdown: window.modifiedMarkdown,
@@ -1829,8 +1829,8 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
                                 convertStatusDiv.style.fontWeight = '500';
                                 convertStatusDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
                             }
-                            if (typeof openSignInPopup === 'function') {
-                                openSignInPopup();
+                            if (typeof window.parent.openSignInPopup === 'function') {
+                                window.parent.openSignInPopup();
                             }
                             convertDownloadBtn.disabled = false;
                             return;
