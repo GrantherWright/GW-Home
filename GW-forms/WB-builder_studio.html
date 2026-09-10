@@ -1748,7 +1748,6 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
                         convertStatusDiv.style.fontWeight = '500';
                         convertStatusDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
-                    // Try to open the login popup
                     if (typeof openSignInPopup === 'function') {
                         console.log('🔍 Opening login popup');
                         openSignInPopup();
@@ -1787,57 +1786,116 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
                 console.log('🔍 Sending fetch to:', API_URL);
                 console.log('🔍 Filename:', desiredFileName);
 
-                fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        markdown: window.modifiedMarkdown,
-                        filename: desiredFileName,
-                        email: submitterEmail
-                    })
-                }).then(function(response) {
-                    console.log('🔍 Response status:', response.status);
-
-                    // ===== HANDLE 401 UNAUTHORIZED =====
-                    if (response.status === 401) {
-                        console.log('❌ 401 Unauthorized - User not logged in');
-                        if (convertStatusDiv) {
-                            convertStatusDiv.innerHTML = '⚠️ Please login first to convert your book.';
-                            convertStatusDiv.style.color = '#e67e22';
-                            convertStatusDiv.style.fontWeight = '500';
-                            convertStatusDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // ===== GET TOKEN AND SEND FETCH WITH AUTH HEADER =====
+                (async function() {
+                    try {
+                        const token = await window.clerk.session?.getToken();
+                        if (!token) {
+                            console.log('❌ No token available');
+                            if (convertStatusDiv) {
+                                convertStatusDiv.innerHTML = '⚠️ Please login first to convert your book.';
+                                convertStatusDiv.style.color = '#e67e22';
+                            }
+                            if (typeof openSignInPopup === 'function') {
+                                openSignInPopup();
+                            }
+                            convertDownloadBtn.disabled = false;
+                            return;
                         }
-                        // Open the login popup
-                        if (typeof openSignInPopup === 'function') {
-                            console.log('🔍 Opening login popup (401 response)');
-                            openSignInPopup();
+
+                        console.log('🔑 Token obtained, sending request...');
+
+                        const response = await fetch(API_URL, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`   // <-- THIS WAS MISSING
+                            },
+                            body: JSON.stringify({
+                                markdown: window.modifiedMarkdown,
+                                filename: desiredFileName,
+                                email: submitterEmail
+                            })
+                        });
+
+                        console.log('🔍 Response status:', response.status);
+
+                        // ===== HANDLE 401 UNAUTHORIZED =====
+                        if (response.status === 401) {
+                            console.log('❌ 401 Unauthorized - Token may be expired');
+                            if (convertStatusDiv) {
+                                convertStatusDiv.innerHTML = '⚠️ Session expired. Please login again.';
+                                convertStatusDiv.style.color = '#e67e22';
+                                convertStatusDiv.style.fontWeight = '500';
+                                convertStatusDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }
+                            if (typeof openSignInPopup === 'function') {
+                                openSignInPopup();
+                            }
+                            convertDownloadBtn.disabled = false;
+                            return;
+                        }
+
+                        // ===== REST OF YOUR RESPONSE HANDLING =====
+                        var contentType = response.headers.get('content-type') || '';
+                        if (contentType.includes('application/json')) {
+                            const json = await response.json();
+                            if (response.status === 429) {
+                                var msg = '❌ ' + json.error;
+                                if (json.limit_crossed) msg += '\nLimit crossed: ' + json.limit_crossed + '. Wait ' + json.wait_seconds + 's.';
+                                if (json.remaining) msg += '\nRemaining: minute: ' + json.remaining.minute + ', hour: ' + json.remaining.hour + ', day: ' + json.remaining.day;
+                                if (convertStatusDiv) { convertStatusDiv.innerHTML = msg; convertStatusDiv.style.color = '#ff6b6b'; }
+                            } else if (response.ok && json.status === 'success') {
+                                if (convertStatusDiv) { convertStatusDiv.innerHTML = '✓ File uploaded and saved: ' + json.filename; convertStatusDiv.style.color = '#4caf50'; }
+                            } else {
+                                var errMsg = json.error || json.message || 'Unknown error';
+                                if (json.details) errMsg += '\n\nDetails:\n' + json.details;
+                                if (convertStatusDiv) { convertStatusDiv.innerHTML = '✗ ' + errMsg; convertStatusDiv.style.color = '#ff6b6b'; }
+                            }
+                        } else if (response.ok && contentType.includes('text/html')) {
+                            const blob = await response.blob();
+                            var url = URL.createObjectURL(blob);
+                            var a = document.createElement('a');
+                            a.href = url;
+                            a.download = desiredFileName.replace(/\.md$/, '.html');
+                            a.click();
+                            URL.revokeObjectURL(url);
+                            if (convertStatusDiv) {
+                                var sizeMsg = '✓ Conversion successful – HTML downloaded.';
+                                var mdSize = response.headers.get('X-Markdown-Size');
+                                var htmlSize = response.headers.get('X-Html-Size');
+                                if (mdSize && htmlSize) {
+                                    sizeMsg += '\nMarkdown: ' + (mdSize / 1024).toFixed(1) + ' KB, HTML: ' + (htmlSize / 1024).toFixed(1) + ' KB.';
+                                }
+                                var remMin = response.headers.get('X-RateLimit-Remaining-Minute');
+                                var remHour = response.headers.get('X-RateLimit-Remaining-Hour');
+                                var remDay = response.headers.get('X-RateLimit-Remaining-Day');
+                                if (remMin && remHour && remDay) {
+                                    sizeMsg += '\nRemaining requests: ' + remMin + ' per minute, ' + remHour + ' per hour, ' + remDay + ' per day.';
+                                }
+                                convertStatusDiv.innerHTML = sizeMsg;
+                                convertStatusDiv.style.color = '#4caf50';
+                            }
                         } else {
-                            console.log('❌ openSignInPopup not found');
-                            window.location.href = 'https://grantherwright.com/GW-forms/GW-landingpage.html';
+                            const text = await response.text();
+                            if (convertStatusDiv) {
+                                convertStatusDiv.innerHTML = '✗ Error (' + response.status + '): ' + text.substring(0, 500);
+                                convertStatusDiv.style.color = '#ff6b6b';
+                            }
                         }
                         convertDownloadBtn.disabled = false;
-                        return;
-                    }
 
-                    // ===== REST OF YOUR RESPONSE HANDLING =====
-                    var contentType = response.headers.get('content-type') || '';
-                    // ... rest of your code ...
-                }).catch(function(err) {
-                    console.error('❌ Network error:', err);
-                    if (convertStatusDiv) {
-                        convertStatusDiv.innerHTML = '✗ Network error: ' + err.message;
-                        convertStatusDiv.style.color = '#ff6b6b';
+                    } catch (err) {
+                        console.error('❌ Error:', err);
+                        if (convertStatusDiv) {
+                            convertStatusDiv.innerHTML = '✗ Error: ' + err.message;
+                            convertStatusDiv.style.color = '#ff6b6b';
+                        }
+                        convertDownloadBtn.disabled = false;
                     }
-                    convertDownloadBtn.disabled = false;
-                });
+                })();
             };
         }
-
-        // ===== SHOW BOOK LIST DEPENDENCY =====
-        document.getElementById('ShowBookListLink').addEventListener('change', function() {
-            updateBookListURLState();
-            saveFormState();
-        });
 
         // ===== INIT =====
         outputBubble.style.display = 'none';
