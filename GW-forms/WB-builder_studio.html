@@ -1738,9 +1738,9 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
                 console.log('🔍 Convert button clicked');
 
                 // ===== CHECK IF USER IS LOGGED IN =====
-                console.log('🔍 Checking clerk.user:', window.clerk ? window.clerk.user : 'clerk not defined');
+                console.log('🔍 Checking clerk.user:', window.parent.clerk ? window.parent.clerk.user : 'clerk not defined');
 
-                if (!window.clerk || !window.clerk.user) {
+                if (!window.parent.clerk || !window.parent.clerk.user) {
                     console.log('❌ User not logged in - showing login message');
                     if (convertStatusDiv) {
                         convertStatusDiv.innerHTML = '⚠️ Please login first to convert your book.';
@@ -1758,7 +1758,7 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
                     return;
                 }
 
-                console.log('✅ User is logged in:', window.clerk.user.primaryEmailAddress?.emailAddress);
+                console.log('✅ User is logged in:', window.parent.clerk.user.primaryEmailAddress?.emailAddress);
 
                 if (!window.modifiedMarkdown || window.modifiedMarkdown.trim().length === 0) {
                     console.log('❌ No content to upload');
@@ -1789,7 +1789,7 @@ ul ul, ol ol, ul ol, ol ul { margin: 0.2em 0 0.2em 1.5em; }
                 // ===== GET TOKEN AND SEND FETCH WITH AUTH HEADER =====
                 (async function() {
                     try {
-                        const token = await window.clerk.session?.getToken();
+                        const token = await window.parent.clerk.session?.getToken();
                         if (!token) {
                             console.log('❌ No token available');
                             if (convertStatusDiv) {
