@@ -305,8 +305,9 @@
 <!-- CLERK AUTHENTICATION SCRIPT                                   -->
 <!-- ============================================================ -->
 <script>
-    const clerkPublishableKey = 'pk_test_c2V0LXRvcnRvaXNlLTMxODkuY2xlcmsuYWNjb3VudHMuZGV2JA';
-    const ACCOUNTS_DOMAIN = 'https://set-tortoise-3189.accounts.dev';
+    const clerkPublishableKey = 'pk_live_Y2xlcmsuZ3JhbnRoZXJ3cmlnaHQuY29tJA';
+    const ACCOUNTS_DOMAIN = 'https://clerk.grantherwright.com';
+    
     let popupWindow = null;
 
     // Listen for reload message from popup
@@ -377,9 +378,8 @@
                         `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
                     );
 
-                    // If popup was blocked or failed, open in same window
                     if (!popupWindow || popupWindow.closed) {
-                        // Don't alert or redirect - just open in current window
+                        alert('Popup was blocked. Redirecting to sign-in page...');
                         window.location.href = signInUrl;
                         return;
                     }
@@ -389,6 +389,7 @@
                             clearInterval(checkPopup);
                             if (clerk.user) {
                                 updateAuthUI();
+                                window.getTime();
                             }
                         }
                     }, 1000);
