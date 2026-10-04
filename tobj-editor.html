@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOBj Publisher Editor Workspace</title>
+    <!-- Tailwind CSS for rapid split-pane layout styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-screen flex flex-col overflow-hidden bg-gray-50">
+
+    <!-- Top Section: Embedded Ribbon Iframe -->
+    <header class="w-full h-24 border-b border-gray-200 bg-white shadow-sm flex-shrink-0">
+        <iframe id="ribbon-frame" src="tobj_ribbon_iframe.html" class="w-full h-full border-0"></iframe>
+    </header>
+
+    <!-- Bottom Section: Split-Pane Workspace -->
+    <main class="flex-grow flex flex-row overflow-hidden">
+        
+        <!-- Bottom-Left Pane: HTML Editor Canvas (TipTap / ProseMirror Workspace) -->
+        <section id="editor-canvas" class="w-1/2 h-full border-r border-gray-200 bg-white p-6 overflow-y-auto focus:outline-none" contenteditable="true">
+            <p class="text-gray-400">Start typing your manuscript here...</p>
+        </section>
+
+        <!-- Bottom-Right Pane: Read-Only TOBj Syntax Inspector -->
+        <section id="tobj-viewer" class="w-1/2 h-full bg-gray-900 text-green-400 font-mono p-6 overflow-y-auto select-none">
+            <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">// TOBj Syntax Inspector (Read-Only)</div>
+            <pre id="tobj-output"><code>// Compiled TOBj output will appear here in real time...</code></pre>
+        </section>
+
+    </main>
+
+    <!-- Step 1 Verification Script -->
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const iframe = document.getElementById('ribbon-frame');
+            const editor = document.getElementById('editor-canvas');
+            const tobjPanel = document.getElementById('tobj-viewer');
+            
+            console.assert(iframe && editor && tobjPanel, "Step 1 Failed: Layout components missing.");
+            console.log("Step 1 Passed: Layout shell initialized successfully.");
+        });
+    </script>
+</body>
+</html>
