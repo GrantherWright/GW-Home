@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOBj Studio - Word-Style Ribbon</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        ::-webkit-scrollbar { height: 3px; width: 3px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+
+        /* White background with tier-themed icon/text colors */
+        .theme-block { background-color: #ffffff; border-color: #bae6fd; color: #0369a1; }
+        .theme-block:hover { background-color: #f0f9ff; }
+        .theme-block svg { stroke: #0369a1; }
+
+        .theme-iblock { background-color: #ffffff; border-color: #7dd3fc; color: #0284c7; }
+        .theme-iblock:hover { background-color: #e0f2fe; }
+        .theme-iblock svg { stroke: #0284c7; }
+
+        .theme-inline { background-color: #ffffff; border-color: #bfdbfe; color: #1d4ed8; }
+        .theme-inline:hover { background-color: #eff6ff; }
+        .theme-inline svg { stroke: #1d4ed8; }
+
+        /* Active state for applied styles/attributes */
+        .ribbon-btn.active, .theme-block.active, .theme-iblock.active, .theme-inline.active {
+            background-color: #eff6ff !important;
+            border-color: #3b82f6 !important;
+            color: #1d4ed8 !important;
+            box-shadow: 0 0 0 1px #3b82f6 inset !important;
+            font-weight: 600;
+        }
+        .ribbon-btn.active svg, .active svg { stroke: #1d4ed8 !important; }
+
+        .ribbon-control { position: relative; display: inline-flex; align-items: center; }
+
+        /* Always-visible reset badge when the color picker control is active (iOS & touch friendly) */
+        .reset-badge {
+            display: none;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 0 2px;
+            color: #94a3b8;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .ribbon-control.active .reset-badge {
+            display: inline-block;
+        }
+        .reset-badge:hover {
+            color: #ef4444;
+        }
+
+        /* Validation States */
+        .input-valid { border-color: #22c55e !important; background-color: rgba(34, 197, 94, 0.05) !important; }
+        .input-invalid { border-color: #ef4444 !important; background-color: rgba(239, 68, 68, 0.05) !important; }
+
+        /* iOS Zoom Prevention: 16px base font scaled down visually via CSS */
+        .no-zoom-input {
+            font-size: 16px !important;
+            transform: scale(0.65);
+            transform-origin: left center;
+            width: calc(100% / 0.65);
+            margin-right: calc(-1 * (100% / 0.65 - 100%));
+        }
+    </style>
+</head>
+<body class="bg-[#f8fafc] text-slate-700 font-sans select-none m-0 p-1 overflow-x-hidden">
+
+    <!-- Stacked Ribbon Container -->
+    <div id="stacked-ribbon" class="space-y-1.5 w-full max-w-7xl mx-auto">
+        <!-- Populated dynamically via script -->
+    </div>
+
+    <!-- Custom Shared Tooltip Element with Strict Width & Wrapping -->
+    <div id="custom-tooltip" class="fixed z-50 px-2 py-1 text-[10px] leading-tight bg-slate-900 text-slate-100 border border-slate-700 rounded shadow-xl pointer-events-none hidden max-w-[240px] break-words whitespace-normal transition-opacity duration-100 opacity-0"></div>
+
+    <script>
+        const REGEX_RULES = {
+            css_size: /^(auto|none|normal|fit-content|inherit|initial|revert|unset|0|(-?\d+(\.\d+)?(px|em|rem|%|vh|vw|pt|pc|in|cm|mm)))$/i,
+            integer: /^-?\d+$/,
+            number: /^-?\d+(\.\d+)?$/,
+            text: /^.*$/
+        };
+
+        const REG_ATTR = {
+          // Block Tier
+          "__left": { type: "block", label: "Left", category: "Alignment", control: "toggle", syntax: "__left", result: "Align block content to the left", icon: "align-left", theme: "theme-block" },
+          "__center": { type: "block", label: "Center", category: "Alignment", control: "toggle", syntax: "__center", result: "Center-align block content", icon: "align-center", theme: "theme-block" },
+          "__right": { type: "block", label: "Right", category: "Alignment", control: "toggle", syntax: "__right", result: "Align block content to the right", icon: "align-right", theme: "theme-block" },
+          "__center_block": { type: "block", label: "Center Block", category: "Alignment", control: "toggle", syntax: "__center_block", result: "Center block element horizontally with auto margins", icon: "align-horizontal-space-center", theme: "theme-block" },
+          "__float_left": { type: "block", label: "Float Left", category: "Alignment", control: "toggle", syntax: "__float_left", result: "Float element to the left side", icon: "move-left", theme: "theme-block" },
+          "__float_right": { type: "block", label: "Float Right", category: "Alignment", control: "toggle", syntax: "__float_right", result: "Float element to the right side", icon: "move-right", theme: "theme-block" },
+          "__text_align_justify": { type: "block", label: "Justify", category: "Alignment", control: "toggle", syntax: "__text_align_justify", result: "Justify block text alignment", icon: "align-justify", theme: "theme-block" },
+          "__flex": { type: "block", label: "Flex", category: "Layout", control: "toggle", syntax: "__flex", result: "Enable flexible box layout", icon: "layout-grid", theme: "theme-block" },
+          "__flex_center": { type: "block", label: "Flex Center", category: "Layout", control: "toggle", syntax: "__flex_center", result: "Center flex items in both directions", icon: "align-center", theme: "theme-block" },
+          "__flex_column": { type: "block", label: "Flex Column", category: "Layout", control: "toggle", syntax: "__flex_column", result: "Arrange flex items vertically", icon: "list", theme: "theme-block" },
+          "__absolute": { type: "block", label: "Absolute", category: "Layout", control: "toggle", syntax: "__absolute", result: "Position element absolutely", icon: "locate", theme: "theme-block" },
+          "__relative": { type: "block", label: "Relative", category: "Layout", control: "toggle", syntax: "__relative", result: "Position element relatively", icon: "compass", theme: "theme-block" },
+          "__sticky": { type: "block", label: "Sticky", category: "Layout", control: "toggle", syntax: "__sticky", result: "Make element sticky during scroll", icon: "pin", theme: "theme-block" },
+
+          "__bgcolor": { type: "block", label: "Bg Color", category: "Background", control: "color", syntax: "__bgcolor(value)", result: "Set block background color", icon: "paint-bucket", theme: "theme-block" },
+          "__border": { type: "block", label: "Border", category: "Background", control: "toggle", syntax: "__border", result: "Add a solid border around block", icon: "square", theme: "theme-block" },
+          "__rounded": { type: "block", label: "Rounded", category: "Background", control: "toggle", syntax: "__rounded", result: "Apply rounded corners (8px radius)", icon: "circle", theme: "theme-block" },
+          "__shadow": { type: "block", label: "Shadow", category: "Background", control: "toggle", syntax: "__shadow", result: "Add drop shadow effect to block", icon: "layers", theme: "theme-block" },
+
+          "__margin": { type: "block", label: "Margin", category: "Spacing", control: "text", validate: "css_size", default: "1rem", syntax: "__margin(value)", result: "Set margin spacing on all sides", icon: "maximize", theme: "theme-block" },
+          "__margin_top": { type: "block", label: "Margin Top", category: "Spacing", control: "text", validate: "css_size", default: "1rem", syntax: "__margin_top(value)", result: "Set top margin spacing", icon: "arrow-up-to-line", theme: "theme-block" },
+          "__margin_bottom": { type: "block", label: "Margin Bottom", category: "Spacing", control: "text", validate: "css_size", default: "1rem", syntax: "__margin_bottom(value)", result: "Set bottom margin spacing", icon: "arrow-down-to-line", theme: "theme-block" },
+          "__margin_vertical": { type: "block", label: "Margin Vert", category: "Spacing", control: "text", validate: "css_size", default: "1rem", syntax: "__margin_vertical(value)", result: "Set top and bottom margin spacing", icon: "move-vertical", theme: "theme-block" },
+          "__margin_horizontal": { type: "block", label: "Margin Horiz", category: "Spacing", control: "text", validate: "css_size", default: "1rem", syntax: "__margin_horizontal(value)", result: "Set left and right margin spacing", icon: "move-horizontal", theme: "theme-block" },
+          "__padding": { type: "block", label: "Padding", category: "Spacing", control: "text", validate: "css_size", default: "1rem", syntax: "__padding(value)", result: "Set internal padding on all sides", icon: "box-select", theme: "theme-block" },
+          "__padding_vertical": { type: "block", label: "Padding Vert", category: "Spacing", control: "text", validate: "css_size", default: "1rem", syntax: "__padding_vertical(value)", result: "Set top and bottom internal padding", icon: "move-vertical", theme: "theme-block" },
+          "__padding_horizontal": { type: "block", label: "Padding Horiz", category: "Spacing", control: "text", validate: "css_size", default: "1rem", syntax: "__padding_horizontal(value)", result: "Set left and right internal padding", icon: "move-horizontal", theme: "theme-block" },
+          "__width": { type: "block", label: "Width", category: "Dimension", control: "text", validate: "css_size", default: "100%", syntax: "__width(value)", result: "Set explicit block width", icon: "move-horizontal", theme: "theme-block" },
+          "__height": { type: "block", label: "Height", category: "Dimension", control: "text", validate: "css_size", default: "auto", syntax: "__height(value)", result: "Set explicit block height", icon: "move-vertical", theme: "theme-block" },
+          "__min_width": { type: "block", label: "Min Width", category: "Dimension", control: "text", validate: "css_size", default: "auto", syntax: "__min_width(value)", result: "Set minimum width constraint", icon: "minimize-2", theme: "theme-block" },
+          "__max_width": { type: "block", label: "Max Width", category: "Dimension", control: "text", validate: "css_size", default: "auto", syntax: "__max_width(value)", result: "Set maximum width constraint", icon: "maximize-2", theme: "theme-block" },
+          "__min_height": { type: "block", label: "Min Height", category: "Dimension", control: "text", validate: "css_size", default: "auto", syntax: "__min_height(value)", result: "Set minimum height constraint", icon: "minimize-2", theme: "theme-block" },
+          "__max_height": { type: "block", label: "Max Height", category: "Dimension", control: "text", validate: "css_size", default: "auto", syntax: "__max_height(value)", result: "Set maximum height constraint", icon: "maximize-2", theme: "theme-block" },
+          "__columns": { type: "block", label: "Columns", category: "Layout", control: "text", validate: "integer", default: "2", syntax: "__columns(value)", result: "Split block content into columns", icon: "columns-2", theme: "theme-block" },
+          "__column_gap": { type: "block", label: "Col Gap", category: "Layout", control: "text", validate: "css_size", default: "2rem", syntax: "__column_gap(value)", result: "Set gap spacing between columns", icon: "space", theme: "theme-block" },
+          "__column_rule": { type: "block", label: "Col Rule", category: "Layout", control: "text", validate: "text", default: "1px solid #ccc", syntax: "__column_rule(value)", result: "Add a divider rule between columns", icon: "separator-vertical", theme: "theme-block" },
+          "__z_index": { type: "block", label: "Z-Index", category: "Layout", control: "text", validate: "integer", default: "1", syntax: "__z_index(value)", result: "Control element layer stacking order", icon: "layers", theme: "theme-block" },
+          "__opacity": { type: "block", label: "Opacity", category: "Effects", control: "text", validate: "number", default: "1", syntax: "__opacity(value)", result: "Set element transparency", icon: "eye", theme: "theme-block" },
+
+          "__blockindent": { type: "block", label: "Block Indent", category: "Indentation", control: "toggle", syntax: "__blockindent", result: "Indent entire block container (2em)", icon: "indent", theme: "theme-block" },
+          "__hanging_indent": { type: "block", label: "Hanging Indent", category: "Indentation", control: "toggle", syntax: "__hanging_indent", result: "Apply hanging indent format", icon: "list-tree", theme: "theme-block" },
+          "__first_line_indent": { type: "block", label: "1st Line Indent", category: "Indentation", control: "toggle", syntax: "__first_line_indent", result: "Indent only the first line of text", icon: "heading", theme: "theme-block" },
+          "__negative_indent": { type: "block", label: "Neg Indent", category: "Indentation", control: "toggle", syntax: "__negative_indent", result: "Shift element left with negative margin", icon: "arrow-left-from-line", theme: "theme-block" },
+          "__outdent": { type: "block", label: "Outdent", category: "Indentation", control: "toggle", syntax: "__outdent", result: "Outdent block with right padding compensation", icon: "arrow-left-from-line", theme: "theme-block" },
+          "__safe": { type: "block", label: "Safe Margins", category: "Layout", control: "toggle", syntax: "__safe", result: "Apply reader safe margins avoiding UI overlays", icon: "shield", theme: "theme-block" },
+
+          // Inline-Block Tier
+          "__ibgcolor": { type: "inlineblock", label: "IBg Color", category: "Background", control: "color", syntax: "__ibgcolor(value)", result: "Set inline-block background color", icon: "palette", theme: "theme-iblock" },
+          "__iborder": { type: "inlineblock", label: "IBorder", category: "Background", control: "toggle", syntax: "__iborder", result: "Add border to inline-block element", icon: "box", theme: "theme-iblock" },
+          "__irounded": { type: "inlineblock", label: "IRounded", category: "Background", control: "toggle", syntax: "__irounded", result: "Apply rounded glassmorphism style", icon: "circle", theme: "theme-iblock" },
+          "__ishadow": { type: "inlineblock", label: "IShadow", category: "Background", control: "toggle", syntax: "__ishadow", result: "Add shadow effect to inline-block", icon: "layers", theme: "theme-iblock" },
+          "__icenter": { type: "inlineblock", label: "ICenter", category: "Alignment", control: "toggle", syntax: "__icenter", result: "Center text inside inline-block", icon: "align-center", theme: "theme-iblock" },
+          "__itext_align_justify": { type: "inlineblock", label: "IJustify", category: "Alignment", control: "toggle", syntax: "__itext_align_justify", result: "Justify text inside inline-block", icon: "align-justify", theme: "theme-iblock" },
+
+          "__imargin": { type: "inlineblock", label: "IMargin", category: "Spacing", control: "text", validate: "css_size", default: "1rem", syntax: "__imargin(value)", result: "Set inline-block margin on all sides", icon: "maximize", theme: "theme-iblock" },
+          "__imargin_vertical": { type: "inlineblock", label: "IMargin Vert", category: "Spacing", control: "text", validate: "css_size", default: "1rem", syntax: "__imargin_vertical(value)", result: "Set vertical margin for inline-block", icon: "move-vertical", theme: "theme-iblock" },
+          "__imargin_horizontal": { type: "inlineblock", label: "IMargin Horiz", category: "Spacing", control: "text", validate: "css_size", default: "1rem", syntax: "__imargin_horizontal(value)", result: "Set horizontal margin for inline-block", icon: "move-horizontal", theme: "theme-iblock" },
+          "__ipadding": { type: "inlineblock", label: "IPadding", category: "Spacing", control: "text", validate: "css_size", default: "1rem", syntax: "__ipadding(value)", result: "Set internal padding for inline-block", icon: "box-select", theme: "theme-iblock" },
+          "__ipadding_vertical": { type: "inlineblock", label: "IPadding Vert", category: "Spacing", control: "text", validate: "css_size", default: "1rem", syntax: "__ipadding_vertical(value)", result: "Set vertical padding for inline-block", icon: "move-vertical", theme: "theme-iblock" },
+          "__ipadding_horizontal": { type: "inlineblock", label: "IPadding Horiz", category: "Spacing", control: "text", validate: "css_size", default: "1rem", syntax: "__ipadding_horizontal(value)", result: "Set horizontal padding for inline-block", icon: "move-horizontal", theme: "theme-iblock" },
+          "__iwidth": { type: "inlineblock", label: "IWidth", category: "Dimension", control: "text", validate: "css_size", default: "100%", syntax: "__iwidth(value)", result: "Set explicit inline-block width", icon: "move-horizontal", theme: "theme-iblock" },
+          "__iheight": { type: "inlineblock", label: "IHeight", category: "Dimension", control: "text", validate: "css_size", default: "auto", syntax: "__iheight(value)", result: "Set explicit inline-block height", icon: "move-vertical", theme: "theme-iblock" },
+          "__imin_width": { type: "inlineblock", label: "IMin Width", category: "Dimension", control: "text", validate: "css_size", default: "auto", syntax: "__imin_width(value)", result: "Set minimum width for inline-block", icon: "minimize-2", theme: "theme-iblock" },
+          "__imax_width": { type: "inlineblock", label: "IMax Width", category: "Dimension", control: "text", validate: "css_size", default: "auto", syntax: "__imax_width(value)", result: "Set maximum width for inline-block", icon: "maximize-2", theme: "theme-iblock" },
+          "__imin_height": { type: "inlineblock", label: "IMin Height", category: "Dimension", control: "text", validate: "css_size", default: "auto", syntax: "__imin_height(value)", result: "Set minimum height for inline-block", icon: "minimize-2", theme: "theme-iblock" },
+          "__imax_height": { type: "inlineblock", label: "IMax Height", category: "Dimension", control: "text", validate: "css_size", default: "auto", syntax: "__imax_height(value)", result: "Set maximum height for inline-block", icon: "maximize-2", theme: "theme-iblock" },
+          "__icolumns": { type: "inlineblock", label: "IColumns", category: "Layout", control: "text", validate: "integer", default: "2", syntax: "__icolumns(value)", result: "Split inline-block content into columns", icon: "columns-2", theme: "theme-iblock" },
+
+          "__iletter_spacing": { type: "inlineblock", label: "ILetter Space", category: "Typography", control: "text", validate: "css_size", default: "0.1em", syntax: "__iletter_spacing(value)", result: "Adjust letter spacing for inline-block", icon: "fold-horizontal", theme: "theme-iblock" },
+          "__itext_transform": { type: "inlineblock", label: "IText Xform", category: "Typography", control: "text", validate: "text", default: "none", syntax: "__itext_transform(value)", result: "Transform text case for inline-block", icon: "case-upper", theme: "theme-iblock" },
+          "__ifont_weight": { type: "inlineblock", label: "IFont Weight", category: "Typography", control: "text", validate: "text", default: "normal", syntax: "__ifont_weight(value)", result: "Set font weight for inline-block", icon: "bold", theme: "theme-iblock" },
+          "__itext_shadow": { type: "inlineblock", label: "IText Shadow", category: "Typography", control: "text", validate: "text", default: "none", syntax: "__itext_shadow(value)", result: "Add text shadow for inline-block", icon: "sparkles", theme: "theme-iblock" },
+
+          "__iindent": { type: "inlineblock", label: "IIndent", category: "Indentation", control: "toggle", syntax: "__iindent", result: "Indent inline-block content (2em)", icon: "indent", theme: "theme-iblock" },
+          "__ihanging_indent": { type: "inlineblock", label: "IHanging Ind", category: "Indentation", control: "toggle", syntax: "__ihanging_indent", result: "Apply hanging indent to inline-block", icon: "list-tree", theme: "theme-iblock" },
+          "__ifirst_line_indent": { type: "inlineblock", label: "I1st Line Ind", category: "Indentation", control: "toggle", syntax: "__ifirst_line_indent", result: "Indent first line of inline-block text", icon: "heading", theme: "theme-iblock" },
+          "__ioutdent": { type: "inlineblock", label: "IOutdent", category: "Indentation", control: "toggle", syntax: "__ioutdent", result: "Pull inline-block left (outdent)", icon: "arrow-left-from-line", theme: "theme-iblock" },
+          "__iopacity": { type: "inlineblock", label: "IOpacity", category: "Effects", control: "text", validate: "number", default: "1", syntax: "__iopacity(value)", result: "Set inline-block transparency", icon: "eye", theme: "theme-iblock" },
+          "__itransform": { type: "inlineblock", label: "ITransform", category: "Effects", control: "text", validate: "text", default: "none", syntax: "__itransform(value)", result: "Apply CSS transform to inline-block", icon: "rotate-cw", theme: "theme-iblock" },
+
+          // Inline Tier
+          "_bold": { type: "inline", label: "Bold", category: "Text Styling", control: "toggle", syntax: "_bold", result: "Apply bold weight to text", icon: "bold", theme: "theme-inline" },
+          "_italic": { type: "inline", label: "Italic", category: "Text Styling", control: "toggle", syntax: "_italic", result: "Apply italic style to text", icon: "italic", theme: "theme-inline" },
+          "_underline": { type: "inline", label: "Underline", category: "Text Styling", control: "toggle", syntax: "_underline", result: "Underline text content", icon: "underline", theme: "theme-inline" },
+          "_box": { type: "inline", label: "Box", category: "Text Styling", control: "toggle", syntax: "_box", result: "Wrap inline text in a border box", icon: "square-dashed", theme: "theme-inline" },
+          "_fontup": { type: "inline", label: "Font Up", category: "Text Styling", control: "toggle", syntax: "_fontup", result: "Increase font size by 20%", icon: "arrow-up-from-line", theme: "theme-inline" },
+          "_fontdn": { type: "inline", label: "Font Down", category: "Text Styling", control: "toggle", syntax: "_fontdn", result: "Decrease font size by 20%", icon: "arrow-down-to-line", theme: "theme-inline" },
+          "_overline": { type: "inline", label: "Overline", category: "Text Styling", control: "toggle", syntax: "_overline", result: "Add an overline above text", icon: "overline", theme: "theme-inline" },
+          "_line_through": { type: "inline", label: "Strikethrough", category: "Text Styling", control: "toggle", syntax: "_line_through", result: "Add a strikethrough line across text", icon: "strikethrough", theme: "theme-inline" },
+          "_double_underline": { type: "inline", label: "Dbl Underline", category: "Text Styling", control: "toggle", syntax: "_double_underline", result: "Add a double underline below text", icon: "underline", theme: "theme-inline" },
+          "_wavy_underline": { type: "inline", label: "Wavy Underline", category: "Text Styling", control: "toggle", syntax: "_wavy_underline", result: "Add a wavy underline below text", icon: "activity", theme: "theme-inline" },
+          "_dotted_underline": { type: "inline", label: "Dot Underline", category: "Text Styling", control: "toggle", syntax: "_dotted_underline", result: "Add a dotted underline below text", icon: "more-horizontal", theme: "theme-inline" },
+          "_dashed_underline": { type: "inline", label: "Dash Underline", category: "Text Styling", control: "toggle", syntax: "_dashed_underline", result: "Add a dashed underline below text", icon: "minus", theme: "theme-inline" },
+          "_uppercase": { type: "inline", label: "Uppercase", category: "Text Styling", control: "toggle", syntax: "_uppercase", result: "Convert text characters to uppercase", icon: "case-upper", theme: "theme-inline" },
+          "_lowercase": { type: "inline", label: "Lowercase", category: "Text Styling", control: "toggle", syntax: "_lowercase", result: "Convert text characters to lowercase", icon: "case-lower", theme: "theme-inline" },
+          "_capitalize": { type: "inline", label: "Capitalize", category: "Text Styling", control: "toggle", syntax: "_capitalize", result: "Capitalize the first letter of each word", icon: "case-sensitive", theme: "theme-inline" },
+          "_small_caps": { type: "inline", label: "Small Caps", category: "Text Styling", control: "toggle", syntax: "_small_caps", result: "Display text in small capital letters", icon: "type", theme: "theme-inline" },
+
+          "_color": { type: "inline", label: "Color", category: "Colors", control: "color", syntax: "_color(value)", result: "Set text font color", icon: "droplet", theme: "theme-inline" },
+          "_bgcolor": { type: "inline", label: "Bg Color", category: "Colors", control: "color", syntax: "_bgcolor(value)", result: "Set background color for inline text", icon: "highlighter", theme: "theme-inline" },
+
+          "_fontfamily": { 
+              type: "inline", label: "Font Family", category: "Text Styling", control: "select", 
+              options: ["Georgia", "Arial", "Verdana", "Times New Roman", "Courier New", "Helvetica", "Palatino", "Garamond", "Comic Sans MS", "Tahoma", "Trebuchet MS", "Impact", "Lucida Console", "Monaco", "Cursive"],
+              default: "", syntax: "_fontfamily(value)", result: "Change text font family", icon: "case-sensitive", theme: "theme-inline" 
+          },
+
+          "_fontsize": { type: "inline", label: "Font Size", category: "Spacing", control: "text", validate: "css_size", default: "5.0", syntax: "_fontsize(value)", result: "Set precise font size in rem units", icon: "type", theme: "theme-inline" },
+          "_letter_spacing": { type: "inline", label: "Letter Space", category: "Spacing", control: "text", validate: "css_size", default: "0.1em", syntax: "_letter_spacing(value)", result: "Adjust letter spacing (tracking)", icon: "fold-horizontal", theme: "theme-inline" },
+          "_word_spacing": { type: "inline", label: "Word Space", category: "Spacing", control: "text", validate: "css_size", default: "0.2em", syntax: "_word_spacing(value)", result: "Adjust spacing between words", icon: "space", theme: "theme-inline" },
+          "_line_height": { type: "inline", label: "Line Height", category: "Spacing", control: "text", validate: "number", default: "1.5", syntax: "_line_height(value)", result: "Adjust line height (vertical spacing)", icon: "list-collapse", theme: "theme-inline" },
+          "_font_weight": { type: "inline", label: "Font Weight", category: "Text Styling", control: "text", validate: "text", default: "700", syntax: "_font_weight(value)", result: "Set custom numeric font weight", icon: "bold", theme: "theme-inline" },
+          "_text_outline": { type: "inline", label: "Text Outline", category: "Text Styling", control: "text", validate: "text", default: "1px #333", syntax: "_text_outline(value)", result: "Add an outline stroke to text", icon: "pen-tool", theme: "theme-inline" },
+
+          "_superscript": { type: "inline", label: "Superscript", category: "Special", control: "toggle", syntax: "_superscript", result: "Format text as superscript", icon: "superscript", theme: "theme-inline" },
+          "_subscript": { type: "inline", label: "Subscript", category: "Special", control: "toggle", syntax: "_subscript", result: "Format text as subscript", icon: "subscript", theme: "theme-inline" },
+          "_clickme_str": { type: "inline", label: "ClickMe", category: "Special", control: "toggle", syntax: "_clickme_str", result: "Style text as an interactive glass button", icon: "mouse-pointer-click", theme: "theme-inline" },
+          "_tab": { type: "inline", label: "Tab", category: "Special", control: "toggle", syntax: "_tab", result: "Insert a tab indent (2em margin)", icon: "indent", theme: "theme-inline" }
+        };
+
+        const tiers = [
+            { key: "block", title: "Block" },
+            { key: "inlineblock", title: "Inline-Block" },
+            { key: "inline", title: "Inline" }
+        ];
+
+        const container = document.getElementById('stacked-ribbon');
+        const tooltip = document.getElementById('custom-tooltip');
+        let activeTouchTimer = null;
+
+        function attachTooltip(element, tooltipText) {
+            const show = () => {
+                tooltip.textContent = tooltipText;
+                tooltip.classList.remove('hidden');
+                const rect = element.getBoundingClientRect();
+                let left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2);
+                let top = rect.bottom + 4;
+                if (left < 4) left = 4;
+                if (left + 240 > window.innerWidth) left = window.innerWidth - 245;
+                if (top + 45 > window.innerHeight) top = rect.top - 38;
+                tooltip.style.left = `${left}px`;
+                tooltip.style.top = `${top}px`;
+                setTimeout(() => tooltip.classList.remove('opacity-0'), 10);
+            };
+            const hide = () => {
+                tooltip.classList.add('opacity-0');
+                setTimeout(() => tooltip.classList.add('hidden'), 100);
+            };
+            element.addEventListener('mouseenter', show);
+            element.addEventListener('mouseleave', hide);
+            element.addEventListener('touchstart', (e) => {
+                show();
+                if (activeTouchTimer) clearTimeout(activeTouchTimer);
+                activeTouchTimer = setTimeout(hide, 2500);
+            }, { passive: true });
+        }
+
+        tiers.forEach(tier => {
+            const tierSection = document.createElement('fieldset');
+            tierSection.className = "border border-slate-300 rounded px-2 pb-1.5 pt-0.5 m-0 bg-white shadow-2xs";
+            
+            const tierLegend = document.createElement('legend');
+            tierLegend.className = "text-[10px] font-bold uppercase tracking-wider text-slate-500 px-1 bg-white";
+            tierLegend.textContent = tier.title;
+            tierSection.appendChild(tierLegend);
+
+            const catMap = {};
+            for (const [key, attr] of Object.entries(REG_ATTR)) {
+                if (attr.type === tier.key) {
+                    const cat = attr.category || "General";
+                    if (!catMap[cat]) catMap[cat] = [];
+                    catMap[cat].push({ key, ...attr });
+                }
+            }
+
+            const wrapContainer = document.createElement('div');
+            wrapContainer.className = "flex flex-wrap gap-1.5 items-center";
+
+            for (const [catName, items] of Object.entries(catMap)) {
+                const subBox = document.createElement('div');
+                subBox.className = "bg-slate-50 border border-slate-200 rounded p-1 flex flex-wrap gap-1 items-center";
+                
+                items.forEach(item => {
+                    const controlDiv = document.createElement('div');
+                    controlDiv.className = "ribbon-control";
+                    const tooltipText = `${item.type}: ${item.label}: ${item.result}`;
+
+                    if (item.control === "toggle") {
+                        const btn = document.createElement('button');
+                        btn.className = `ribbon-btn p-1 rounded border transition-all cursor-pointer flex items-center justify-center shadow-2xs ${item.theme}`;
+                        btn.setAttribute('data-key', item.key);
+                        btn.innerHTML = `<i data-lucide="${item.icon || 'circle'}" class="w-3.5 h-3.5"></i>`;
+                        attachTooltip(btn, tooltipText);
+                        btn.addEventListener('click', () => {
+                            btn.classList.toggle('active');
+                            const isActive = btn.classList.contains('active');
+                            window.parent.postMessage({ action: 'tobj_insert', syntax: item.syntax, key: item.key, active: isActive }, '*');
+                        });
+                        controlDiv.appendChild(btn);
+
+                    } else if (item.control === "color") {
+                        const wrap = document.createElement('label');
+                        wrap.className = `ribbon-btn p-1 rounded border transition-all cursor-pointer flex items-center gap-0.5 shadow-2xs ${item.theme}`;
+                        wrap.setAttribute('data-key', item.key);
+                        wrap.innerHTML = `
+                            <i data-lucide="${item.icon || 'palette'}" class="w-3.5 h-3.5"></i>
+                            <input type="color" value="#000000" class="w-3 h-3 opacity-90 cursor-pointer bg-transparent border-0">
+                            <span class="reset-badge" title="Clear color">×</span>
+                        `;
+                        attachTooltip(wrap, tooltipText);
+                        
+                        const input = wrap.querySelector('input');
+                        input.addEventListener('change', (e) => {
+                            wrap.classList.add('active');
+                            const valColor = e.target.value;
+                            const finalSyntax = item.syntax.replace('{value}', valColor);
+                            window.parent.postMessage({ action: 'tobj_insert', syntax: finalSyntax, key: item.key, active: true }, '*');
+                        });
+
+                        const resetBadge = wrap.querySelector('.reset-badge');
+                        resetBadge.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            wrap.classList.remove('active');
+                            input.value = "#000000";
+                            window.parent.postMessage({ action: 'tobj_insert', syntax: '', key: item.key, active: false }, '*');
+                        });
+
+                        controlDiv.appendChild(wrap);
+
+                    } else if (item.control === "select") {
+                        const selectWrap = document.createElement('div');
+                        selectWrap.className = `flex items-center border rounded px-1 py-0.5 gap-1 ${item.theme}`;
+                        selectWrap.setAttribute('data-key', item.key);
+                        
+                        const iconSpan = document.createElement('span');
+                        iconSpan.className = "flex items-center p-0.5";
+                        iconSpan.innerHTML = `<i data-lucide="${item.icon || 'case-sensitive'}" class="w-3.5 h-3.5"></i>`;
+
+                        const select = document.createElement('select');
+                        select.className = "no-zoom-input px-1 py-0.5 rounded border bg-white text-slate-800 border-slate-300 cursor-pointer focus:outline-none";
+                        
+                        // Default / None option
+                        const defaultOpt = document.createElement('option');
+                        defaultOpt.value = "";
+                        defaultOpt.textContent = "Default / None";
+                        select.appendChild(defaultOpt);
+
+                        item.options.forEach(opt => {
+                            const option = document.createElement('option');
+                            option.value = opt;
+                            option.textContent = opt;
+                            select.appendChild(option);
+                        });
+
+                        selectWrap.appendChild(iconSpan);
+                        selectWrap.appendChild(select);
+                        attachTooltip(selectWrap, tooltipText);
+
+                        select.addEventListener('change', (e) => {
+                            const valSelect = e.target.value;
+                            if (valSelect === "") {
+                                selectWrap.classList.remove('active');
+                                window.parent.postMessage({ action: 'tobj_insert', syntax: '', key: item.key, active: false }, '*');
+                            } else {
+                                selectWrap.classList.add('active');
+                                const finalSyntax = item.syntax.replace('{value}', valSelect);
+                                window.parent.postMessage({ action: 'tobj_insert', syntax: finalSyntax, key: item.key, active: true }, '*');
+                            }
+                        });
+                        controlDiv.appendChild(selectWrap);
+
+                    } else if (item.control === "text") {
+                        const inputWrap = document.createElement('div');
+                        inputWrap.className = `flex items-center border rounded px-1 py-0.5 gap-0.5 ${item.theme}`;
+                        inputWrap.setAttribute('data-key', item.key);
+                        
+                        const iconSpan = document.createElement('span');
+                        iconSpan.className = "flex items-center p-0.5";
+                        iconSpan.innerHTML = `<i data-lucide="${item.icon || 'type'}" class="w-3 h-3"></i>`;
+                        
+                        const input = document.createElement('input');
+                        input.type = "text";
+                        input.value = item.default || "";
+                        input.className = "no-zoom-input w-11 bg-white text-slate-900 border border-slate-300 rounded focus:outline-none px-0.5";
+                        
+                        inputWrap.appendChild(iconSpan);
+                        inputWrap.appendChild(input);
+                        attachTooltip(inputWrap, tooltipText);
+
+                        const validateAndSend = () => {
+                            const valText = input.value.trim();
+                            
+                            // If backed out / deleted completely, reset to default/inactive
+                            if (valText === "") {
+                                inputWrap.classList.remove('active');
+                                window.parent.postMessage({ action: 'tobj_insert', syntax: '', key: item.key, active: false }, '*');
+                                return;
+                            }
+
+                            const ruleKey = item.validate || "text";
+                            const pattern = REGEX_RULES[ruleKey] || REGEX_RULES.text;
+
+                            if (pattern.test(valText)) {
+                                input.classList.remove('input-invalid');
+                                input.classList.add('input-valid');
+                                inputWrap.classList.add('active');
+                                setTimeout(() => input.classList.remove('input-valid'), 600);
+
+                                const finalSyntax = item.syntax.replace('{value}', valText);
+                                window.parent.postMessage({ action: 'tobj_insert', syntax: finalSyntax, key: item.key, active: true }, '*');
+                            } else {
+                                input.classList.remove('input-valid');
+                                input.classList.add('input-invalid');
+                                setTimeout(() => input.classList.remove('input-invalid'), 800);
+                            }
+                        };
+
+                        input.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter') {
+                                validateAndSend();
+                                input.blur();
+                            }
+                        });
+
+                        input.addEventListener('blur', () => {
+                            validateAndSend();
+                        });
+
+                        controlDiv.appendChild(inputWrap);
+                    }
+
+                    subBox.appendChild(controlDiv);
+                });
+
+                wrapContainer.appendChild(subBox);
+            }
+
+            tierSection.appendChild(wrapContainer);
+            container.appendChild(tierSection);
+        });
+
+        // Listen for incoming postMessage from host to hydrate / update active button states
+        window.addEventListener('message', (event) => {
+            const data = event.data;
+            if (data && data.type === 'HYDRATE_RIBBON') {
+                const activeKeys = data.keys || data.styles || [];
+                
+                document.querySelectorAll('[data-key]').forEach(el => {
+                    const key = el.getAttribute('data-key');
+                    if (activeKeys.includes(key)) {
+                        el.classList.add('active');
+                    } else {
+                        el.classList.remove('active');
+                    }
+                });
+            }
+        });
+
+        document.addEventListener('touchstart', (e) => {
+            if (!e.target.closest('button') && !e.target.closest('input') && !e.target.closest('select') && !e.target.closest('label')) {
+                tooltip.classList.add('opacity-0');
+                setTimeout(() => tooltip.classList.add('hidden'), 100);
+            }
+        });
+
+        lucide.createIcons();
+    </script>
+</body>
+</html>
