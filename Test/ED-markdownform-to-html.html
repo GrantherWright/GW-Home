@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarkCraft Studio - Enhanced Markdown & Table Builder</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Marked.js for Markdown Preview -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 h-screen flex flex-col font-sans overflow-hidden transition-colors duration-200">
+
+    <!-- Top Ribbon / Navbar -->
+    <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-2 flex items-center justify-between shadow-sm transition-colors duration-200">
+        <div class="flex items-center space-x-3">
+            <div class="bg-blue-600 text-white p-2 rounded-lg font-bold text-lg flex items-center justify-center w-10 h-10 shadow-sm">
+                <i data-lucide="pen-tool"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-gray-800 dark:text-gray-100 text-lg leading-tight">MarkCraft Studio</h1>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Advanced Markdown & Table Builder</p>
+            </div>
+        </div>
+
+        <!-- Action Toolbar Buttons -->
+        <div class="flex items-center space-x-2">
+            <!-- Dark Mode Toggle -->
+            <button onclick="toggleDarkMode()" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-md transition border border-gray-200 dark:border-gray-700" title="Toggle Dark Mode">
+                <i data-lucide="moon" id="dark-mode-icon"></i>
+            </button>
+            <button onclick="copyMarkdown()" class="flex items-center space-x-1.5 px-3 py-1.5 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-md transition border border-gray-300 dark:border-gray-600">
+                <i data-lucide="copy" class="w-4 h-4"></i>
+                <span>Copy MD</span>
+            </button>
+            <button onclick="copyHTML()" class="flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 text-sm font-medium rounded-md transition border border-emerald-200 dark:border-emerald-800" title="Convert markdown to HTML and copy to clipboard">
+                <i data-lucide="code-2" class="w-4 h-4"></i>
+                <span>Copy HTML</span>
+            </button>
+            <button onclick="copyBoth()" class="flex items-center space-x-1.5 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 text-sm font-medium rounded-md transition border border-indigo-200 dark:border-indigo-800" title="Copy both Markdown and converted HTML">
+                <i data-lucide="files" class="w-4 h-4"></i>
+                <span>Copy Both</span>
+            </button>
+            <button onclick="exportHTML()" class="flex items-center space-x-1.5 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 text-sm font-medium rounded-md transition border border-blue-200 dark:border-blue-800">
+                <i data-lucide="download" class="w-4 h-4"></i>
+                <span>Export HTML</span>
+            </button>
+            <button onclick="clearEditor()" class="flex items-center space-x-1.5 px-3 py-1.5 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 text-sm font-medium rounded-md transition border border-red-200 dark:border-red-800">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                <span>Clear</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Ribbon Formatting Toolbar -->
+    <div class="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-2 flex flex-wrap items-center gap-3 text-sm shadow-inner transition-colors duration-200">
+        <!-- Tables Group -->
+        <div class="flex items-center space-x-1 bg-white dark:bg-gray-900 px-2 py-1 rounded border border-gray-200 dark:border-gray-700 shadow-xs">
+            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider mr-1">Table</span>
+            <button onclick="openTableModal()" class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition flex items-center gap-1" title="Visual Table Grid Builder">
+                <i data-lucide="table" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+        <!-- Lists Group -->
+        <div class="flex items-center space-x-1 bg-white dark:bg-gray-900 px-2 py-1 rounded border border-gray-200 dark:border-gray-700 shadow-xs">
+            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider mr-1">Lists</span>
+            <button onclick="insertBulletList()" class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition" title="Bullet List">
+                <i data-lucide="list" class="w-4 h-4"></i>
+            </button>
+            <button onclick="insertNumberedList()" class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition" title="Numbered List">
+                <i data-lucide="list-ordered" class="w-4 h-4"></i>
+            </button>
+            <button onclick="insertChecklist()" class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition" title="Checklist">
+                <i data-lucide="check-square" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+        <!-- Headings Group -->
+        <div class="flex items-center space-x-1 bg-white dark:bg-gray-900 px-2 py-1 rounded border border-gray-200 dark:border-gray-700 shadow-xs">
+            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider mr-1">Headings</span>
+            <button onclick="wrapText('# ', '')" class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition font-bold text-xs" title="Heading 1">H1</button>
+            <button onclick="wrapText('## ', '')" class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition font-bold text-xs" title="Heading 2">H2</button>
+            <button onclick="wrapText('### ', '')" class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition font-bold text-xs" title="Heading 3">H3</button>
+        </div>
+
+        <!-- Text Styling Group -->
+        <div class="flex items-center space-x-1 bg-white dark:bg-gray-900 px-2 py-1 rounded border border-gray-200 dark:border-gray-700 shadow-xs">
+            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider mr-1">Format</span>
+            <button onclick="wrapText('**', '**')" class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition" title="Bold">
+                <i data-lucide="bold" class="w-4 h-4"></i>
+            </button>
+            <button onclick="wrapText('*', '*')" class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition" title="Italic">
+                <i data-lucide="italic" class="w-4 h-4"></i>
+            </button>
+            <button onclick="wrapText('`', '`')" class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition" title="Inline Code">
+                <i data-lucide="code" class="w-4 h-4"></i>
+            </button>
+            <button onclick="wrapText('> ', '')" class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition" title="Quote">
+                <i data-lucide="quote" class="w-4 h-4"></i>
+            </button>
+            <button onclick="insertLink()" class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition" title="Insert Link">
+                <i data-lucide="link" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Split-Pane Workspace -->
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden p-4 gap-4 bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
+        <!-- Editor Pane -->
+        <div class="flex-1 flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-200">
+            <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex justify-between items-center">
+                <span>Markdown Input</span>
+                <span id="stats" class="text-gray-400 dark:text-gray-500 font-normal normal-case">0 chars | 0 words</span>
+            </div>
+            <textarea id="markdown-input" class="flex-1 p-4 resize-none outline-none font-mono text-sm text-gray-800 dark:text-gray-200 bg-transparent leading-relaxed" placeholder="Type markdown or use the ribbon above..."></textarea>
+        </div>
+
+        <!-- Live Preview Pane -->
+        <div class="flex-1 flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-200">
+            <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                Live Preview
+            </div>
+            <div id="preview-output" class="flex-1 p-6 overflow-y-auto prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800">
+                <!-- Rendered output appears here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Advanced Visual Table Grid Modal -->
+    <div id="table-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4 backdrop-blur-xs">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+            <div class="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                <h3 class="font-bold text-gray-800 dark:text-gray-100 text-base flex items-center gap-2">
+                    <i data-lucide="table" class="w-5 h-5 text-blue-600"></i> Interactive Table Grid Builder
+                </h3>
+                <button onclick="closeTableModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="flex gap-4">
+                    <div class="flex-1">
+                        <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase mb-1">Rows</label>
+                        <input type="number" id="table-rows" value="3" min="1" max="10" onchange="renderTableGridInputs()" class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase mb-1">Columns</label>
+                        <input type="number" id="table-cols" value="3" min="1" max="6" onchange="renderTableGridInputs()" class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase mb-2">Edit Cell Values (Row 1 = Headers)</label>
+                    <div id="table-grid-container" class="max-h-60 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded p-2 bg-gray-50 dark:bg-gray-900 space-y-2">
+                        <!-- Dynamic cell inputs generated here -->
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-2">
+                <button onclick="closeTableModal()" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded transition">Cancel</button>
+                <button onclick="generateCustomTable()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded transition shadow-sm">Insert Table</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-900 dark:bg-gray-700 text-white px-4 py-2 rounded-lg shadow-lg text-sm transition-opacity duration-300 opacity-0 pointer-events-none z-50 border border-gray-800">
+        Copied to clipboard!
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        const input = document.getElementById('markdown-input');
+        const preview = document.getElementById('preview-output');
+        const stats = document.getElementById('stats');
+        const tableModal = document.getElementById('table-modal');
+        const tableGridContainer = document.getElementById('table-grid-container');
+
+        // Load saved content from LocalStorage or default sample
+        const savedMarkdown = localStorage.getItem('markcraft_content');
+        if (savedMarkdown !== null) {
+            input.value = savedMarkdown;
+        } else {
+            input.value = `# Welcome to MarkCraft Studio\n\nBuild clean Markdown tables, lists, and formatted text instantly using the ribbon above.\n\n| Layer | Style | HTML |\n|---|---|---|\n| 3 (outermost) | Block | \`<div style="text-align: center;">\` |\n| 2 (middle) | Inline-Block | \`<div style="display: inline-block;">\` |\n| 1 (innermost) | Inline | \`<span style="font-weight: bold;">\` |`;
+        }
+
+        // Dark Mode State Management
+        if (localStorage.getItem('markcraft_theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.getElementById('dark-mode-icon').setAttribute('data-lucide', 'sun');
+            lucide.createIcons();
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('markcraft_theme', isDark ? 'dark' : 'light');
+            document.getElementById('dark-mode-icon').setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+            lucide.createIcons();
+        }
+
+        // Update preview & local storage on input
+        input.addEventListener('input', () => {
+            updatePreview();
+            localStorage.setItem('markcraft_content', input.value);
+        });
+
+        function updatePreview() {
+            const text = input.value;
+            preview.innerHTML = marked.parse(text);
+            const chars = text.length;
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            stats.textContent = `${chars} chars | ${words} words`;
+        }
+
+        // Text Wrapping & Insertion Helpers
+        function wrapText(before, after) {
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            const text = input.value;
+            const selectedText = text.substring(start, end) || 'text';
+            
+            input.value = text.substring(0, start) + before + selectedText + after + text.substring(end);
+            input.focus();
+            input.setSelectionRange(start + before.length, start + before.length + selectedText.length);
+            updatePreview();
+            localStorage.setItem('markcraft_content', input.value);
+        }
+
+        function insertBulletList() {
+            const start = input.selectionStart;
+            const text = input.value;
+            const bullet = "\n- Item 1\n- Item 2\n- Item 3\n";
+            input.value = text.substring(0, start) + bullet + text.substring(start);
+            input.focus();
+            updatePreview();
+            localStorage.setItem('markcraft_content', input.value);
+        }
+
+        function insertNumberedList() {
+            const start = input.selectionStart;
+            const text = input.value;
+            const numList = "\n1. First item\n2. Second item\n3. Third item\n";
+            input.value = text.substring(0, start) + numList + text.substring(start);
+            input.focus();
+            updatePreview();
+            localStorage.setItem('markcraft_content', input.value);
+        }
+
+        function insertChecklist() {
+            const start = input.selectionStart;
+            const text = input.value;
+            const checklist = "\n- [ ] Task 1\n- [x] Completed task\n- [ ] Task 3\n";
+            input.value = text.substring(0, start) + checklist + text.substring(start);
+            input.focus();
+            updatePreview();
+            localStorage.setItem('markcraft_content', input.value);
+        }
+
+        function insertLink() {
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            const text = input.value;
+            const selected = text.substring(start, end) || 'link text';
+            const linkMarkdown = `[${selected}](https://example.com)`;
+            input.value = text.substring(0, start) + linkMarkdown + text.substring(end);
+            input.focus();
+            updatePreview();
+            localStorage.setItem('markcraft_content', input.value);
+        }
+
+        // Table Grid Modal Controls
+        function openTableModal() {
+            tableModal.classList.remove('hidden');
+            tableModal.classList.add('flex');
+            renderTableGridInputs();
+        }
+
+        function closeTableModal() {
+            tableModal.classList.remove('flex');
+            tableModal.classList.add('hidden');
+        }
+
+        function renderTableGridInputs() {
+            const rows = parseInt(document.getElementById('table-rows').value) || 3;
+            const cols = parseInt(document.getElementById('table-cols').value) || 3;
+            
+            let html = '';
+            for (let r = 0; r < rows; r++) {
+                html += `<div class="flex gap-2 items-center"><span class="text-xs text-gray-400 w-12">${r === 0 ? 'Header' : 'Row ' + r}</span>`;
+                for (let c = 0; c < cols; c++) {
+                    const placeholder = r === 0 ? `Col ${c+1} Header` : `Cell ${r},${c+1}`;
+                    html += `<input type="text" data-row="${r}" data-col="${c}" value="${placeholder}" class="flex-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded px-2 py-1 text-xs outline-none focus:ring-1 focus:ring-blue-500">`;
+                }
+                html += `</div>`;
+            }
+            tableGridContainer.innerHTML = html;
+        }
+
+        function generateCustomTable() {
+            const rows = parseInt(document.getElementById('table-rows').value) || 3;
+            const cols = parseInt(document.getElementById('table-cols').value) || 3;
+            const inputs = tableGridContainer.querySelectorAll('input');
+            
+            let gridData = Array.from({length: rows}, () => Array(cols).fill(''));
+            inputs.forEach(inputEl => {
+                const r = parseInt(inputEl.dataset.row);
+                const c = parseInt(inputEl.dataset.col);
+                gridData[r][c] = inputEl.value.trim() || ' ';
+            });
+
+            let headerRow = '| ' + gridData[0].join(' | ') + ' |\n';
+            let dividerRow = '| ' + Array(cols).fill('---').join(' | ') + ' |\n';
+            let bodyRows = '';
+
+            for (let r = 1; r < rows; r++) {
+                bodyRows += '| ' + gridData[r].join(' | ') + ' |\n';
+            }
+
+            const tableMarkdown = `\n${headerRow}${dividerRow}${bodyRows}\n`;
+            
+            const start = input.selectionStart;
+            input.value = input.value.substring(0, start) + tableMarkdown + input.value.substring(start);
+            closeTableModal();
+            input.focus();
+            updatePreview();
+            localStorage.setItem('markcraft_content', input.value);
+        }
+
+        // Utility Actions
+        function copyMarkdown() {
+            navigator.clipboard.writeText(input.value).then(() => {
+                showToast("Copied Markdown to clipboard!");
+            });
+        }
+
+        function copyHTML() {
+            const htmlText = preview.innerHTML;
+            navigator.clipboard.writeText(htmlText).then(() => {
+                showToast("Copied converted HTML to clipboard!");
+            });
+        }
+
+        function copyBoth() {
+            const markdownText = input.value;
+            const htmlText = preview.innerHTML;
+            const combinedOutput = `--- MARKDOWN ---\n${markdownText}\n\n--- HTML ---\n${htmlText}`;
+
+            navigator.clipboard.writeText(combinedOutput).then(() => {
+                showToast("Copied both Markdown & HTML to clipboard!");
+            });
+        }
+
+        function exportHTML() {
+            const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exported Document</title>
+    <script src="https://cdn.tailwindcss.com"><\/script>
+</head>
+<body class="p-8 max-w-4xl mx-auto prose">
+    ${preview.innerHTML}
+</body>
+</html>`;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'document.html';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast("Exported HTML file!");
+        }
+
+        function clearEditor() {
+            if (confirm("Are you sure you want to clear the editor?")) {
+                input.value = "";
+                updatePreview();
+                localStorage.removeItem('markcraft_content');
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            toast.classList.add('opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 2000);
+        }
+
+        // Initial Render
+        updatePreview();
+    </script>
+</body>
+</html>
