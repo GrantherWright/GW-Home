@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOBj Studio - Custom Markup Editor & HTML Converter</title>
+    <title>TOBj Studio - Custom Markup Engine & HTML Exporter</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -24,7 +24,7 @@
             </div>
             <div>
                 <h1 class="font-bold text-gray-800 dark:text-gray-100 text-lg leading-tight">TOBj Studio</h1>
-                <p class="text-xs text-gray-500 dark:text-gray-400">Custom Markup Engine & HTML Exporter</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Advanced TOBj Markup Engine with GIDs</p>
             </div>
         </div>
 
@@ -54,52 +54,64 @@
         <!-- Block Group (__) -->
         <div class="flex items-center space-x-1 bg-white dark:bg-gray-900 px-2 py-1 rounded border border-gray-200 dark:border-gray-700 shadow-xs">
             <span class="text-xs font-semibold text-purple-500 uppercase tracking-wider mr-1">Block (__)</span>
-            <button onclick="insertSnippet('__center', 'Hello')" class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition text-xs font-mono" title="Center Alignment">Center</button>
-            <button onclick="insertSnippet('__bgcolor(#f0f0f0)', 'Hello')" class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition text-xs font-mono" title="Background Color">BgColor</button>
-            <button onclick="insertSnippet('__padding(1rem)', 'Hello')" class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition text-xs font-mono" title="Padding">Padding</button>
+            <button onclick="insertSnippet('__center', 'Hello')" class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition text-xs font-mono">Center</button>
+            <button onclick="insertSnippet('__bgcolor(#f0f0f0)', 'Hello')" class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition text-xs font-mono">BgColor</button>
+            <button onclick="insertSnippet('__padding(1rem)', 'Hello')" class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition text-xs font-mono">Padding</button>
         </div>
 
         <!-- Inline-Block Group (_i) -->
         <div class="flex items-center space-x-1 bg-white dark:bg-gray-900 px-2 py-1 rounded border border-gray-200 dark:border-gray-700 shadow-xs">
             <span class="text-xs font-semibold text-blue-500 uppercase tracking-wider mr-1">Inline-Block (_i)</span>
-            <button onclick="insertSnippet('_ibgcolor(#eee)', 'Hello')" class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition text-xs font-mono" title="Inline Block Background">iBgColor</button>
-            <button onclick="insertSnippet('_ipadding(0.5rem)', 'Hello')" class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition text-xs font-mono" title="Inline Block Padding">iPadding</button>
+            <button onclick="insertSnippet('_i_ibgcolor(#eee)', 'Hello')" class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition text-xs font-mono">iBgColor</button>
+            <button onclick="insertSnippet('_i_ipadding(0.5rem)', 'Hello')" class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition text-xs font-mono">iPadding</button>
         </div>
 
         <!-- Inline Group (_) -->
         <div class="flex items-center space-x-1 bg-white dark:bg-gray-900 px-2 py-1 rounded border border-gray-200 dark:border-gray-700 shadow-xs">
             <span class="text-xs font-semibold text-emerald-500 uppercase tracking-wider mr-1">Inline (_)</span>
-            <button onclick="insertSnippet('_bold', 'Hello')" class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition text-xs font-bold" title="Bold">Bold</button>
-            <button onclick="insertSnippet('_italic', 'Hello')" class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition text-xs italic" title="Italic">Italic</button>
-            <button onclick="insertSnippet('_color(red)', 'Hello')" class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition text-xs font-mono" title="Color">Color</button>
+            <button onclick="insertSnippet('_bold', 'Hello')" class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition text-xs font-bold">Bold</button>
+            <button onclick="insertSnippet('_italic', 'Hello')" class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition text-xs italic">Italic</button>
+            <button onclick="insertSnippet('_color(red)', 'Hello')" class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300 transition text-xs font-mono">Color</button>
         </div>
 
-        <!-- Combined Full Example -->
+        <!-- Rule 5 Demo -->
         <div class="flex items-center space-x-1 bg-white dark:bg-gray-900 px-2 py-1 rounded border border-gray-200 dark:border-gray-700 shadow-xs">
             <button onclick="insertRule5Example()" class="px-2 py-1 bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 text-purple-600 dark:text-purple-300 rounded transition text-xs font-semibold flex items-center gap-1">
-                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Insert Combined Rule 5 Demo
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Insert Rule 5 Demo with GID
             </button>
         </div>
-    </div>
+    </header>
 
-    <!-- Main Split-Pane Workspace -->
-    <main class="flex-1 flex flex-col md:flex-row overflow-hidden p-4 gap-4 bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
-        <!-- Editor Pane -->
+    <!-- Main 3-Panel Workspace -->
+    <main class="flex-1 flex flex-col lg:flex-row overflow-hidden p-4 gap-4 bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
+        
+        <!-- Panel 1: TOBj Syntax Editor -->
         <div class="flex-1 flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-200">
             <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex justify-between items-center">
-                <span>TOBj Input Syntax</span>
-                <span id="stats" class="text-gray-400 dark:text-gray-500 font-normal normal-case">0 chars</span>
+                <span>1. TOBj Syntax Input</span>
+                <span id="tobj-stats" class="text-gray-400 dark:text-gray-500 font-normal normal-case">0 chars</span>
             </div>
-            <textarea id="tobj-input" class="flex-1 p-4 resize-none outline-none font-mono text-sm text-gray-800 dark:text-gray-200 bg-transparent leading-relaxed" placeholder="Type TOBj markup like {[ __center; _bold ]} [[Hello World]]..."></textarea>
+            <textarea id="tobj-input" class="flex-1 p-4 resize-none outline-none font-mono text-sm text-gray-800 dark:text-gray-200 bg-transparent leading-relaxed" placeholder="Type TOBj markup..."></textarea>
         </div>
 
-        <!-- Live Preview Pane -->
+        <!-- Panel 2: HTML Syntax Code Review -->
+        <div class="flex-1 flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-200">
+            <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex justify-between items-center">
+                <span>2. Generated HTML Code Review</span>
+                <button onclick="copyHTML()" class="text-xs text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1">
+                    <i data-lucide="copy" class="w-3 h-3"></i> Copy HTML
+                </button>
+            </div>
+            <pre id="html-output" class="flex-1 p-4 overflow-auto font-mono text-xs text-purple-700 dark:text-purple-300 bg-gray-50 dark:bg-gray-900/50 leading-relaxed"></pre>
+        </div>
+
+        <!-- Panel 3: Rendered HTML Preview -->
         <div class="flex-1 flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-200">
             <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Live Rendered Preview & Generated HTML
+                <span>3. Live Rendered Preview</span>
             </div>
-            <div id="preview-output" class="flex-1 p-6 overflow-y-auto text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 space-y-4">
-                <!-- Rendered output appears here -->
+            <div id="preview-output" class="flex-1 p-6 overflow-y-auto text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 flex items-center justify-center">
+                <!-- Live rendered DOM appears here -->
             </div>
         </div>
     </main>
@@ -115,15 +127,23 @@
         lucide.createIcons();
 
         const input = document.getElementById('tobj-input');
-        const preview = document.getElementById('preview-output');
-        const stats = document.getElementById('stats');
+        const htmlOutput = document.getElementById('html-output');
+        const previewOutput = document.getElementById('preview-output');
+        const stats = document.getElementById('tobj-stats');
 
-        // Load saved content from LocalStorage or default sample (Rule 5 demo)
-        const savedTOBj = localStorage.getItem('tobj_content');
+        // Helper to generate 10-digit random hex ID (tobj-xxxx)
+        function generateGID() {
+            const hex = Math.floor(Math.random() * 0xFFFFFFFFFF).toString(16).padStart(10, '0');
+            return `tobj-${hex}`;
+        }
+
+        // Load saved content or default sample with GID
+        const savedTOBj = localStorage.getItem('tobj_content_gid');
         if (savedTOBj !== null) {
             input.value = savedTOBj;
         } else {
-            input.value = "{[ __center; _i_ibgcolor(#eee); _bold; _color(red) ]} [[Hello World]]";
+            const sampleGid = generateGID();
+            input.value = `{[ __center; _i_ibgcolor(#eee); _bold; _color(red); data-gid(${sampleGid}) ]} [[Hello World]]`;
         }
 
         // Dark Mode State Management
@@ -141,149 +161,133 @@
             lucide.createIcons();
         }
 
-        // Custom TOBj Parser Engine (Following Rules 1-9)
+        // Custom TOBj Parser Engine supporting GIDs and Reordering (Block -> Inline-Block -> Inline)
         function parseTOBj(text) {
-            // Regex to match {[ attributes ]} [[ content ]]
-            // Handles nesting recursively by processing inner matches first
             const tobjRegex = /\{\[\s*([^\]]*?)\s*\]\}\s*\[\[([\s\S]*?)\]\]/;
 
             let currentText = text;
             let match;
 
-            // Loop to handle nested TOBj (Rule 7 & 8)
             while ((match = tobjRegex.exec(currentText)) !== null) {
                 const fullMatch = match[0];
                 const rawAttrs = match[1];
                 let innerContent = match[2];
 
-                // Recursively parse inner content first if it contains TOBj
+                // Recursively parse inner content
                 innerContent = parseTOBj(innerContent);
 
-                // Split attributes by semicolon (Rule 2)
                 const attrList = rawAttrs.split(';').map(a => a.trim()).filter(a => a.length > 0);
 
                 let blockStyles = [];
                 let inlineBlockStyles = [];
                 let inlineStyles = [];
+                let explicitGid = '';
 
-                // Categorize attributes (Rule 3)
+                // Categorize attributes
                 attrList.forEach(attr => {
-                    let cssProp = '';
                     let valMatch = attr.match(/\((.*?)\)/);
                     let val = valMatch ? valMatch[1] : '';
                     let cleanName = attr.replace(/\(.*\)/, '').trim();
 
-                    // Map attributes to CSS styles
-                    if (cleanName.startsWith('__')) {
-                        // Block level (__)
+                    if (cleanName === 'data-gid') {
+                        explicitGid = val;
+                    } else if (cleanName.startsWith('__')) {
                         let propName = cleanName.substring(2);
-                        if (propName === 'center') cssProp = 'text-align: center;';
-                        else if (propName === 'bgcolor') cssProp = `background-color: ${val};`;
-                        else if (propName === 'padding') cssProp = `padding: ${val};`;
-                        else cssProp = `${propName.replace(/_/g, '-')}: ${val || 'initial'};`;
-                        blockStyles.push(cssProp);
+                        if (propName === 'center') blockStyles.push('text-align: center;');
+                        else if (propName === 'bgcolor') blockStyles.push(`background-color: ${val};`);
+                        else if (propName === 'padding') blockStyles.push(`padding: ${val};`);
+                        else blockStyles.push(`${propName.replace(/_/g, '-')}: ${val || 'initial'};`);
                     } 
                     else if (cleanName.startsWith('_i')) {
-                        // Inline-block level (_i)
-                        let propName = cleanName.substring(2); // removes _i
-                        if (propName === 'ibgcolor' || propName === 'bgcolor') cssProp = `background-color: ${val};`;
-                        else if (propName === 'ipadding' || propName === 'padding') cssProp = `padding: ${val};`;
-                        else cssProp = `${propName.replace(/_/g, '-')}: ${val || 'initial'};`;
-                        inlineBlockStyles.push(cssProp);
+                        let propName = cleanName.substring(2);
+                        if (propName === 'ibgcolor' || propName === 'bgcolor') inlineBlockStyles.push(`background-color: ${val};`);
+                        else if (propName === 'ipadding' || propName === 'padding') inlineBlockStyles.push(`padding: ${val};`);
+                        else inlineBlockStyles.push(`${propName.replace(/_/g, '-')}: ${val || 'initial'};`);
                     } 
                     else if (cleanName.startsWith('_')) {
-                        // Inline level (_)
                         let propName = cleanName.substring(1);
-                        if (propName === 'bold') cssProp = 'font-weight: bold;';
-                        else if (propName === 'italic') cssProp = 'font-style: italic;';
-                        else if (propName === 'color') cssProp = `color: ${val};`;
-                        else if (propName === 'fontsize') cssProp = `font-size: ${val}rem;`;
-                        else cssProp = `${propName.replace(/_/g, '-')}: ${val || 'initial'};`;
-                        inlineStyles.push(cssProp);
+                        if (propName === 'bold') inlineStyles.push('font-weight: bold;');
+                        else if (propName === 'italic') inlineStyles.push('font-style: italic;');
+                        else if (propName === 'color') inlineStyles.push(`color: ${val};`);
+                        else if (propName === 'fontsize') inlineStyles.push(`font-size: ${val}rem;`);
+                        else inlineStyles.push(`${propName.replace(/_/g, '-')}: ${val || 'initial'};`);
                     }
                 });
 
-                // Assemble Layers (Innermost → Outermost: Inline → Inline-Block → Block)
+                // Assign GIDs (fallback to auto-generated if missing)
+                const gid = explicitGid || generateGID();
+
+                // Build HTML Layers (Innermost -> Outermost)
                 let assembledHTML = innerContent;
 
-                // 1. Inline Layer (span)
-                if (inlineStyles.length > 0) {
-                    assembledHTML = `<span style="${inlineStyles.join(' ')}">${assembledHTML}</span>`;
+                if (inlineStyles.length > 0 || !blockStyles.length && !inlineBlockStyles.length) {
+                    assembledHTML = `<span data-gid="${gid}" style="${inlineStyles.join(' ')}">${assembledHTML}</span>`;
                 }
 
-                // 2. Inline-Block Layer (div with display: inline-block)
                 if (inlineBlockStyles.length > 0 || attrList.some(a => a.startsWith('_i'))) {
                     let ibStyles = `display: inline-block; ${inlineBlockStyles.join(' ')}`;
-                    assembledHTML = `<div style="${ibStyles}">${assembledHTML}</div>`;
+                    assembledHTML = <div data-gid="${gid}" style="${ibStyles}">${assembledHTML}</div>;
                 }
 
-                // 3. Block Layer (div)
                 if (blockStyles.length > 0) {
-                    assembledHTML = `<div style="${blockStyles.join(' ')}">${assembledHTML}</div>`;
+                    assembledHTML = <div data-gid="${gid}" style="${blockStyles.join(' ')}">${assembledHTML}</div>;
                 }
 
-                // If no attributes provided at all, just return content
-                if (blockStyles.length === 0 && inlineBlockStyles.length === 0 && inlineStyles.length === 0) {
-                    assembledHTML = `<span>${innerContent}</span>`;
-                }
-
-                // Replace current TOBj token with generated HTML
                 currentText = currentText.replace(fullMatch, assembledHTML);
             }
 
             return currentText;
         }
 
-        // Update preview & local storage on input
+        // Helper to format HTML cleanly for display in Panel 2
+        function formatHTML(html) {
+            let formatted = '';
+            let indent = 0;
+            html.split(/>\s*</).forEach(node => {
+                if (node.match(/^\/\w/)) indent--;
+                formatted += '    '.repeat(Math.max(0, indent)) + '<' + node + '>\r\n';
+                if (node.match(/^<?\w[^>]*[^\/]$/)) indent++;
+            });
+            return formatted.substring(2, formatted.length - 2);
+        }
+
+        // Update application views on input
         input.addEventListener('input', () => {
-            updatePreview();
-            localStorage.setItem('tobj_content', input.value);
+            updatePanels();
+            localStorage.setItem('tobj_content_gid', input.value);
         });
 
-        function updatePreview() {
+        function updatePanels() {
             const text = input.value;
             stats.textContent = `${text.length} chars`;
             
             try {
                 const renderedHTML = parseTOBj(text);
-                preview.innerHTML = `
-                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900/50 mb-4">
-                        <div class="text-xs font-bold text-gray-400 uppercase mb-2">Visual Render:</div>
-                        <div class="p-3 bg-white dark:bg-gray-800 rounded border border-gray-100 dark:border-gray-700 shadow-xs">
-                            ${renderedHTML}
-                        </div>
-                    </div>
-                    <div>
-                        <div class="text-xs font-bold text-gray-400 uppercase mb-2">Generated HTML Code:</div>
-                        <pre class="p-3 bg-gray-900 text-purple-300 rounded font-mono text-xs overflow-x-auto">${escapeHTML(renderedHTML)}</pre>
-                    </div>
-                `;
+                htmlOutput.textContent = formatHTML(renderedHTML);
+                previewOutput.innerHTML = renderedHTML;
             } catch (err) {
-                preview.innerHTML = `<span class="text-red-500 text-xs">Parsing error: ${err.message}</span>`;
+                htmlOutput.textContent = `Parsing error: ${err.message}`;
+                previewOutput.innerHTML = `<span class="text-red-500 text-xs">Error</span>`;
             }
-        }
-
-        function escapeHTML(str) {
-            return str.replace(/[&<>'"]/g, 
-                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-            );
         }
 
         // Helper Insertion Buttons
         function insertSnippet(attr, content) {
             const start = input.selectionStart;
             const text = input.value;
-            const snippet = `{[ ${attr} ]} [[${content}]]`;
+            const gid = generateGID();
+            const snippet = `{[ ${attr}; data-gid(${gid}) ]} [[${content}]]`;
             input.value = text.substring(0, start) + snippet + text.substring(start);
             input.focus();
-            updatePreview();
-            localStorage.setItem('tobj_content', input.value);
+            updatePanels();
+            localStorage.setItem('tobj_content_gid', input.value);
         }
 
         function insertRule5Example() {
-            input.value = "{[ __center; _i_ibgcolor(#eee); _bold; _color(red) ]} [[Hello World]]";
-            updatePreview();
-            localStorage.setItem('tobj_content', input.value);
+            const gid = generateGID();
+            input.value = `{[ __center; _i_ibgcolor(#eee); _bold; _color(red); data-gid(${gid}) ]} [[Hello World]]`;
+            updatePanels();
+            localStorage.setItem('tobj_content_gid', input.value);
         }
 
         // Utility Actions
@@ -303,8 +307,8 @@
         function clearEditor() {
             if (confirm("Are you sure you want to clear the editor?")) {
                 input.value = "";
-                updatePreview();
-                localStorage.removeItem('tobj_content');
+                updatePanels();
+                localStorage.removeItem('tobj_content_gid');
             }
         }
 
@@ -320,7 +324,7 @@
         }
 
         // Initial Render
-        updatePreview();
+        updatePanels();
     </script>
 </body>
 </html>
