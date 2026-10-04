@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOBj Studio - Attribute Ribbon</title>
-    <!-- Tailwind CSS for clean layout & Lucide for icons -->
+    <title>TOBj Studio - Icon Ribbon</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* Custom Blue-Family Theme Styling */
         .theme-light-blue {
             background-color: #f0f9ff;
             border-color: #bae6fd;
             color: #0369a1;
         }
-        .theme-light-blue:hover {
+        .theme-light-blue:hover, .theme-light-blue:active {
             background-color: #e0f2fe;
         }
 
@@ -23,7 +21,7 @@
             border-color: #7dd3fc;
             color: #0284c7;
         }
-        .theme-medium-blue:hover {
+        .theme-medium-blue:hover, .theme-medium-blue:active {
             background-color: #bae6fd;
         }
 
@@ -32,7 +30,7 @@
             border-color: #bfdbfe;
             color: #1d4ed8;
         }
-        .theme-medium-dark-blue:hover {
+        .theme-medium-dark-blue:hover, .theme-medium-dark-blue:active {
             background-color: #dbeafe;
         }
     </style>
@@ -44,29 +42,31 @@
         <header class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-800 pb-4">
             <div>
                 <h1 class="text-2xl font-bold tracking-tight text-white">TOBj Studio Ribbon</h1>
-                <p class="text-sm text-slate-400">Interactive attribute toolbar grouped by category and styled via hierarchical blue themes.</p>
+                <p class="text-sm text-slate-400">Icon-only toolbar grouped by execution hierarchy (Block, Inline-Block, Inline).</p>
             </div>
             <div class="flex items-center gap-3 mt-4 md:mt-0 text-xs">
                 <span class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-sky-950/60 border border-sky-800 text-sky-300">
-                    <span class="w-2 h-2 rounded-full bg-sky-400"></span> Block (Light Blue)
+                    <span class="w-2 h-2 rounded-full bg-sky-400"></span> Block
                 </span>
                 <span class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-blue-950/60 border border-blue-800 text-blue-300">
-                    <span class="w-2 h-2 rounded-full bg-blue-400"></span> Inline-Block (Medium Blue)
+                    <span class="w-2 h-2 rounded-full bg-blue-400"></span> Inline-Block
                 </span>
                 <span class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-indigo-950/60 border border-indigo-800 text-indigo-300">
-                    <span class="w-2 h-2 rounded-full bg-indigo-500"></span> Inline (Medium-Dark Blue)
+                    <span class="w-2 h-2 rounded-full bg-indigo-500"></span> Inline
                 </span>
             </div>
         </header>
 
-        <!-- Ribbon Container -->
-        <main id="ribbon-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            <!-- Dynamically populated via script -->
+        <!-- Ribbon Container Grouped by Type -->
+        <main id="ribbon-container" class="space-y-4">
+            <!-- Populated dynamically -->
         </main>
     </div>
 
+    <!-- Custom Shared Tooltip Element (Supports iOS & Desktop) -->
+    <div id="custom-tooltip" class="fixed z-50 px-3 py-1.5 text-xs bg-slate-950 text-slate-100 border border-slate-700 rounded-md shadow-xl pointer-events-none hidden max-w-xs transition-opacity duration-100 opacity-0"></div>
+
     <script>
-        // Embedded Complete Registry Data
         const REG_ATTR = {
           "__left": { type: "block", label: "Left", category: "Alignment", syntax: "__left", result: "Align block content to the left", icon: "align-left", theme: "light-blue" },
           "__center": { type: "block", label: "Center", category: "Alignment", syntax: "__center", result: "Center-align block content", icon: "align-center", theme: "light-blue" },
@@ -174,52 +174,111 @@
           "_text_outline": { type: "inline", label: "Text Outline", category: "Text Styling", syntax: "_text_outline(value)", result: "Add an outline stroke to text", icon: "pen-tool", theme: "medium-dark-blue" }
         };
 
-        // Group attributes by Category
-        const grouped = {};
+        // Group by Type (block, inlineblock, inline)
+        const typeGroups = {
+            "block": { title: "Block Attributes", items: [] },
+            "inlineblock": { title: "Inline-Block Attributes", items: [] },
+            "inline": { title: "Inline Attributes", items: [] }
+        };
+
         for (const [key, attr] of Object.entries(REG_ATTR)) {
-            const cat = attr.category || "General";
-            if (!grouped[cat]) grouped[cat] = [];
-            grouped[cat].push({ key, ...attr });
+            const t = attr.type;
+            if (typeGroups[t]) {
+                typeGroups[t].items.push({ key, ...attr });
+            }
         }
 
-        // Render Ribbon Groups
         const container = document.getElementById('ribbon-container');
-        
-        for (const [category, items] of Object.entries(grouped)) {
-            const groupCard = document.createElement('div');
-            groupCard.className = "bg-slate-800/80 border border-slate-700/60 rounded-lg p-3 flex flex-col shadow-sm";
-            
-            // Category Title
-            const title = document.createElement('h3');
-            title.className = "text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 px-1";
-            title.textContent = category;
-            groupCard.appendChild(title);
+        const tooltip = document.getElementById('custom-tooltip');
+        let activeTouchTimer = null;
 
-            // Button Flex/Wrap Container
+        // Render sections
+        for (const [groupKey, groupData] of Object.entries(typeGroups)) {
+            if (groupData.items.length === 0) continue;
+
+            const section = document.createElement('div');
+            section.className = "bg-slate-800/80 border border-slate-700/60 rounded-lg p-3.5 shadow-sm";
+            
+            const title = document.createElement('h2');
+            title.className = "text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 px-1 border-b border-slate-700/50 pb-1.5";
+            title.textContent = groupData.title;
+            section.appendChild(title);
+
             const btnWrapper = document.createElement('div');
             btnWrapper.className = "flex flex-wrap gap-1.5";
 
-            items.forEach(item => {
+            groupData.items.forEach(item => {
                 const btn = document.createElement('button');
-                btn.title = item.result; // Tooltip populated from 'result'
-                btn.className = `flex items-center gap-1.5 px-2.5 py-1.5 rounded text-xs font-medium border transition-all duration-150 cursor-pointer shadow-2xs ${item.theme}`;
                 
-                // Icon + Label
-                btn.innerHTML = `<i data-lucide="${item.icon || 'circle'}" class="w-3.5 h-3.5"></i><span>${item.label}</span>`;
+                // Formatted Tooltip Text: block: label: result
+                const tooltipText = `${item.type}: ${item.label}: ${item.result}`;
                 
-                // Click action placeholder
+                // Icon only button class styling
+                btn.className = `p-2 rounded-md border transition-all duration-150 cursor-pointer flex items-center justify-center shadow-2xs ${item.theme}`;
+                btn.innerHTML = `<i data-lucide="${item.icon || 'circle'}" class="w-4 h-4"></i>`;
+
+                // Show Tooltip Handler
+                const showTooltip = (e) => {
+                    tooltip.textContent = tooltipText;
+                    tooltip.classList.remove('hidden');
+                    
+                    // Position tooltip near the button
+                    const rect = btn.getBoundingClientRect();
+                    let left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2);
+                    let top = rect.bottom + 6;
+
+                    // Prevent clipping off screen edges
+                    if (left < 10) left = 10;
+                    if (left + 200 > window.innerWidth) left = window.innerWidth - 210;
+                    if (top + 40 > window.innerHeight) top = rect.top - 36;
+
+                    tooltip.style.left = `${left}px`;
+                    tooltip.style.top = `${top}px`;
+                    
+                    setTimeout(() => tooltip.classList.remove('opacity-0'), 10);
+                };
+
+                // Hide Tooltip Handler
+                const hideTooltip = () => {
+                    tooltip.classList.add('opacity-0');
+                    setTimeout(() => tooltip.classList.add('hidden'), 100);
+                };
+
+                // Desktop Hover Events
+                btn.addEventListener('mouseenter', showTooltip);
+                btn.addEventListener('mouseleave', hideTooltip);
+
+                // iOS Touch / Tap Events (Shows tooltip on tap, hides after delay or tap elsewhere)
+                btn.addEventListener('touchstart', (e) => {
+                    e.preventDefault(); // Prevents double firing mouse events on mobile
+                    showTooltip();
+                    
+                    if (activeTouchTimer) clearTimeout(activeTouchTimer);
+                    activeTouchTimer = setTimeout(hideTooltip, 2500); // auto-hide after 2.5s on mobile
+                }, { passive: false });
+
                 btn.addEventListener('click', () => {
-                    console.log(`Clicked: ${item.syntax} -> ${item.result}`);
+                    console.log(`Action executed: ${item.syntax}`);
                 });
 
                 btnWrapper.appendChild(btn);
             });
 
-            groupCard.appendChild(btnWrapper);
-            container.appendChild(groupCard);
+            section.appendChild(btnWrapper);
+            container.appendChild(section);
         }
 
-        // Initialize Lucide Icons
+        // Hide tooltip if tapping anywhere else on mobile
+        document.addEventListener('touchstart', (e) => {
+            if (!e.target.closest('button')) {
+                hideTooltipMobile = () => {
+                    tooltip.classList.add('opacity-0');
+                    setTimeout(() => tooltip.classList.add('hidden'), 100);
+                };
+                hideTooltipMobile();
+            }
+        });
+
         lucide.createIcons();
     </script>
 </body>
