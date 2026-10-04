@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOBj Studio - Ultra-Slim Ribbon</title>
+    <title>TOBj Studio - Word-Style Ribbon</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -11,27 +11,30 @@
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
 
-        .theme-block { background-color: #f0f9ff; border-color: #bae6fd; color: #0369a1; }
-        .theme-block:hover { background-color: #e0f2fe; }
+        /* White background with tier-themed icon/text colors */
+        .theme-block { background-color: #ffffff; border-color: #bae6fd; color: #0369a1; }
+        .theme-block:hover { background-color: #f0f9ff; }
+        .theme-block svg { stroke: #0369a1; }
 
-        .theme-iblock { background-color: #e0f2fe; border-color: #7dd3fc; color: #0284c7; }
-        .theme-iblock:hover { background-color: #bae6fd; }
+        .theme-iblock { background-color: #ffffff; border-color: #7dd3fc; color: #0284c7; }
+        .theme-iblock:hover { background-color: #e0f2fe; }
+        .theme-iblock svg { stroke: #0284c7; }
 
-        .theme-inline { background-color: #1d4ed8; border-color: #2563eb; color: #ffffff; }
-        .theme-inline:hover { background-color: #1e40af; }
-        .theme-inline svg { stroke: #ffffff; }
+        .theme-inline { background-color: #ffffff; border-color: #bfdbfe; color: #1d4ed8; }
+        .theme-inline:hover { background-color: #eff6ff; }
+        .theme-inline svg { stroke: #1d4ed8; }
 
         .ribbon-control { position: relative; display: inline-flex; align-items: center; }
 
         /* Validation States */
-        .input-valid { border-color: #22c55e !important; background-color: rgba(34, 197, 94, 0.1) !important; }
-        .input-invalid { border-color: #ef4444 !important; background-color: rgba(239, 68, 68, 0.1) !important; }
+        .input-valid { border-color: #22c55e !important; background-color: rgba(34, 197, 94, 0.05) !important; }
+        .input-invalid { border-color: #ef4444 !important; background-color: rgba(239, 68, 68, 0.05) !important; }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans select-none m-0 p-1.5 overflow-x-hidden">
+<body class="bg-slate-900 text-slate-100 font-sans select-none m-0 p-1 overflow-x-hidden">
 
-    <!-- Stacked Ultra-Slim Ribbon Container -->
-    <div id="stacked-ribbon" class="space-y-1 w-full max-w-7xl mx-auto">
+    <!-- Stacked Ribbon Container -->
+    <div id="stacked-ribbon" class="space-y-1.5 w-full max-w-7xl mx-auto">
         <!-- Populated dynamically via script -->
     </div>
 
@@ -39,7 +42,6 @@
     <div id="custom-tooltip" class="fixed z-50 px-2 py-0.5 text-[10px] bg-slate-950 text-slate-100 border border-slate-700 rounded shadow-xl pointer-events-none hidden max-w-xs transition-opacity duration-100 opacity-0"></div>
 
     <script>
-        // Validation Regex Patterns
         const REGEX_RULES = {
             css_size: /^(auto|fit-content|inherit|initial|revert|unset|0|(-?\d+(\.\d+)?(px|em|rem|%|vh|vw|pt|pc|in|cm|mm)))$/i,
             integer: /^-?\d+$/,
@@ -207,13 +209,14 @@
         }
 
         tiers.forEach(tier => {
-            const tierSection = document.createElement('div');
-            tierSection.className = "bg-slate-950 border border-slate-800 rounded p-1.5 shadow-sm";
+            // Tier Box with label pinned to border
+            const tierSection = document.createElement('fieldset');
+            tierSection.className = "border border-slate-700/80 rounded px-2 pb-1.5 pt-0.5 m-0 bg-slate-950";
             
-            const tierHeader = document.createElement('h2');
-            tierHeader.className = "text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 px-1 border-b border-slate-800/60 pb-0.5";
-            tierHeader.textContent = tier.title;
-            tierSection.appendChild(tierHeader);
+            const tierLegend = document.createElement('legend');
+            tierLegend.className = "text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1 bg-slate-950";
+            tierLegend.textContent = tier.title;
+            tierSection.appendChild(tierLegend);
 
             const catMap = {};
             for (const [key, attr] of Object.entries(REG_ATTR)) {
@@ -224,22 +227,13 @@
                 }
             }
 
-            // Single row scrollable container per tier
-            const rowWrapper = document.createElement('div');
-            rowWrapper.className = "flex flex-nowrap gap-2 items-center overflow-x-auto pb-0.5";
+            // Wrapper allowing wrapping as a set
+            const wrapContainer = document.createElement('div');
+            wrapContainer.className = "flex flex-wrap gap-1.5 items-center";
 
-            let catIndex = 0;
             for (const [catName, items] of Object.entries(catMap)) {
-                if (catIndex > 0) {
-                    // Subtle vertical divider between category sections
-                    const divider = document.createElement('div');
-                    divider.className = "h-5 w-[1px] bg-slate-800 flex-shrink-0 mx-0.5";
-                    rowWrapper.appendChild(divider);
-                }
-                catIndex++;
-
                 const subBox = document.createElement('div');
-                subBox.className = "bg-slate-900/40 border border-slate-800/80 rounded p-1 flex flex-nowrap gap-1 items-center flex-shrink-0";
+                subBox.className = "bg-slate-900/30 border border-slate-800/60 rounded p-1 flex flex-wrap gap-1 items-center";
                 
                 items.forEach(item => {
                     const controlDiv = document.createElement('div');
@@ -259,7 +253,7 @@
                     } else if (item.control === "color") {
                         const wrap = document.createElement('label');
                         wrap.className = `p-1 rounded border transition-all cursor-pointer flex items-center gap-0.5 shadow-2xs ${item.theme}`;
-                        wrap.innerHTML = `<i data-lucide="${item.icon || 'palette'}" class="w-3.5 h-3.5"></i><input type="color" value="#000000" class="w-3 h-3 opacity-80 cursor-pointer bg-transparent border-0">`;
+                        wrap.innerHTML = `<i data-lucide="${item.icon || 'palette'}" class="w-3.5 h-3.5"></i><input type="color" value="#000000" class="w-3 h-3 opacity-90 cursor-pointer bg-transparent border-0">`;
                         attachTooltip(wrap, tooltipText);
                         const input = wrap.querySelector('input');
                         input.addEventListener('change', (e) => {
@@ -270,8 +264,15 @@
                         controlDiv.appendChild(wrap);
 
                     } else if (item.control === "select") {
+                        const selectWrap = document.createElement('div');
+                        selectWrap.className = `flex items-center border rounded px-1 py-0.5 gap-1 ${item.theme}`;
+                        
+                        const iconSpan = document.createElement('span');
+                        iconSpan.className = "flex items-center p-0.5";
+                        iconSpan.innerHTML = `<i data-lucide="${item.icon || 'case-sensitive'}" class="w-3.5 h-3.5"></i>`;
+
                         const select = document.createElement('select');
-                        select.className = "px-1.5 py-0.5 text-[11px] rounded border bg-slate-900 text-slate-200 border-slate-700 cursor-pointer focus:outline-none";
+                        select.className = "px-1 py-0.5 text-[10px] rounded border bg-white text-slate-800 border-slate-300 cursor-pointer focus:outline-none";
                         item.options.forEach(opt => {
                             const option = document.createElement('option');
                             option.value = opt;
@@ -279,26 +280,30 @@
                             if (opt === item.default) option.selected = true;
                             select.appendChild(option);
                         });
-                        attachTooltip(select, tooltipText);
+
+                        selectWrap.appendChild(iconSpan);
+                        selectWrap.appendChild(select);
+                        attachTooltip(selectWrap, tooltipText);
+
                         select.addEventListener('change', (e) => {
                             const valSelect = e.target.value;
                             const finalSyntax = item.syntax.replace('{value}', valSelect);
                             window.parent.postMessage({ action: 'tobj_insert', syntax: finalSyntax, key: item.key }, '*');
                         });
-                        controlDiv.appendChild(select);
+                        controlDiv.appendChild(selectWrap);
 
                     } else if (item.control === "text") {
                         const inputWrap = document.createElement('div');
-                        inputWrap.className = "flex items-center bg-slate-900 border border-slate-700 rounded px-1 py-0.5 gap-0.5";
+                        inputWrap.className = `flex items-center border rounded px-1 py-0.5 gap-0.5 ${item.theme}`;
                         
                         const iconSpan = document.createElement('span');
-                        iconSpan.className = "flex items-center text-slate-400 p-0.5";
+                        iconSpan.className = "flex items-center p-0.5";
                         iconSpan.innerHTML = `<i data-lucide="${item.icon || 'type'}" class="w-3 h-3"></i>`;
                         
                         const input = document.createElement('input');
                         input.type = "text";
                         input.value = item.default || "";
-                        input.className = "w-12 text-[11px] bg-transparent text-slate-100 focus:outline-none px-0.5";
+                        input.className = "w-11 text-[10px] bg-white text-slate-900 border border-slate-300 rounded focus:outline-none px-0.5";
                         
                         inputWrap.appendChild(iconSpan);
                         inputWrap.appendChild(input);
@@ -310,7 +315,6 @@
                             const pattern = REGEX_RULES[ruleKey] || REGEX_RULES.text;
 
                             if (pattern.test(valText)) {
-                                // Valid input: flash green, send message
                                 input.classList.remove('input-invalid');
                                 input.classList.add('input-valid');
                                 setTimeout(() => input.classList.remove('input-valid'), 600);
@@ -318,7 +322,6 @@
                                 const finalSyntax = item.syntax.replace('{value}', valText);
                                 window.parent.postMessage({ action: 'tobj_insert', syntax: finalSyntax, key: item.key }, '*');
                             } else {
-                                // Invalid input: flash red, reject
                                 input.classList.remove('input-valid');
                                 input.classList.add('input-invalid');
                                 setTimeout(() => input.classList.remove('input-invalid'), 800);
@@ -342,10 +345,10 @@
                     subBox.appendChild(controlDiv);
                 });
 
-                rowWrapper.appendChild(subBox);
+                wrapContainer.appendChild(subBox);
             }
 
-            tierSection.appendChild(rowWrapper);
+            tierSection.appendChild(wrapContainer);
             container.appendChild(tierSection);
         });
 
