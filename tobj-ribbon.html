@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOBj Studio - Word-Style Ribbon with Pill Wrappers</title>
+    <title>TOBj Studio - Word-Style Ribbon</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -11,7 +11,6 @@
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
 
-        /* White background with tier-themed icon/text colors */
         .theme-block { background-color: #ffffff; border-color: #bae6fd; color: #0369a1; }
         .theme-block:hover { background-color: #f0f9ff; }
         .theme-block svg { stroke: #0369a1; }
@@ -24,7 +23,6 @@
         .theme-inline:hover { background-color: #eff6ff; }
         .theme-inline svg { stroke: #1d4ed8; }
 
-        /* Active state for applied styles/attributes */
         .ribbon-btn.active, .theme-block.active, .theme-iblock.active, .theme-inline.active {
             background-color: #eff6ff !important;
             border-color: #3b82f6 !important;
@@ -36,7 +34,6 @@
 
         .ribbon-control { position: relative; display: inline-flex; align-items: center; }
 
-        /* Pill Wrapper styling for grouped controls */
         .pill-wrapper {
             display: inline-flex;
             align-items: center;
@@ -60,7 +57,6 @@
             stroke: #ffffff !important;
         }
 
-        /* Always-visible reset badge when the color picker label is active */
         .reset-badge {
             display: none;
             font-size: 11px;
@@ -73,11 +69,9 @@
         label.active .reset-badge { display: inline-block; }
         .reset-badge:hover { color: #ef4444; }
 
-        /* Validation States */
         .input-valid { border-color: #22c55e !important; background-color: rgba(34, 197, 94, 0.05) !important; }
         .input-invalid { border-color: #ef4444 !important; background-color: rgba(239, 68, 68, 0.05) !important; }
 
-        /* iOS Zoom Prevention */
         .no-zoom-input {
             font-size: 16px !important;
             transform: scale(0.65);
@@ -89,12 +83,7 @@
 </head>
 <body class="bg-[#f8fafc] text-slate-700 font-sans select-none m-0 p-1 overflow-x-hidden">
 
-    <!-- Stacked Ribbon Container -->
-    <div id="stacked-ribbon" class="space-y-1.5 w-full max-w-7xl mx-auto">
-        <!-- Populated dynamically via script -->
-    </div>
-
-    <!-- Custom Shared Tooltip Element -->
+    <div id="stacked-ribbon" class="space-y-1.5 w-full max-w-7xl mx-auto"></div>
     <div id="custom-tooltip" class="fixed z-50 px-2 py-1 text-[10px] leading-tight bg-slate-900 text-slate-100 border border-slate-700 rounded shadow-xl pointer-events-none hidden max-w-[240px] break-words whitespace-normal transition-opacity duration-100 opacity-0"></div>
 
     <script>
@@ -105,7 +94,6 @@
             text: /^.*$/
         };
 
-        // Master 100-item dictionary mapped with explicit behavioral models and groups
         const REG_ATTR = {
           // --- BLOCK TIER ---
           "__left": { type: "block", label: "Left", category: "Alignment", behavior: "radio", group: "alignment", control: "toggle", syntax: "__left", result: "Align block content left", icon: "align-left", theme: "theme-block" },
@@ -113,27 +101,27 @@
           "__right": { type: "block", label: "Right", category: "Alignment", behavior: "radio", group: "alignment", control: "toggle", syntax: "__right", result: "Align block content right", icon: "align-right", theme: "theme-block" },
           "__text_align_justify": { type: "block", label: "Justify", category: "Alignment", behavior: "radio", group: "alignment", control: "toggle", syntax: "__text_align_justify", result: "Justify block text", icon: "align-justify", theme: "theme-block" },
 
-          "__center_block": { type: "block", label: "Center Block", category: "Layout", behavior: "radio", group: "layout-mode", control: "toggle", syntax: "__center_block", result: "Center block horizontally", icon: "align-horizontal-space-center", theme: "theme-block" },
-          "__float_left": { type: "block", label: "Float Left", category: "Layout", behavior: "radio", group: "layout-mode", control: "toggle", syntax: "__float_left", result: "Float element left", icon: "move-left", theme: "theme-block" },
-          "__float_right": { type: "block", label: "Float Right", category: "Layout", behavior: "radio", group: "layout-mode", control: "toggle", syntax: "__float_right", result: "Float element right", icon: "move-right", theme: "theme-block" },
-          "__flex": { type: "block", label: "Flex", category: "Layout", behavior: "radio", group: "layout-mode", control: "toggle", syntax: "__flex", result: "Enable flex layout", icon: "layout-grid", theme: "theme-block" },
+          "__center_block": { type: "block", label: "Center Block", category: "Layout", behavior: "radio", group: "layout-mode", control: "toggle", syntax: "__center_block", result: "Center block horizontally", icon: "maximize-2", theme: "theme-block" },
+          "__float_left": { type: "block", label: "Float Left", category: "Layout", behavior: "radio", group: "layout-mode", control: "toggle", syntax: "__float_left", result: "Float element left", icon: "arrow-left", theme: "theme-block" },
+          "__float_right": { type: "block", label: "Float Right", category: "Layout", behavior: "radio", group: "layout-mode", control: "toggle", syntax: "__float_right", result: "Float element right", icon: "arrow-right", theme: "theme-block" },
+          "__flex": { type: "block", label: "Flex", category: "Layout", behavior: "radio", group: "layout-mode", control: "toggle", syntax: "__flex", result: "Enable flex layout", icon: "grid", theme: "theme-block" },
           "__flex_center": { type: "block", label: "Flex Center", category: "Layout", behavior: "radio", group: "layout-mode", control: "toggle", syntax: "__flex_center", result: "Center flex items", icon: "align-center", theme: "theme-block" },
           "__flex_column": { type: "block", label: "Flex Column", category: "Layout", behavior: "radio", group: "layout-mode", control: "toggle", syntax: "__flex_column", result: "Arrange flex vertically", icon: "list", theme: "theme-block" },
-          "__absolute": { type: "block", label: "Absolute", category: "Layout", behavior: "radio", group: "layout-mode", control: "toggle", syntax: "__absolute", result: "Position absolute", icon: "locate", theme: "theme-block" },
+          "__absolute": { type: "block", label: "Absolute", category: "Layout", behavior: "radio", group: "layout-mode", control: "toggle", syntax: "__absolute", result: "Position absolute", icon: "crosshair", theme: "theme-block" },
           "__relative": { type: "block", label: "Relative", category: "Layout", behavior: "radio", group: "layout-mode", control: "toggle", syntax: "__relative", result: "Position relative", icon: "compass", theme: "theme-block" },
-          "__sticky": { type: "block", label: "Sticky", category: "Layout", behavior: "radio", group: "layout-mode", control: "toggle", syntax: "__sticky", result: "Make element sticky", icon: "pin", theme: "theme-block" },
+          "__sticky": { type: "block", label: "Sticky", category: "Layout", behavior: "radio", group: "layout-mode", control: "toggle", syntax: "__sticky", result: "Make element sticky", icon: "anchor", theme: "theme-block" },
 
-          "__bgcolor": { type: "block", label: "Bg Color", category: "Background", behavior: "freestanding", control: "color", syntax: "__bgcolor(value)", result: "Set block background color", icon: "paint-bucket", theme: "theme-block" },
+          "__bgcolor": { type: "block", label: "Bg Color", category: "Background", behavior: "freestanding", control: "color", syntax: "__bgcolor(value)", result: "Set block background color", icon: "palette", theme: "theme-block" },
           "__border": { type: "block", label: "Border", category: "Background", behavior: "checkbox", control: "toggle", syntax: "__border", result: "Add solid border", icon: "square", theme: "theme-block" },
           "__rounded": { type: "block", label: "Rounded", category: "Background", behavior: "checkbox", control: "toggle", syntax: "__rounded", result: "Apply rounded corners", icon: "circle", theme: "theme-block" },
           "__shadow": { type: "block", label: "Shadow", category: "Background", behavior: "checkbox", control: "toggle", syntax: "__shadow", result: "Add drop shadow", icon: "layers", theme: "theme-block" },
 
           "__margin": { type: "block", label: "Margin", category: "Spacing", behavior: "freestanding", control: "text", validate: "css_size", default: "1rem", syntax: "__margin(value)", result: "Set margin", icon: "maximize", theme: "theme-block" },
-          "__margin_top": { type: "block", label: "Margin Top", category: "Spacing", behavior: "freestanding", control: "text", validate: "css_size", default: "1rem", syntax: "__margin_top(value)", result: "Set top margin", icon: "arrow-up-to-line", theme: "theme-block" },
-          "__margin_bottom": { type: "block", label: "Margin Bottom", category: "Spacing", behavior: "freestanding", control: "text", validate: "css_size", default: "1rem", syntax: "__margin_bottom(value)", result: "Set bottom margin", icon: "arrow-down-to-line", theme: "theme-block" },
+          "__margin_top": { type: "block", label: "Margin Top", category: "Spacing", behavior: "freestanding", control: "text", validate: "css_size", default: "1rem", syntax: "__margin_top(value)", result: "Set top margin", icon: "arrow-up", theme: "theme-block" },
+          "__margin_bottom": { type: "block", label: "Margin Bottom", category: "Spacing", behavior: "freestanding", control: "text", validate: "css_size", default: "1rem", syntax: "__margin_bottom(value)", result: "Set bottom margin", icon: "arrow-down", theme: "theme-block" },
           "__margin_vertical": { type: "block", label: "Margin Vert", category: "Spacing", behavior: "freestanding", control: "text", validate: "css_size", default: "1rem", syntax: "__margin_vertical(value)", result: "Set vertical margin", icon: "move-vertical", theme: "theme-block" },
           "__margin_horizontal": { type: "block", label: "Margin Horiz", category: "Spacing", behavior: "freestanding", control: "text", validate: "css_size", default: "1rem", syntax: "__margin_horizontal(value)", result: "Set horizontal margin", icon: "move-horizontal", theme: "theme-block" },
-          "__padding": { type: "block", label: "Padding", category: "Spacing", behavior: "freestanding", control: "text", validate: "css_size", default: "1rem", syntax: "__padding(value)", result: "Set padding", icon: "box-select", theme: "theme-block" },
+          "__padding": { type: "block", label: "Padding", category: "Spacing", behavior: "freestanding", control: "text", validate: "css_size", default: "1rem", syntax: "__padding(value)", result: "Set padding", icon: "box", theme: "theme-block" },
           "__padding_vertical": { type: "block", label: "Padding Vert", category: "Spacing", behavior: "freestanding", control: "text", validate: "css_size", default: "1rem", syntax: "__padding_vertical(value)", result: "Set vertical padding", icon: "move-vertical", theme: "theme-block" },
           "__padding_horizontal": { type: "block", label: "Padding Horiz", category: "Spacing", behavior: "freestanding", control: "text", validate: "css_size", default: "1rem", syntax: "__padding_horizontal(value)", result: "Set horizontal padding", icon: "move-horizontal", theme: "theme-block" },
 
@@ -144,22 +132,22 @@
           "__min_height": { type: "block", label: "Min Height", category: "Dimension", behavior: "freestanding", control: "text", validate: "css_size", default: "auto", syntax: "__min_height(value)", result: "Set min height", icon: "minimize-2", theme: "theme-block" },
           "__max_height": { type: "block", label: "Max Height", category: "Dimension", behavior: "freestanding", control: "text", validate: "css_size", default: "auto", syntax: "__max_height(value)", result: "Set max height", icon: "maximize-2", theme: "theme-block" },
 
-          "__columns": { type: "block", label: "Columns", category: "Layout", behavior: "freestanding", control: "text", validate: "integer", default: "2", syntax: "__columns(value)", result: "Split into columns", icon: "columns-2", theme: "theme-block" },
+          "__columns": { type: "block", label: "Columns", category: "Layout", behavior: "freestanding", control: "text", validate: "integer", default: "2", syntax: "__columns(value)", result: "Split into columns", icon: "columns", theme: "theme-block" },
           "__column_gap": { type: "block", label: "Col Gap", category: "Layout", behavior: "freestanding", control: "text", validate: "css_size", default: "2rem", syntax: "__column_gap(value)", result: "Set column gap", icon: "space", theme: "theme-block" },
-          "__column_rule": { type: "block", label: "Col Rule", category: "Layout", behavior: "freestanding", control: "text", validate: "text", default: "1px solid #ccc", syntax: "__column_rule(value)", result: "Add column rule", icon: "separator-vertical", theme: "theme-block" },
+          "__column_rule": { type: "block", label: "Col Rule", category: "Layout", behavior: "freestanding", control: "text", validate: "text", default: "1px solid #ccc", syntax: "__column_rule(value)", result: "Add column rule", icon: "minus", theme: "theme-block" },
           "__z_index": { type: "block", label: "Z-Index", category: "Layout", behavior: "freestanding", control: "text", validate: "integer", default: "1", syntax: "__z_index(value)", result: "Set stacking order", icon: "layers", theme: "theme-block" },
           "__opacity": { type: "block", label: "Opacity", category: "Effects", behavior: "freestanding", control: "text", validate: "number", default: "1", syntax: "__opacity(value)", result: "Set transparency", icon: "eye", theme: "theme-block" },
 
           "__blockindent": { type: "block", label: "Block Indent", category: "Indentation", behavior: "radio", group: "indent", control: "toggle", syntax: "__blockindent", result: "Indent block", icon: "indent", theme: "theme-block" },
-          "__hanging_indent": { type: "block", label: "Hanging Indent", category: "Indentation", behavior: "radio", group: "indent", control: "toggle", syntax: "__hanging_indent", result: "Hanging indent", icon: "list-tree", theme: "theme-block" },
+          "__hanging_indent": { type: "block", label: "Hanging Indent", category: "Indentation", behavior: "radio", group: "indent", control: "toggle", syntax: "__hanging_indent", result: "Hanging indent", icon: "list", theme: "theme-block" },
           "__first_line_indent": { type: "block", label: "1st Line Indent", category: "Indentation", behavior: "radio", group: "indent", control: "toggle", syntax: "__first_line_indent", result: "First line indent", icon: "heading", theme: "theme-block" },
-          "__negative_indent": { type: "block", label: "Neg Indent", category: "Indentation", behavior: "radio", group: "indent", control: "toggle", syntax: "__negative_indent", result: "Negative indent", icon: "arrow-left-from-line", theme: "theme-block" },
-          "__outdent": { type: "block", label: "Outdent", category: "Indentation", behavior: "radio", group: "indent", control: "toggle", syntax: "__outdent", result: "Outdent block", icon: "arrow-left-from-line", theme: "theme-block" },
+          "__negative_indent": { type: "block", label: "Neg Indent", category: "Indentation", behavior: "radio", group: "indent", control: "toggle", syntax: "__negative_indent", result: "Negative indent", icon: "arrow-left", theme: "theme-block" },
+          "__outdent": { type: "block", label: "Outdent", category: "Indentation", behavior: "radio", group: "indent", control: "toggle", syntax: "__outdent", result: "Outdent block", icon: "arrow-left", theme: "theme-block" },
           "__safe": { type: "block", label: "Safe Margins", category: "Layout", behavior: "freestanding", control: "toggle", syntax: "__safe", result: "Safe margins", icon: "shield", theme: "theme-block" },
 
           // --- INLINE-BLOCK TIER (_i) ---
           "_ibgcolor": { type: "inlineblock", label: "IBg Color", category: "Background", behavior: "freestanding", control: "color", syntax: "_ibgcolor(value)", result: "Set inline-block background", icon: "palette", theme: "theme-iblock" },
-          "_iborder": { type: "inlineblock", label: "IBorder", category: "Background", behavior: "checkbox", control: "toggle", syntax: "_iborder", result: "Add inline-block border", icon: "box", theme: "theme-iblock" },
+          "_iborder": { type: "inlineblock", label: "IBorder", category: "Background", behavior: "checkbox", control: "toggle", syntax: "_iborder", result: "Add inline-block border", icon: "square", theme: "theme-iblock" },
           "_irounded": { type: "inlineblock", label: "IRounded", category: "Background", behavior: "checkbox", control: "toggle", syntax: "_irounded", result: "Rounded inline-block", icon: "circle", theme: "theme-iblock" },
           "_ishadow": { type: "inlineblock", label: "IShadow", category: "Background", behavior: "checkbox", control: "toggle", syntax: "_ishadow", result: "Shadow inline-block", icon: "layers", theme: "theme-iblock" },
 
@@ -169,7 +157,7 @@
           "_imargin": { type: "inlineblock", label: "IMargin", category: "Spacing", behavior: "freestanding", control: "text", validate: "css_size", default: "1rem", syntax: "_imargin(value)", result: "Inline-block margin", icon: "maximize", theme: "theme-iblock" },
           "_imargin_vertical": { type: "inlineblock", label: "IMargin Vert", category: "Spacing", behavior: "freestanding", control: "text", validate: "css_size", default: "1rem", syntax: "_imargin_vertical(value)", result: "Vertical margin", icon: "move-vertical", theme: "theme-iblock" },
           "_imargin_horizontal": { type: "inlineblock", label: "IMargin Horiz", category: "Spacing", behavior: "freestanding", control: "text", validate: "css_size", default: "1rem", syntax: "_imargin_horizontal(value)", result: "Horizontal margin", icon: "move-horizontal", theme: "theme-iblock" },
-          "_ipadding": { type: "inlineblock", label: "IPadding", category: "Spacing", behavior: "freestanding", control: "text", validate: "css_size", default: "1rem", syntax: "_ipadding(value)", result: "Inline-block padding", icon: "box-select", theme: "theme-iblock" },
+          "_ipadding": { type: "inlineblock", label: "IPadding", category: "Spacing", behavior: "freestanding", control: "text", validate: "css_size", default: "1rem", syntax: "_ipadding(value)", result: "Inline-block padding", icon: "box", theme: "theme-iblock" },
           "_ipadding_vertical": { type: "inlineblock", label: "IPadding Vert", category: "Spacing", behavior: "freestanding", control: "text", validate: "css_size", default: "1rem", syntax: "_ipadding_vertical(value)", result: "Vertical padding", icon: "move-vertical", theme: "theme-iblock" },
           "_ipadding_horizontal": { type: "inlineblock", label: "IPadding Horiz", category: "Spacing", behavior: "freestanding", control: "text", validate: "css_size", default: "1rem", syntax: "_ipadding_horizontal(value)", result: "Horizontal padding", icon: "move-horizontal", theme: "theme-iblock" },
 
@@ -179,17 +167,17 @@
           "_imax_width": { type: "inlineblock", label: "IMax Width", category: "Dimension", behavior: "freestanding", control: "text", validate: "css_size", default: "auto", syntax: "_imax_width(value)", result: "Max width", icon: "maximize-2", theme: "theme-iblock" },
           "_imin_height": { type: "inlineblock", label: "IMin Height", category: "Dimension", behavior: "freestanding", control: "text", validate: "css_size", default: "auto", syntax: "_imin_height(value)", result: "Min height", icon: "minimize-2", theme: "theme-iblock" },
           "_imax_height": { type: "inlineblock", label: "IMax Height", category: "Dimension", behavior: "freestanding", control: "text", validate: "css_size", default: "auto", syntax: "_imax_height(value)", result: "Max height", icon: "maximize-2", theme: "theme-iblock" },
-          "_icolumns": { type: "inlineblock", label: "IColumns", category: "Layout", behavior: "freestanding", control: "text", validate: "integer", default: "2", syntax: "_icolumns(value)", result: "Columns", icon: "columns-2", theme: "theme-iblock" },
+          "_icolumns": { type: "inlineblock", label: "IColumns", category: "Layout", behavior: "freestanding", control: "text", validate: "integer", default: "2", syntax: "_icolumns(value)", result: "Columns", icon: "columns", theme: "theme-iblock" },
 
-          "_iletter_spacing": { type: "inlineblock", label: "ILetter Space", category: "Typography", behavior: "freestanding", control: "text", validate: "css_size", default: "0.1em", syntax: "_iletter_spacing(value)", result: "Letter spacing", icon: "fold-horizontal", theme: "theme-iblock" },
-          "_itext_transform": { type: "inlineblock", label: "IText Xform", category: "Typography", behavior: "freestanding", control: "text", validate: "text", default: "none", syntax: "_itext_transform(value)", result: "Text transform", icon: "case-upper", theme: "theme-iblock" },
+          "_iletter_spacing": { type: "inlineblock", label: "ILetter Space", category: "Typography", behavior: "freestanding", control: "text", validate: "css_size", default: "0.1em", syntax: "_iletter_spacing(value)", result: "Letter spacing", icon: "space", theme: "theme-iblock" },
+          "_itext_transform": { type: "inlineblock", label: "IText Xform", category: "Typography", behavior: "freestanding", control: "text", validate: "text", default: "none", syntax: "_itext_transform(value)", result: "Text transform", icon: "type", theme: "theme-iblock" },
           "_ifont_weight": { type: "inlineblock", label: "IFont Weight", category: "Typography", behavior: "freestanding", control: "text", validate: "text", default: "normal", syntax: "_ifont_weight(value)", result: "Font weight", icon: "bold", theme: "theme-iblock" },
           "_itext_shadow": { type: "inlineblock", label: "IText Shadow", category: "Typography", behavior: "freestanding", control: "text", validate: "text", default: "none", syntax: "_itext_shadow(value)", result: "Text shadow", icon: "sparkles", theme: "theme-iblock" },
 
           "_iindent": { type: "inlineblock", label: "IIndent", category: "Indentation", behavior: "radio", group: "iindent", control: "toggle", syntax: "_iindent", result: "Indent", icon: "indent", theme: "theme-iblock" },
-          "_ihanging_indent": { type: "inlineblock", label: "IHanging Ind", category: "Indentation", behavior: "radio", group: "iindent", control: "toggle", syntax: "_ihanging_indent", result: "Hanging indent", icon: "list-tree", theme: "theme-iblock" },
+          "_ihanging_indent": { type: "inlineblock", label: "IHanging Ind", category: "Indentation", behavior: "radio", group: "iindent", control: "toggle", syntax: "_ihanging_indent", result: "Hanging indent", icon: "list", theme: "theme-iblock" },
           "_ifirst_line_indent": { type: "inlineblock", label: "I1st Line Ind", category: "Indentation", behavior: "radio", group: "iindent", control: "toggle", syntax: "_ifirst_line_indent", result: "1st line indent", icon: "heading", theme: "theme-iblock" },
-          "_ioutdent": { type: "inlineblock", label: "IOutdent", category: "Indentation", behavior: "radio", group: "iindent", control: "toggle", syntax: "_ioutdent", result: "Outdent", icon: "arrow-left-from-line", theme: "theme-iblock" },
+          "_ioutdent": { type: "inlineblock", label: "IOutdent", category: "Indentation", behavior: "radio", group: "iindent", control: "toggle", syntax: "_ioutdent", result: "Outdent", icon: "arrow-left", theme: "theme-iblock" },
           "_iopacity": { type: "inlineblock", label: "IOpacity", category: "Effects", behavior: "freestanding", control: "text", validate: "number", default: "1", syntax: "_iopacity(value)", result: "Opacity", icon: "eye", theme: "theme-iblock" },
           "_itransform": { type: "inlineblock", label: "ITransform", category: "Effects", behavior: "freestanding", control: "text", validate: "text", default: "none", syntax: "_itransform(value)", result: "Transform", icon: "rotate-cw", theme: "theme-iblock" },
 
@@ -197,34 +185,34 @@
           "_bold": { type: "inline", label: "Bold", category: "Text Styling", behavior: "checkbox", control: "toggle", syntax: "_bold", result: "Bold text", icon: "bold", theme: "theme-inline" },
           "_italic": { type: "inline", label: "Italic", category: "Text Styling", behavior: "checkbox", control: "toggle", syntax: "_italic", result: "Italic text", icon: "italic", theme: "theme-inline" },
           "_underline": { type: "inline", label: "Underline", category: "Text Styling", behavior: "checkbox", control: "toggle", syntax: "_underline", result: "Underline text", icon: "underline", theme: "theme-inline" },
-          "_box": { type: "inline", label: "Box", category: "Text Styling", behavior: "checkbox", control: "toggle", syntax: "_box", result: "Box text", icon: "square-dashed", theme: "theme-inline" },
-          "_fontup": { type: "inline", label: "Font Up", category: "Text Styling", behavior: "checkbox", control: "toggle", syntax: "_fontup", result: "Increase size", icon: "arrow-up-from-line", theme: "theme-inline" },
-          "_fontdn": { type: "inline", label: "Font Down", category: "Text Styling", behavior: "checkbox", control: "toggle", syntax: "_fontdn", result: "Decrease size", icon: "arrow-down-to-line", theme: "theme-inline" },
-          "_overline": { type: "inline", label: "Overline", category: "Text Styling", behavior: "checkbox", control: "toggle", syntax: "_overline", result: "Overline text", icon: "overline", theme: "theme-inline" },
+          "_box": { type: "inline", label: "Box", category: "Text Styling", behavior: "checkbox", control: "toggle", syntax: "_box", result: "Box text", icon: "square", theme: "theme-inline" },
+          "_fontup": { type: "inline", label: "Font Up", category: "Text Styling", behavior: "checkbox", control: "toggle", syntax: "_fontup", result: "Increase size", icon: "arrow-up", theme: "theme-inline" },
+          "_fontdn": { type: "inline", label: "Font Down", category: "Text Styling", behavior: "checkbox", control: "toggle", syntax: "_fontdn", result: "Decrease size", icon: "arrow-down", theme: "theme-inline" },
+          "_overline": { type: "inline", label: "Overline", category: "Text Styling", behavior: "checkbox", control: "toggle", syntax: "_overline", result: "Overline text", icon: "minus", theme: "theme-inline" },
           "_line_through": { type: "inline", label: "Strikethrough", category: "Text Styling", behavior: "checkbox", control: "toggle", syntax: "_line_through", result: "Strikethrough", icon: "strikethrough", theme: "theme-inline" },
           "_double_underline": { type: "inline", label: "Dbl Underline", category: "Text Styling", behavior: "checkbox", control: "toggle", syntax: "_double_underline", result: "Double underline", icon: "underline", theme: "theme-inline" },
           "_wavy_underline": { type: "inline", label: "Wavy Underline", category: "Text Styling", behavior: "checkbox", control: "toggle", syntax: "_wavy_underline", result: "Wavy underline", icon: "activity", theme: "theme-inline" },
           "_dotted_underline": { type: "inline", label: "Dot Underline", category: "Text Styling", behavior: "checkbox", control: "toggle", syntax: "_dotted_underline", result: "Dotted underline", icon: "more-horizontal", theme: "theme-inline" },
           "_dashed_underline": { type: "inline", label: "Dash Underline", category: "Text Styling", behavior: "checkbox", control: "toggle", syntax: "_dashed_underline", result: "Dashed underline", icon: "minus", theme: "theme-inline" },
 
-          "_uppercase": { type: "inline", label: "Uppercase", category: "Text Styling", behavior: "radio", group: "case", control: "toggle", syntax: "_uppercase", result: "Uppercase text", icon: "case-upper", theme: "theme-inline" },
-          "_lowercase": { type: "inline", label: "Lowercase", category: "Text Styling", behavior: "radio", group: "case", control: "toggle", syntax: "_lowercase", result: "Lowercase text", icon: "case-lower", theme: "theme-inline" },
-          "_capitalize": { type: "inline", label: "Capitalize", category: "Text Styling", behavior: "radio", group: "case", control: "toggle", syntax: "_capitalize", result: "Capitalize words", icon: "case-sensitive", theme: "theme-inline" },
+          "_uppercase": { type: "inline", label: "Uppercase", category: "Text Styling", behavior: "radio", group: "case", control: "toggle", syntax: "_uppercase", result: "Uppercase text", icon: "type", theme: "theme-inline" },
+          "_lowercase": { type: "inline", label: "Lowercase", category: "Text Styling", behavior: "radio", group: "case", control: "toggle", syntax: "_lowercase", result: "Lowercase text", icon: "type", theme: "theme-inline" },
+          "_capitalize": { type: "inline", label: "Capitalize", category: "Text Styling", behavior: "radio", group: "case", control: "toggle", syntax: "_capitalize", result: "Capitalize words", icon: "type", theme: "theme-inline" },
           "_small_caps": { type: "inline", label: "Small Caps", category: "Text Styling", behavior: "radio", group: "case", control: "toggle", syntax: "_small_caps", result: "Small caps", icon: "type", theme: "theme-inline" },
 
           "_color": { type: "inline", label: "Color", category: "Colors", behavior: "freestanding", control: "color", syntax: "_color(value)", result: "Text color", icon: "droplet", theme: "theme-inline" },
-          "_bgcolor": { type: "inline", label: "Bg Color", category: "Colors", behavior: "freestanding", control: "color", syntax: "_bgcolor(value)", result: "Background color", icon: "highlighter", theme: "theme-inline" },
-          "_fontfamily": { type: "inline", label: "Font Family", category: "Text Styling", behavior: "freestanding", control: "select", options: ["Georgia", "Arial", "Verdana", "Times New Roman", "Courier New", "Helvetica", "Palatino", "Garamond", "Comic Sans MS", "Tahoma", "Trebuchet MS", "Impact", "Lucida Console", "Monaco", "Cursive"], default: "", syntax: "_fontfamily(value)", result: "Font family", icon: "case-sensitive", theme: "theme-inline" },
+          "_bgcolor": { type: "inline", label: "Bg Color", category: "Colors", behavior: "freestanding", control: "color", syntax: "_bgcolor(value)", result: "Background color", icon: "palette", theme: "theme-inline" },
+          "_fontfamily": { type: "inline", label: "Font Family", category: "Text Styling", behavior: "freestanding", control: "select", options: ["Georgia", "Arial", "Verdana", "Times New Roman", "Courier New", "Helvetica", "Palatino", "Garamond", "Comic Sans MS", "Tahoma", "Trebuchet MS", "Impact", "Lucida Console", "Monaco", "Cursive"], default: "", syntax: "_fontfamily(value)", result: "Font family", icon: "type", theme: "theme-inline" },
           "_fontsize": { type: "inline", label: "Font Size", category: "Spacing", behavior: "freestanding", control: "text", validate: "css_size", default: "5.0", syntax: "_fontsize(value)", result: "Font size", icon: "type", theme: "theme-inline" },
-          "_letter_spacing": { type: "inline", label: "Letter Space", category: "Spacing", behavior: "freestanding", control: "text", validate: "css_size", default: "0.1em", syntax: "_letter_spacing(value)", result: "Letter space", icon: "fold-horizontal", theme: "theme-inline" },
+          "_letter_spacing": { type: "inline", label: "Letter Space", category: "Spacing", behavior: "freestanding", control: "text", validate: "css_size", default: "0.1em", syntax: "_letter_spacing(value)", result: "Letter space", icon: "space", theme: "theme-inline" },
           "_word_spacing": { type: "inline", label: "Word Space", category: "Spacing", behavior: "freestanding", control: "text", validate: "css_size", default: "0.2em", syntax: "_word_spacing(value)", result: "Word space", icon: "space", theme: "theme-inline" },
-          "_line_height": { type: "inline", label: "Line Height", category: "Spacing", behavior: "freestanding", control: "text", validate: "number", default: "1.5", syntax: "_line_height(value)", result: "Line height", icon: "list-collapse", theme: "theme-inline" },
+          "_line_height": { type: "inline", label: "Line Height", category: "Spacing", behavior: "freestanding", control: "text", validate: "number", default: "1.5", syntax: "_line_height(value)", result: "Line height", icon: "list", theme: "theme-inline" },
           "_font_weight": { type: "inline", label: "Font Weight", category: "Text Styling", behavior: "freestanding", control: "text", validate: "text", default: "700", syntax: "_font_weight(value)", result: "Font weight", icon: "bold", theme: "theme-inline" },
           "_text_outline": { type: "inline", label: "Text Outline", category: "Text Styling", behavior: "freestanding", control: "text", validate: "text", default: "1px #333", syntax: "_text_outline(value)", result: "Text outline", icon: "pen-tool", theme: "theme-inline" },
 
           "_superscript": { type: "inline", label: "Superscript", category: "Special", behavior: "checkbox", control: "toggle", syntax: "_superscript", result: "Superscript", icon: "superscript", theme: "theme-inline" },
           "_subscript": { type: "inline", label: "Subscript", category: "Special", behavior: "checkbox", control: "toggle", syntax: "_subscript", result: "Subscript", icon: "subscript", theme: "theme-inline" },
-          "_clickme_str": { type: "inline", label: "ClickMe", category: "Special", behavior: "checkbox", control: "toggle", syntax: "_clickme_str", result: "Glass button", icon: "mouse-pointer-click", theme: "theme-inline" },
+          "_clickme_str": { type: "inline", label: "ClickMe", category: "Special", behavior: "checkbox", control: "toggle", syntax: "_clickme_str", result: "Glass button", icon: "mouse-pointer", theme: "theme-inline" },
           "_tab": { type: "inline", label: "Tab", category: "Special", behavior: "checkbox", control: "toggle", syntax: "_tab", result: "Tab indent", icon: "indent", theme: "theme-inline" }
         };
 
@@ -258,7 +246,7 @@
             };
             element.addEventListener('mouseenter', show);
             element.addEventListener('mouseleave', hide);
-            element.addEventListener('touchstart', (e) => {
+            element.addEventListener('touchstart', () => {
                 show();
                 if (activeTouchTimer) clearTimeout(activeTouchTimer);
                 activeTouchTimer = setTimeout(hide, 2500);
@@ -287,8 +275,6 @@
             wrapContainer.className = "flex flex-wrap gap-1.5 items-center";
 
             for (const [catName, items] of Object.entries(catMap)) {
-                // Group items into sub-boxes or pill wrappers
-                // We'll group radio items with the same 'group' property into a pill wrapper
                 const radioGroups = {};
                 const otherItems = [];
 
@@ -301,27 +287,23 @@
                     }
                 });
 
-                // Render non-radio items in standard sub-boxes
                 if (otherItems.length > 0) {
                     const subBox = document.createElement('div');
                     subBox.className = "bg-slate-50 border border-slate-200 rounded p-1 flex flex-wrap gap-1 items-center";
                     
                     otherItems.forEach(item => {
-                        const controlDiv = renderControl(item);
-                        subBox.appendChild(controlDiv);
+                        subBox.appendChild(renderControl(item));
                     });
                     wrapContainer.appendChild(subBox);
                 }
 
-                // Render radio groups inside dedicated Pill Wrappers
                 for (const [groupName, groupItems] of Object.entries(radioGroups)) {
                     const pillBox = document.createElement('div');
                     pillBox.className = "pill-wrapper";
                     pillBox.setAttribute('data-radio-group', groupName);
 
                     groupItems.forEach(item => {
-                        const controlDiv = renderControl(item, pillBox);
-                        pillBox.appendChild(controlDiv);
+                        pillBox.appendChild(renderControl(item, pillBox));
                     });
                     wrapContainer.appendChild(pillBox);
                 }
@@ -336,24 +318,33 @@
             controlDiv.className = "ribbon-control";
             controlDiv.setAttribute('data-key', item.key);
             const tooltipText = `${item.type}: ${item.label}: ${item.result}`;
+            const iconName = item.icon || 'circle';
 
             if (item.control === "toggle") {
                 const btn = document.createElement('button');
                 btn.className = `ribbon-btn p-1 rounded border transition-all cursor-pointer flex items-center justify-center shadow-2xs ${item.theme}`;
-                btn.innerHTML = `<i data-lucide="${item.icon || 'circle'}" class="w-3.5 h-3.5"></i>`;
+                btn.innerHTML = `<i data-lucide="${iconName}" class="w-3.5 h-3.5"></i>`;
                 attachTooltip(btn, tooltipText);
 
                 btn.addEventListener('click', () => {
                     if (item.behavior === 'radio' && pillContainer) {
-                        // Mutually exclusive behavior within pill wrapper
-                        pillContainer.querySelectorAll('.ribbon-control').forEach(rc => rc.classList.remove('active'));
+                        // Deactivate any currently active item in this radio group
+                        pillContainer.querySelectorAll('.ribbon-control').forEach(rc => {
+                            if (rc.classList.contains('active')) {
+                                rc.classList.remove('active');
+                                const oldKey = rc.getAttribute('data-key');
+                                const oldItem = REG_ATTR[oldKey];
+                                if (oldItem) {
+                                    window.parent.postMessage({ action: 'tobj_insert', syntax: oldItem.syntax, key: oldKey, active: false }, '*');
+                                }
+                            }
+                        });
                         pillContainer.querySelectorAll('.ribbon-btn').forEach(b => b.classList.remove('active'));
                         
                         controlDiv.classList.add('active');
                         btn.classList.add('active');
                         window.parent.postMessage({ action: 'tobj_insert', syntax: item.syntax, key: item.key, active: true }, '*');
                     } else {
-                        // Checkbox independent toggle behavior
                         controlDiv.classList.toggle('active');
                         btn.classList.toggle('active');
                         const isActive = btn.classList.contains('active');
@@ -366,7 +357,7 @@
                 const wrap = document.createElement('label');
                 wrap.className = `ribbon-btn p-1 rounded border transition-all cursor-pointer flex items-center gap-0.5 shadow-2xs ${item.theme}`;
                 wrap.innerHTML = `
-                    <i data-lucide="${item.icon || 'palette'}" class="w-3.5 h-3.5"></i>
+                    <i data-lucide="${iconName}" class="w-3.5 h-3.5"></i>
                     <input type="color" value="#000000" class="w-3 h-3 opacity-90 cursor-pointer bg-transparent border-0">
                     <span class="reset-badge" title="Clear color">×</span>
                 `;
@@ -397,7 +388,7 @@
                 
                 const iconSpan = document.createElement('span');
                 iconSpan.className = "flex items-center p-0.5";
-                iconSpan.innerHTML = `<i data-lucide="${item.icon || 'case-sensitive'}" class="w-3.5 h-3.5"></i>`;
+                iconSpan.innerHTML = `<i data-lucide="${iconName}" class="w-3.5 h-3.5"></i>`;
 
                 const select = document.createElement('select');
                 select.className = "no-zoom-input px-1 py-0.5 rounded border bg-white text-slate-800 border-slate-300 cursor-pointer focus:outline-none";
@@ -439,7 +430,7 @@
                 
                 const iconSpan = document.createElement('span');
                 iconSpan.className = "flex items-center p-0.5";
-                iconSpan.innerHTML = `<i data-lucide="${item.icon || 'type'}" class="w-3 h-3"></i>`;
+                iconSpan.innerHTML = `<i data-lucide="${iconName}" class="w-3 h-3"></i>`;
                 
                 const input = document.createElement('input');
                 input.type = "text";
@@ -496,7 +487,6 @@
             return controlDiv;
         }
 
-        // Hydration listener
         window.addEventListener('message', (event) => {
             const data = event.data;
             if (data && data.type === 'HYDRATE_RIBBON') {
@@ -522,6 +512,7 @@
             }
         });
 
+        // Initialize Lucide icons after dynamic DOM population
         lucide.createIcons();
     </script>
 </body>
